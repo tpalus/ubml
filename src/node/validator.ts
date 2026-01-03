@@ -8,7 +8,8 @@ import { resolve, basename } from 'path';
 import { type FileSystem, nodeFS } from './fs.js';
 import { parseFile } from './parser.js';
 import { 
-  createValidator, 
+  createValidator,
+  validate,
   type Validator, 
   type ValidationResult, 
   type ValidationError, 
@@ -18,6 +19,7 @@ import {
   getUBMLFilePatterns,
   type DocumentType,
 } from '../generated/metadata.js';
+import type { UBMLDocument } from '../parser.js';
 
 /**
  * Validation error with file location.
@@ -83,12 +85,12 @@ export interface WorkspaceValidationResult {
 export interface ValidateOptions {
   /** Custom file system implementation */
   fs?: FileSystem;
-  /** Validate cross-document references */
-  validateReferences?: boolean;
   /** Explicit list of files to validate (overrides workspace file) */
   files?: string[];
   /** Glob patterns to exclude */
   exclude?: string[];
+  /** Suppress unused-id warnings (useful for catalog documents) */
+  suppressUnusedWarnings?: boolean;
 }
 
 /**
@@ -317,38 +319,51 @@ export async function validateWorkspace(
     };
   }
 
-  // Create a single validator instance for all files
-  const validator = await createValidator();
+  // Parse all documents
+  const documents: UBMLDocument[] = [];
   const fileResults: FileValidationResult[] = [];
-
-  // Validate each file
+  
   for (const filepath of files) {
-    const errors: FileValidationError[] = [];
-    const warnings: FileValidationWarning[] = [];
-
-    // Parse the document
     const parseResult = await parseFile(filepath, { fs });
-    errors.push(...convertParseErrors(parseResult.errors, filepath));
-    warnings.push(...convertParseWarnings(parseResult.warnings, filepath));
-
-    let documentType: DocumentType | undefined;
-
+    const errors: FileValidationError[] = convertParseErrors(parseResult.errors, filepath);
+    const warnings: FileValidationWarning[] = convertParseWarnings(parseResult.warnings, filepath);
+    
     if (parseResult.ok && parseResult.document) {
-      documentType = parseResult.document.meta.type;
-      const result = validator.validateDocument(parseResult.document);
-
-      if (!result.valid) {
-        errors.push(...convertBrowserErrors(result.errors, filepath));
-      }
+      documents.push(parseResult.document);
     }
-
+    
     fileResults.push({
       path: filepath,
       valid: errors.length === 0,
-      documentType,
+      documentType: parseResult.document?.meta.type,
       errors,
       warnings,
     });
+  }
+
+  // Validate all documents (schema + references) in one call
+  const validationResult = await validate(documents, {
+    suppressUnusedWarnings: options.suppressUnusedWarnings,
+  });
+
+  // Distribute validation errors/warnings to file results
+  for (const error of validationResult.errors) {
+    if (error.filepath) {
+      const fileResult = fileResults.find(f => f.path.endsWith(error.filepath!));
+      if (fileResult) {
+        fileResult.errors.push(error as FileValidationError);
+        fileResult.valid = false;
+      }
+    }
+  }
+
+  for (const warning of validationResult.warnings) {
+    if (warning.filepath) {
+      const fileResult = fileResults.find(f => f.path.endsWith(warning.filepath!));
+      if (fileResult) {
+        fileResult.warnings.push(warning as FileValidationWarning);
+      }
+    }
   }
 
   const totalErrors = fileResults.reduce((sum, r) => sum + r.errors.length, 0);

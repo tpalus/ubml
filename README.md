@@ -22,7 +22,7 @@ Traditional modeling tools don't help:
 - **Diagramming tools** present blank canvases with no guidance
 - **Workshop notes** can't be validated, connected, or processed
 
-UBML solves this by treating business understanding as code—structured, validated, version-controlled, and designed for AI assistance.
+UBML solves this by treating business understanding as code - structured, validated, version-controlled and designed for AI assistance.
 
 ---
 
@@ -59,10 +59,10 @@ Whether you're figuring out *what to build* or *why it matters*, UBML provides a
 ## Key Features
 
 - **Version control** — Track changes to business processes with Git
-- **Validation** — Catch structural errors before they become misunderstandings  
+- **Validation** — Schema + cross-document references in one call 
 - **Editor support** — Red squiggles in VS Code as you type
 - **CLI for CI/CD** — Validate models in your pipeline
-- **Browser-safe** — Parse and validate in web applications
+- **Universal** — Works everywhere: browser, Node, Deno, Bun (zero Node deps)
 - **AI-ready** — Semantic structure designed for AI assistance
 - **Open standard** — MIT licensed, no vendor lock-in
 
@@ -169,10 +169,10 @@ ubml validate . --format json
 ### Library Usage
 
 ```typescript
-// Browser & Node — zero Node.js deps
-import { parse, createValidator, serialize, schemas } from 'ubml';
+// Parse, validate, serialize (works everywhere - browser, Node, Deno, Bun)
+import { parse, validate, serialize, schemas } from 'ubml';
 
-// Node.js only — file system operations  
+// Node.js file operations
 import { parseFile, validateWorkspace, serializeToFile } from 'ubml/node';
 
 // ESLint plugin
@@ -182,22 +182,41 @@ import ubml from 'ubml/eslint';
 ### Parse and Validate
 
 ```typescript
-import { parse, createValidator } from 'ubml';
+import { parse, validate } from 'ubml';
 
-const result = parse(yamlContent, 'process.ubml.yaml');
+// Parse documents
+const actors = parse(actorsYaml, 'actors.actors.ubml.yaml');
+const process = parse(processYaml, 'process.process.ubml.yaml');
 
-if (!result.ok) {
+// Validate everything (schema + cross-document references)
+const result = await validate([actors.document!, process.document!]);
+
+if (!result.valid) {
   for (const error of result.errors) {
-    console.error(`${error.line}:${error.column} - ${error.message}`);
+    console.error(`${error.filepath}: ${error.message}`);
   }
 }
 
-const validator = await createValidator();
-const validation = validator.validateDocument(result.document);
+// Check for warnings (unused IDs with line numbers)
+for (const warning of result.warnings) {
+  console.warn(`${warning.filepath}:${warning.line}:${warning.column} - ${warning.message}`);
+}
+```
 
-if (!validation.valid) {
-  for (const error of validation.errors) {
-    console.error(`${error.path}: ${error.message}`);
+### Validate Workspace (Node.js)
+
+```typescript
+import { validateWorkspace } from 'ubml/node';
+
+// Validate all UBML files in a directory (schema + references)
+const result = await validateWorkspace('./my-workspace');
+
+if (!result.valid) {
+  console.log(`${result.errorCount} errors in ${result.fileCount} files`);
+  for (const file of result.files) {
+    for (const error of file.errors) {
+      console.error(`${file.path}:${error.line} - ${error.message}`);
+    }
   }
 }
 ```

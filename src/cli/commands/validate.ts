@@ -6,7 +6,6 @@ import { Command } from 'commander';
 import { statSync } from 'fs';
 import { resolve } from 'path';
 import { validateFile, validateWorkspace } from '../../node/validator.js';
-import { validateReferences } from '../../node/semantic-validator.js';
 import { formatStylish } from '../formatters/stylish.js';
 import { formatJson } from '../formatters/json.js';
 import { formatSarif } from '../formatters/sarif.js';
@@ -17,8 +16,8 @@ export type OutputFormat = 'stylish' | 'json' | 'sarif';
 export interface ValidateOptions {
   format: OutputFormat;
   strict: boolean;
-  references: boolean;
   quiet: boolean;
+  suppressUnused: boolean;
 }
 
 /**
@@ -32,8 +31,8 @@ export function validateCommand(): Command {
     .argument('<path>', 'File or directory to validate')
     .option('-f, --format <format>', 'Output format: stylish, json, sarif', 'stylish')
     .option('-s, --strict', 'Treat warnings as errors', false)
-    .option('-r, --references', 'Validate cross-document references', true)
     .option('-q, --quiet', 'Only output errors', false)
+    .option('--suppress-unused', 'Suppress unused-id warnings (useful for catalog documents)', false)
     .action(async (path: string, options: ValidateOptions) => {
       const absolutePath = resolve(path);
       let isDirectory: boolean;
@@ -47,7 +46,7 @@ export function validateCommand(): Command {
 
       // Validate
       const rawResult = isDirectory
-        ? await validateWorkspace(absolutePath)
+        ? await validateWorkspace(absolutePath, { suppressUnusedWarnings: options.suppressUnused })
         : await validateFile(absolutePath);
 
       // Convert to unified format for formatters
@@ -68,14 +67,6 @@ export function validateCommand(): Command {
             warnings: (rawResult as Awaited<ReturnType<typeof validateFile>>).warnings,
             filesValidated: 1,
           };
-
-      // Validate references if enabled and validating a workspace
-      if (options.references && isDirectory) {
-        const refResult = await validateReferences(absolutePath);
-        result.errors.push(...refResult.errors);
-        result.warnings.push(...refResult.warnings);
-        result.valid = result.valid && refResult.valid;
-      }
 
       // Apply strict mode
       if (options.strict) {

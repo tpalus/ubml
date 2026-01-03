@@ -37,6 +37,8 @@ export interface ValidationError {
   path?: string;
   /** Error code/keyword for programmatic handling */
   code?: string;
+  /** File path (for cross-document errors) */
+  filepath?: string;
   /** Line number (1-indexed) */
   line?: number;
   /** Column number (1-indexed) */
@@ -52,8 +54,8 @@ export interface ValidationWarning {
   /** JSON path to the warning location */
   path?: string;
   /** Warning code for programmatic handling */
-  code?: string;
-  /** Line number (1-indexed) */
+  code?: string;  /** File path (for cross-document warnings) */
+  filepath?: string;  /** Line number (1-indexed) */
   line?: number;
   /** Column number (1-indexed) */
   column?: number;
@@ -291,5 +293,130 @@ export async function parseAndValidate<T = unknown>(
   return {
     ...parseResult,
     validation,
+  };
+}
+
+/**
+ * Options for validating multiple documents.
+ */
+export interface ValidateOptions {
+  /** Suppress unused-id warnings (useful for catalog documents) */
+  suppressUnusedWarnings?: boolean;
+}
+
+/**
+ * Validate multiple UBML documents (schema + cross-document references).
+ * 
+ * This is the unified validation function that handles both schema validation
+ * and cross-document reference validation in one call.
+ * 
+ * @param documents - Array of parsed UBML documents to validate
+ * @param options - Validation options
+ * 
+ * @example
+ * ```typescript
+ * import { parse, validate } from 'ubml';
+ * 
+ * const actors = parse(actorsYaml, 'actors.actors.ubml.yaml');
+ * const process = parse(processYaml, 'process.process.ubml.yaml');
+ * 
+ * const result = await validate([actors.document!, process.document!]);
+ * if (!result.valid) {
+ *   for (const error of result.errors) {
+ *     console.error(error.message);
+ *   }
+ * }
+ * ```
+ */
+export async function validate(
+  documents: UBMLDocument[],
+  options: ValidateOptions = {}
+): Promise<ValidationResult> {
+  const { extractDefinedIds, extractReferencedIds } = await import('./semantic-validator.js');
+  const errors: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
+  
+  const validator = await getValidator();
+  
+  // Phase 1: Validate each document against its schema
+  for (const doc of documents) {
+    const schemaResult = validator.validateDocument(doc);
+    errors.push(...schemaResult.errors);
+    warnings.push(...schemaResult.warnings);
+  }
+  
+  // Phase 2: Validate cross-document references
+  const definedIds = new Map<string, { filepath: string; path: string }>();
+  const referencedIds = new Map<string, string[]>();
+  
+  // Extract all defined IDs
+  for (const doc of documents) {
+    const filepath = doc.meta.filename || 'unknown';
+    const ids = extractDefinedIds(doc.content, filepath);
+    
+    for (const [id, info] of ids) {
+      if (definedIds.has(id)) {
+        const existing = definedIds.get(id)!;
+        errors.push({
+          code: 'ubml/duplicate-id',
+          message: `ID \"${id}\" is defined in multiple files: ${existing.filepath} and ${info.filepath}`,
+          filepath: info.filepath,
+          path: info.path,
+        });
+      } else {
+        definedIds.set(id, info);
+      }
+    }
+    
+    // Extract all referenced IDs
+    const refs = extractReferencedIds(doc.content, filepath);
+    for (const [id, locations] of refs) {
+      const existing = referencedIds.get(id) ?? [];
+      existing.push(...locations.map(l => l.filepath));
+      referencedIds.set(id, existing);
+    }
+  }
+  
+  // Check for undefined references
+  for (const [id, filepaths] of referencedIds) {
+    if (!definedIds.has(id)) {
+      const uniqueFiles = [...new Set(filepaths)];
+      for (const filepath of uniqueFiles) {
+        errors.push({
+          code: 'ubml/undefined-reference',
+          message: `Reference to undefined ID \"${id}\"`,
+          filepath,
+        });
+      }
+    }
+  }
+  
+  // Check for unused IDs (warning only)
+  if (!options.suppressUnusedWarnings) {
+    for (const [id, info] of definedIds) {
+      if (!referencedIds.has(id)) {
+        // Get the document to resolve source location
+        const doc = documents.find(d => d.meta.filename === info.filepath);
+        const jsonPointerPath = '/' + info.path.replace(/\./g, '/');
+        const location = doc?.getSourceLocation(jsonPointerPath);
+        
+        warnings.push({
+          code: 'ubml/unused-id',
+          message: `ID \"${id}\" is defined but never referenced`,
+          filepath: info.filepath,
+          path: info.path,
+          ...(location && {
+            line: location.line,
+            column: location.column,
+          }),
+        });
+      }
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
   };
 }

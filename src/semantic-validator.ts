@@ -1,12 +1,12 @@
 /**
- * Semantic validation for cross-document references.
+ * Browser-safe semantic validation (cross-document references).
+ * 
+ * This module provides the core validation logic without file system dependencies.
+ * For file system operations, use the Node.js version in `node/semantic-validator.ts`.
  */
 
-import { resolve } from 'path';
-import { type FileSystem, nodeFS } from './fs.js';
-import { parseFile } from './parser.js';
-import { isValidId, getUBMLFilePatterns } from '../generated/metadata.js';
-import type { UBMLDocument } from '../parser.js';
+import { isValidId, REFERENCE_FIELDS } from './generated/metadata.js';
+import type { UBMLDocument } from './parser.js';
 
 /**
  * Validation error for reference issues.
@@ -34,6 +34,10 @@ export interface ReferenceWarning {
   path?: string;
   /** Warning code */
   code?: string;
+  /** Line number (1-indexed) */
+  line?: number;
+  /** Column number (1-indexed) */
+  column?: number;
 }
 
 /**
@@ -47,23 +51,23 @@ export interface ReferenceValidationResult {
   /** Validation warnings */
   warnings: ReferenceWarning[];
   /** All defined IDs in the workspace */
-  definedIds: Map<string, string>; // ID -> filepath
+  definedIds: Map<string, { filepath: string; path: string }>;
   /** All referenced IDs in the workspace */
-  referencedIds: Map<string, string[]>; // ID -> filepaths where referenced
+  referencedIds: Map<string, string[]>;
 }
 
 /**
  * Options for reference validation.
  */
 export interface ReferenceValidateOptions {
-  /** Custom file system implementation */
-  fs?: FileSystem;
+  /** Suppress unused-id warnings (useful for catalog documents like entities, actors, metrics) */
+  suppressUnusedWarnings?: boolean;
 }
 
 /**
  * Extract all defined IDs from a document.
  */
-function extractDefinedIds(
+export function extractDefinedIds(
   content: unknown,
   filepath: string,
   path: string = ''
@@ -103,7 +107,7 @@ function extractDefinedIds(
 /**
  * Extract all referenced IDs from a document.
  */
-function extractReferencedIds(
+export function extractReferencedIds(
   content: unknown,
   filepath: string,
   path: string = ''
@@ -136,16 +140,8 @@ function extractReferencedIds(
       for (const [key, value] of Object.entries(obj)) {
         const currentPath = path ? `${path}.${key}` : key;
         
-        // Check reference fields
-        const refFields = [
-          'responsible', 'accountable', 'consulted', 'informed', 
-          'actor', 'actors', 'from', 'to', 'source', 'target', 
-          'parent', 'children', 'relatedTo', 'inputs', 'outputs', 
-          'resources', 'tools', 'systems', 'owner', 'members',
-          'subprocess', 'skills', 'entity', 'linkedHypotheses',
-        ];
-        
-        if (refFields.includes(key)) {
+        // Check if this key is a known reference field (auto-generated from schemas)
+        if (REFERENCE_FIELDS.includes(key as typeof REFERENCE_FIELDS[number])) {
           if (typeof value === 'string' && isValidId(value)) {
             addRef(value, currentPath);
           } else if (Array.isArray(value)) {
@@ -172,72 +168,62 @@ function extractReferencedIds(
 }
 
 /**
- * Validate cross-document references in a workspace.
+ * Validate cross-document references in a collection of pre-parsed documents.
  * 
- * @param dir - Workspace directory to validate
+ * This is the browser-safe version that accepts documents directly instead of reading from disk.
+ * 
+ * @param documents - Array of parsed UBML documents
  * @param options - Validation options
  * 
  * @example
  * ```typescript
- * import { validateReferences } from 'ubml/node';
+ * import { parse } from 'ubml';
+ * import { validateDocuments } from 'ubml';
  * 
- * const result = await validateReferences('./my-workspace');
+ * const doc1 = parse(yaml1, 'actors.actors.ubml.yaml');
+ * const doc2 = parse(yaml2, 'process.process.ubml.yaml');
+ * 
+ * const result = validateDocuments([doc1.document!, doc2.document!]);
  * if (!result.valid) {
- *   for (const error of result.errors) {
- *     console.error(error.message);
- *   }
+ *   console.error('Reference errors:', result.errors);
  * }
  * ```
  */
-export async function validateReferences(
-  dir: string,
+export function validateDocuments(
+  documents: UBMLDocument[],
   options: ReferenceValidateOptions = {}
-): Promise<ReferenceValidationResult> {
-  const fs = options.fs ?? nodeFS;
-  const absoluteDir = resolve(dir);
+): ReferenceValidationResult {
   const errors: ReferenceError[] = [];
   const warnings: ReferenceWarning[] = [];
-  const definedIds = new Map<string, string>();
+  const definedIds = new Map<string, { filepath: string; path: string }>();
   const referencedIds = new Map<string, string[]>();
 
-  // Find all UBML files
-  const patterns = getUBMLFilePatterns();
-  const files: string[] = [];
-  
-  for (const pattern of patterns) {
-    const matches = await fs.glob(pattern, { cwd: absoluteDir });
-    files.push(...matches);
-  }
-
-  // Parse all documents and extract IDs
-  const documents: UBMLDocument[] = [];
-  for (const filepath of files) {
-    const result = await parseFile(filepath, { fs });
-    if (result.ok && result.document) {
-      documents.push(result.document);
-      
-      // Extract defined IDs
-      const ids = extractDefinedIds(result.document.content, filepath);
-      for (const [id, info] of ids) {
-        if (definedIds.has(id)) {
-          errors.push({
-            message: `Duplicate ID "${id}" (also defined in ${definedIds.get(id)!})`,
-            filepath: info.filepath,
-            path: info.path,
-            code: 'ubml/duplicate-id',
-          });
-        } else {
-          definedIds.set(id, info.filepath);
-        }
+  // Extract IDs from all documents
+  for (const document of documents) {
+    const filepath = document.meta.filename || 'unknown';
+    
+    // Extract defined IDs
+    const ids = extractDefinedIds(document.content, filepath);
+    for (const [id, info] of ids) {
+      if (definedIds.has(id)) {
+        const existing = definedIds.get(id)!;
+        errors.push({
+          message: `Duplicate ID "${id}" (also defined in ${existing.filepath})`,
+          filepath: info.filepath,
+          path: info.path,
+          code: 'ubml/duplicate-id',
+        });
+      } else {
+        definedIds.set(id, info);
       }
-      
-      // Extract referenced IDs
-      const refs = extractReferencedIds(result.document.content, filepath);
-      for (const [id, locations] of refs) {
-        const existing = referencedIds.get(id) ?? [];
-        existing.push(...locations.map(l => l.filepath));
-        referencedIds.set(id, existing);
-      }
+    }
+    
+    // Extract referenced IDs
+    const refs = extractReferencedIds(document.content, filepath);
+    for (const [id, locations] of refs) {
+      const existing = referencedIds.get(id) ?? [];
+      existing.push(...locations.map(l => l.filepath));
+      referencedIds.set(id, existing);
     }
   }
 
@@ -256,13 +242,26 @@ export async function validateReferences(
   }
 
   // Check for unused IDs (warning only)
-  for (const [id, filepath] of definedIds) {
-    if (!referencedIds.has(id)) {
-      warnings.push({
-        message: `ID "${id}" is defined but never referenced`,
-        filepath,
-        code: 'ubml/unused-id',
-      });
+  if (!options.suppressUnusedWarnings) {
+    for (const [id, info] of definedIds) {
+      if (!referencedIds.has(id)) {
+        // Get the document to resolve source location
+        const doc = documents.find(d => d.meta.filename === info.filepath);
+        // Convert dot notation to JSON pointer: actors.AC118 -> /actors/AC118
+        const jsonPointerPath = '/' + info.path.replace(/\./g, '/');
+        const location = doc?.getSourceLocation(jsonPointerPath);
+        
+        warnings.push({
+          message: `ID "${id}" is defined but never referenced`,
+          filepath: info.filepath,
+          path: info.path,
+          code: 'ubml/unused-id',
+          ...(location && {
+            line: location.line,
+            column: location.column,
+          }),
+        });
+      }
     }
   }
 

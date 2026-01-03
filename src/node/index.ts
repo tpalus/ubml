@@ -43,11 +43,8 @@ export {
   type ValidateOptions,
 } from './validator.js';
 
-// Re-export reference validation
-export { 
-  validateReferences,
-  type ReferenceValidationResult,
-} from './semantic-validator.js';
+// Re-export browser-safe core for convenience
+export * from '../index.js';
 
 // Re-export browser-safe types that are commonly needed
 export type { 

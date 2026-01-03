@@ -54,10 +54,12 @@ export {
   createValidator,
   getValidator,
   parseAndValidate,
+  validate,
   type Validator,
   type ValidationResult,
   type ValidationError,
   type ValidationWarning,
+  type ValidateOptions,
   type ParseAndValidateResult,
 } from './validator.js';
 
@@ -123,6 +125,9 @@ export {
   getSchemaPathForFileSuffix,
   getSchemaPathForDocumentType,
   SCHEMA_PATHS,
+  // Reference field validation
+  REFERENCE_FIELDS,
+  isReferenceField,
 } from './generated/metadata.js';
 
 // ============================================================================
