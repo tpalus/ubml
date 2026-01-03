@@ -3,13 +3,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { serializeToString } from '../../src/serializer/index.js';
+import { serialize } from '../../src/index.js';
 
 describe('Serializer', () => {
-  describe('serializeToString', () => {
+  describe('serialize', () => {
     it('should serialize simple objects', () => {
       const obj = { ubml: '1.0', name: 'Test' };
-      const yaml = serializeToString(obj);
+      const yaml = serialize(obj);
       
       expect(yaml).toContain('ubml: "1.0"');
       expect(yaml).toContain('name: Test');
@@ -29,7 +29,7 @@ describe('Serializer', () => {
         },
       };
       
-      const yaml = serializeToString(obj);
+      const yaml = serialize(obj);
       expect(yaml).toContain('processes:');
       expect(yaml).toContain('PR001:');
       expect(yaml).toContain('steps:');
@@ -40,7 +40,7 @@ describe('Serializer', () => {
         documents: ['file1.yaml', 'file2.yaml'],
       };
       
-      const yaml = serializeToString(obj);
+      const yaml = serialize(obj);
       expect(yaml).toContain('documents:');
       expect(yaml).toContain('- file1.yaml');
       expect(yaml).toContain('- file2.yaml');
@@ -49,8 +49,8 @@ describe('Serializer', () => {
     it('should respect indent option', () => {
       const obj = { parent: { child: 'value' } };
       
-      const yaml2 = serializeToString(obj, { indent: 2 });
-      const yaml4 = serializeToString(obj, { indent: 4 });
+      const yaml2 = serialize(obj, { indent: 2 });
+      const yaml4 = serialize(obj, { indent: 4 });
       
       expect(yaml2).toContain('  child:');
       expect(yaml4).toContain('    child:');
@@ -59,8 +59,8 @@ describe('Serializer', () => {
     it('should handle trailingNewline option', () => {
       const obj = { name: 'test' };
       
-      const withNewline = serializeToString(obj, { trailingNewline: true });
-      const withoutNewline = serializeToString(obj, { trailingNewline: false });
+      const withNewline = serialize(obj, { trailingNewline: true });
+      const withoutNewline = serialize(obj, { trailingNewline: false });
       
       expect(withNewline.endsWith('\n')).toBe(true);
       expect(withoutNewline.endsWith('\n')).toBe(false);

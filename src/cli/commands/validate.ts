@@ -5,12 +5,12 @@
 import { Command } from 'commander';
 import { statSync } from 'fs';
 import { resolve } from 'path';
-import { validateDocument, validateWorkspace } from '../../validator/index.js';
-import { validateReferences } from '../../validator/semantic-validator.js';
+import { validateFile, validateWorkspace } from '../../node/validator.js';
+import { validateReferences } from '../../node/semantic-validator.js';
 import { formatStylish } from '../formatters/stylish.js';
 import { formatJson } from '../formatters/json.js';
 import { formatSarif } from '../formatters/sarif.js';
-import { CLI_MESSAGES } from '../../validator/messages.js';
+import type { FormatterResult } from '../formatters/common.js';
 
 export type OutputFormat = 'stylish' | 'json' | 'sarif';
 
@@ -41,14 +41,33 @@ export function validateCommand(): Command {
       try {
         isDirectory = statSync(absolutePath).isDirectory();
       } catch (err) {
-        console.error(CLI_MESSAGES.PATH_NOT_FOUND(absolutePath));
+        console.error(`Error: Path not found: ${absolutePath}`);
         process.exit(2);
       }
 
       // Validate
-      const result = isDirectory
+      const rawResult = isDirectory
         ? await validateWorkspace(absolutePath)
-        : await validateDocument(absolutePath);
+        : await validateFile(absolutePath);
+
+      // Convert to unified format for formatters
+      const result: FormatterResult = isDirectory
+        ? {
+            valid: (rawResult as Awaited<ReturnType<typeof validateWorkspace>>).valid,
+            errors: (rawResult as Awaited<ReturnType<typeof validateWorkspace>>).files.flatMap(f => 
+              f.errors.map(e => ({ ...e, filepath: f.path }))
+            ),
+            warnings: (rawResult as Awaited<ReturnType<typeof validateWorkspace>>).files.flatMap(f => 
+              f.warnings.map(w => ({ ...w, filepath: f.path }))
+            ),
+            filesValidated: (rawResult as Awaited<ReturnType<typeof validateWorkspace>>).fileCount,
+          }
+        : {
+            valid: (rawResult as Awaited<ReturnType<typeof validateFile>>).valid,
+            errors: (rawResult as Awaited<ReturnType<typeof validateFile>>).errors,
+            warnings: (rawResult as Awaited<ReturnType<typeof validateFile>>).warnings,
+            filesValidated: 1,
+          };
 
       // Validate references if enabled and validating a workspace
       if (options.references && isDirectory) {
@@ -61,7 +80,7 @@ export function validateCommand(): Command {
       // Apply strict mode
       if (options.strict) {
         result.errors.push(
-          ...result.warnings.map((w) => ({ ...w, severity: 'error' as const }))
+          ...result.warnings.map((w) => ({ ...w }))
         );
         result.warnings = [];
         result.valid = result.errors.length === 0;

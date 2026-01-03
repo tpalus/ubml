@@ -9,52 +9,55 @@
 
 import { describe, it, expect } from 'vitest';
 import { resolve } from 'path';
-import { parseDocument } from '../../src/parser/index.js';
-import { validateWorkspace } from '../../src/validator/index.js';
-import { validateReferences } from '../../src/validator/semantic-validator.js';
+import { parseFile, validateWorkspace, validateReferences } from '../../src/node/index.js';
 
 const EXAMPLE_DIR = resolve(__dirname, '../../example');
 
 describe('Example Workspace', () => {
   describe('YAML Parsing', () => {
     it('should parse workspace file', async () => {
-      const result = await parseDocument(
+      const result = await parseFile(
         resolve(EXAMPLE_DIR, 'acme-corp.workspace.ubml.yaml')
       );
       expect(result.errors).toHaveLength(0);
+      expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
       expect(result.document?.content).toHaveProperty('ubml', '1.0');
     });
 
     it('should parse actors file', async () => {
-      const result = await parseDocument(
+      const result = await parseFile(
         resolve(EXAMPLE_DIR, 'organization.actors.ubml.yaml')
       );
       expect(result.errors).toHaveLength(0);
+      expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
     });
 
     it('should parse process file', async () => {
-      const result = await parseDocument(
+      const result = await parseFile(
         resolve(EXAMPLE_DIR, 'customer-onboarding.process.ubml.yaml')
       );
       expect(result.errors).toHaveLength(0);
+      expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
     });
 
     it('should parse entities file', async () => {
-      const result = await parseDocument(
+      const result = await parseFile(
         resolve(EXAMPLE_DIR, 'data-model.entities.ubml.yaml')
       );
       expect(result.errors).toHaveLength(0);
+      expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
     });
 
     it('should parse metrics file', async () => {
-      const result = await parseDocument(
+      const result = await parseFile(
         resolve(EXAMPLE_DIR, 'onboarding-kpis.metrics.ubml.yaml')
       );
       expect(result.errors).toHaveLength(0);
+      expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
     });
   });
@@ -64,11 +67,12 @@ describe('Example Workspace', () => {
       const result = await validateWorkspace(EXAMPLE_DIR);
       
       // Log any errors for debugging
-      if (result.errors.length > 0) {
-        console.log('Validation errors:', JSON.stringify(result.errors, null, 2));
+      if (result.errorCount > 0) {
+        const allErrors = result.files.flatMap(f => f.errors);
+        console.log('Validation errors:', JSON.stringify(allErrors, null, 2));
       }
       
-      expect(result.filesValidated).toBeGreaterThan(0);
+      expect(result.fileCount).toBeGreaterThan(0);
       // Note: Schema validation may produce errors if schemas are strict
       // For now, we just ensure files are parsed correctly
     });

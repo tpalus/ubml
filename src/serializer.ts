@@ -1,8 +1,12 @@
 /**
- * YAML serializer with consistent formatting for UBML documents.
+ * UBML Serializer (Browser-Safe)
+ * 
+ * Provides YAML serialization with consistent formatting.
+ * Works in any JavaScript runtime (browser, Node.js, Deno, Bun).
+ * 
+ * @module ubml
  */
 
-import { writeFile } from 'fs/promises';
 import { stringify, type DocumentOptions, type SchemaOptions, type ToStringOptions } from 'yaml';
 
 /**
@@ -15,9 +19,9 @@ export interface SerializeOptions {
   lineWidth?: number;
   /** Whether to use flow style for short arrays/objects */
   flowLevel?: number;
-  /** Whether to add a final newline */
+  /** Whether to add a final newline (default: true) */
   trailingNewline?: boolean;
-  /** Whether to sort keys alphabetically */
+  /** Whether to sort keys alphabetically (default: false) */
   sortKeys?: boolean;
   /** Quote style for strings: 'single' | 'double' | null (default: null = unquoted where possible) */
   quoteStyle?: 'single' | 'double' | null;
@@ -37,11 +41,23 @@ const DEFAULT_OPTIONS: Required<SerializeOptions> = {
 
 /**
  * Serialize a JavaScript object to a YAML string.
+ * 
+ * @param content - The object to serialize
+ * @param options - Serialization options
+ * 
+ * @example
+ * ```typescript
+ * import { serialize } from 'ubml';
+ * 
+ * const yaml = serialize({
+ *   ubml: '1.0',
+ *   processes: {
+ *     PR001: { name: 'My Process' }
+ *   }
+ * });
+ * ```
  */
-export function serializeToString(
-  content: unknown,
-  options: SerializeOptions = {}
-): string {
+export function serialize(content: unknown, options: SerializeOptions = {}): string {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
   const yamlOptions: DocumentOptions & SchemaOptions & ToStringOptions = {
@@ -65,16 +81,4 @@ export function serializeToString(
   }
 
   return yaml;
-}
-
-/**
- * Serialize a JavaScript object to a YAML file.
- */
-export async function serializeDocument(
-  content: unknown,
-  filepath: string,
-  options: SerializeOptions = {}
-): Promise<void> {
-  const yaml = serializeToString(content, options);
-  await writeFile(filepath, yaml, 'utf8');
 }

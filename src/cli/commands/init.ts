@@ -5,9 +5,8 @@
 import { Command } from 'commander';
 import { mkdirSync, writeFileSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
-import { serializeToString } from '../../serializer/index.js';
-import { DOCUMENT_TYPES, SCHEMA_VERSION, SCHEMA_PATHS } from '../../schemas/loader.js';
-import { CLI_MESSAGES, SUCCESS_MESSAGES } from '../../validator/messages.js';
+import { serialize } from '../../serializer.js';
+import { DOCUMENT_TYPES, SCHEMA_VERSION, SCHEMA_PATHS } from '../../generated/metadata.js';
 
 /**
  * Generate VS Code YAML schema settings from document types.
@@ -101,28 +100,28 @@ export function initCommand(): Command {
 
       // Check if directory exists
       if (existsSync(workspaceDir)) {
-        console.error(CLI_MESSAGES.DIRECTORY_EXISTS(workspaceDir));
+        console.error(`Error: Directory already exists: ${workspaceDir}`);
         process.exit(1);
       }
 
       // Create directory
       mkdirSync(workspaceDir, { recursive: true });
-      console.log(SUCCESS_MESSAGES.CREATED_DIR(workspaceDir));
+      console.log(`Created workspace directory: ${workspaceDir}`);
 
       // Create workspace file
       const workspaceFile = join(workspaceDir, `${safeName}.workspace.ubml.yaml`);
-      writeFileSync(workspaceFile, serializeToString(createDocumentTemplate('workspace', name)));
-      console.log(SUCCESS_MESSAGES.CREATED_FILE(workspaceFile));
+      writeFileSync(workspaceFile, serialize(createDocumentTemplate('workspace', name)));
+      console.log(`Created: ${workspaceFile}`);
 
       // Create sample process file
       const processFile = join(workspaceDir, 'sample.process.ubml.yaml');
-      writeFileSync(processFile, serializeToString(createDocumentTemplate('process')));
-      console.log(SUCCESS_MESSAGES.CREATED_FILE(processFile));
+      writeFileSync(processFile, serialize(createDocumentTemplate('process')));
+      console.log(`Created: ${processFile}`);
 
       // Create sample actors file
       const actorsFile = join(workspaceDir, 'organization.actors.ubml.yaml');
-      writeFileSync(actorsFile, serializeToString(createDocumentTemplate('actors')));
-      console.log(SUCCESS_MESSAGES.CREATED_FILE(actorsFile));
+      writeFileSync(actorsFile, serialize(createDocumentTemplate('actors')));
+      console.log(`Created: ${actorsFile}`);
 
       // Create VS Code settings
       const vscodeDir = join(workspaceDir, '.vscode');
@@ -135,9 +134,9 @@ export function initCommand(): Command {
         join(vscodeDir, 'settings.json'),
         JSON.stringify(vscodeSettings, null, 2)
       );
-      console.log(SUCCESS_MESSAGES.CREATED_FILE(join(vscodeDir, 'settings.json')));
+      console.log(`Created: ${join(vscodeDir, 'settings.json')}`);
 
-      console.log(`\n${SUCCESS_MESSAGES.WORKSPACE_CREATED}`);
+      console.log(`\n✓ Workspace initialized successfully!`);
       console.log(`\nNext steps:`);
       console.log(`  cd ${name}`);
       console.log(`  npx ubml validate .`);

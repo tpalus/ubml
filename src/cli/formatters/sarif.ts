@@ -5,10 +5,9 @@
  * for the output of static analysis tools, supported by VS Code, GitHub, etc.
  */
 
-import type { ValidationResult } from '../../validator/index.js';
+import type { FormatterResult, ValidationMessage } from './common.js';
 import { VERSION, PACKAGE_NAME, REPOSITORY_URL } from '../../constants.js';
-import { ERROR_CODES } from '../../validator/messages.js';
-import { iterateMessages } from './common.js';
+import { ERROR_CODES, iterateMessages } from './common.js';
 
 interface SarifResult {
   ruleId: string;
@@ -47,35 +46,17 @@ interface SarifLog {
 /**
  * Format validation results as SARIF.
  */
-export function formatSarif(result: ValidationResult): string {
+export function formatSarif(result: FormatterResult): string {
   const sarifResults: SarifResult[] = [];
 
-  for (const message of iterateMessages(result)) {
-    const sarifResult: SarifResult = {
-      ruleId: message.code ?? (message.severity === 'error' 
-        ? ERROR_CODES.VALIDATION_ERROR 
-        : ERROR_CODES.VALIDATION_WARNING),
-      level: message.severity,
-      message: { text: message.message },
-    };
+  // Process errors
+  for (const error of result.errors) {
+    sarifResults.push(createSarifResult(error, 'error'));
+  }
 
-    if (message.filepath) {
-      sarifResult.locations = [
-        {
-          physicalLocation: {
-            artifactLocation: { uri: message.filepath },
-            region: message.line
-              ? {
-                  startLine: message.line,
-                  startColumn: message.column,
-                }
-              : undefined,
-          },
-        },
-      ];
-    }
-
-    sarifResults.push(sarifResult);
+  // Process warnings
+  for (const warning of result.warnings) {
+    sarifResults.push(createSarifResult(warning, 'warning'));
   }
 
   const sarif: SarifLog = {
@@ -90,20 +71,16 @@ export function formatSarif(result: ValidationResult): string {
             informationUri: REPOSITORY_URL,
             rules: [
               {
-                id: ERROR_CODES.VALIDATION_ERROR,
+                id: ERROR_CODES.SCHEMA_ERROR,
                 shortDescription: { text: 'UBML schema validation error' },
               },
               {
-                id: ERROR_CODES.VALIDATION_WARNING,
-                shortDescription: { text: 'UBML schema validation warning' },
+                id: ERROR_CODES.PARSE_ERROR,
+                shortDescription: { text: 'UBML parse error' },
               },
               {
-                id: ERROR_CODES.UNDEFINED_REFERENCE,
+                id: ERROR_CODES.REFERENCE_ERROR,
                 shortDescription: { text: 'Reference to undefined ID' },
-              },
-              {
-                id: ERROR_CODES.DUPLICATE_ID,
-                shortDescription: { text: 'Duplicate ID definition' },
               },
             ],
           },
@@ -114,4 +91,35 @@ export function formatSarif(result: ValidationResult): string {
   };
 
   return JSON.stringify(sarif, null, 2);
+}
+
+function createSarifResult(
+  message: ValidationMessage,
+  level: 'error' | 'warning'
+): SarifResult {
+  const sarifResult: SarifResult = {
+    ruleId: message.code ?? (level === 'error'
+      ? ERROR_CODES.SCHEMA_ERROR
+      : ERROR_CODES.UNKNOWN_ERROR),
+    level,
+    message: { text: message.message },
+  };
+
+  if (message.filepath) {
+    sarifResult.locations = [
+      {
+        physicalLocation: {
+          artifactLocation: { uri: message.filepath },
+          region: message.line
+            ? {
+                startLine: message.line,
+                startColumn: message.column,
+              }
+            : undefined,
+        },
+      },
+    ];
+  }
+
+  return sarifResult;
 }

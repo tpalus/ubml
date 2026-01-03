@@ -2,9 +2,8 @@
  * Stylish formatter for CLI output.
  */
 
-import type { ValidationResult } from '../../validator/index.js';
-import { SUCCESS_MESSAGES } from '../../validator/messages.js';
-import { groupMessagesByFile, formatLocation, formatPath } from './common.js';
+import type { FormatterResult } from './common.js';
+import { groupMessagesByFile, formatLocation, formatPath, SUCCESS_MESSAGES } from './common.js';
 
 export interface StylishOptions {
   quiet?: boolean;
@@ -15,7 +14,7 @@ export interface StylishOptions {
  * Format validation results in a human-readable style.
  */
 export function formatStylish(
-  result: ValidationResult,
+  result: FormatterResult,
   options: StylishOptions = {}
 ): string {
   const { quiet = false } = options;
@@ -49,7 +48,7 @@ export function formatStylish(
   const problemCount = errorCount + warningCount;
 
   if (problemCount === 0) {
-    lines.push(SUCCESS_MESSAGES.FILES_VALIDATED(result.filesValidated));
+    lines.push(SUCCESS_MESSAGES.allFilesValid(result.filesValidated));
   } else {
     const parts: string[] = [];
     if (errorCount > 0) {

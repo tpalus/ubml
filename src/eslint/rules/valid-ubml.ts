@@ -1,12 +1,23 @@
 /**
  * ESLint rule for validating UBML documents.
+ * 
+ * Uses the browser-safe parser and validator directly,
+ * no file system operations needed.
  */
 
 import type { Rule } from 'eslint';
-import { tmpdir } from 'os';
-import { join } from 'path';
-import { writeFileSync } from 'fs';
-import { validateDocument } from '../../validator/schema-validator.js';
+import { parse } from '../../parser.js';
+import { createValidator, type Validator } from '../../validator.js';
+
+// Cache the validator instance
+let cachedValidator: Validator | null = null;
+
+async function getValidator(): Promise<Validator> {
+  if (!cachedValidator) {
+    cachedValidator = await createValidator();
+  }
+  return cachedValidator;
+}
 
 /**
  * ESLint rule for validating UBML documents.
@@ -28,10 +39,6 @@ export const validUbmlRule: Rule.RuleModule = {
       {
         type: 'object',
         properties: {
-          schemasDir: {
-            type: 'string',
-            description: 'Path to schemas directory',
-          },
           strict: {
             type: 'boolean',
             description: 'Treat warnings as errors',
@@ -57,31 +64,41 @@ export const validUbmlRule: Rule.RuleModule = {
         const text = sourceCode.getText();
         const options = context.options[0] || {};
 
-        // For in-memory or untitled files, we need to write to temp file
-        // because validateDocument expects a file path
-        let filePathToValidate = filename;
-        let isTempFile = false;
-
-        if (filename.startsWith('untitled:') || !filename) {
-          // Create a temporary file with proper UBML naming
-          const tempFilename = `temp.process.ubml.yaml`;
-          filePathToValidate = join(tmpdir(), tempFilename);
-          writeFileSync(filePathToValidate, text, 'utf8');
-          isTempFile = true;
-        }
-
         try {
-          // Use the shared validation logic
-          const result = await validateDocument(filePathToValidate, {
-            schemasDir: options.schemasDir,
-            strict: options.strict ?? false,
-          });
+          // Parse the document using browser-safe parser
+          const parseResult = parse(text, filename);
 
-          // Report errors
-          for (const error of result.errors) {
+          // Report parse errors
+          for (const error of parseResult.errors) {
             context.report({
               node,
-              messageId: error.code === 'parse-error' ? 'parseError' : 'validationError',
+              messageId: 'parseError',
+              data: {
+                message: error.message,
+              },
+              loc: error.line
+                ? {
+                    start: { line: error.line, column: (error.column ?? 1) - 1 },
+                    end: { line: error.endLine ?? error.line, column: (error.endColumn ?? error.column ?? 1) },
+                  }
+                : undefined,
+            });
+          }
+
+          // If parsing failed, don't validate
+          if (!parseResult.ok || !parseResult.document) {
+            return;
+          }
+
+          // Validate using browser-safe validator
+          const validator = await getValidator();
+          const validationResult = validator.validateDocument(parseResult.document);
+
+          // Report validation errors
+          for (const error of validationResult.errors) {
+            context.report({
+              node,
+              messageId: 'validationError',
               data: {
                 message: error.message,
                 path: error.path ? ` at ${error.path}` : '',
@@ -95,9 +112,9 @@ export const validUbmlRule: Rule.RuleModule = {
             });
           }
 
-          // Report warnings if not in strict mode (strict mode converts warnings to errors)
+          // Report warnings if not in strict mode
           if (!options.strict) {
-            for (const warning of result.warnings) {
+            for (const warning of validationResult.warnings) {
               context.report({
                 node,
                 messageId: 'validationWarning',
@@ -114,6 +131,24 @@ export const validUbmlRule: Rule.RuleModule = {
               });
             }
           }
+
+          // Report parse warnings
+          for (const warning of parseResult.warnings) {
+            context.report({
+              node,
+              messageId: 'validationWarning',
+              data: {
+                message: warning.message,
+                path: '',
+              },
+              loc: warning.line
+                ? {
+                    start: { line: warning.line, column: (warning.column ?? 1) - 1 },
+                    end: { line: warning.endLine ?? warning.line, column: (warning.endColumn ?? warning.column ?? 1) },
+                  }
+                : undefined,
+            });
+          }
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           context.report({
@@ -121,16 +156,6 @@ export const validUbmlRule: Rule.RuleModule = {
             messageId: 'validationError',
             data: { message, path: '' },
           });
-        } finally {
-          // Clean up temp file if created
-          if (isTempFile) {
-            try {
-              const { unlinkSync } = await import('fs');
-              unlinkSync(filePathToValidate);
-            } catch {
-              // Ignore cleanup errors
-            }
-          }
         }
       },
     };

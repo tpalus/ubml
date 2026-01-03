@@ -22,25 +22,25 @@ description: |
   UBML is a YAML-based domain-specific language for business process modeling.
   It supports the full lifecycle of process improvement projects:
   
-  📋 PROBLEM FRAMING
+  PROBLEM FRAMING
      Hypothesis trees with SCQH (Situation-Complication-Question-Hypothesis)
   
-  📊 PROCESS MODELING  
+  PROCESS MODELING  
      Multi-level processes (L1-L4), steps, links, blocks, phases
   
-  👥 ACTORS & RESOURCES
+  ACTORS & RESOURCES
      Roles, teams, systems, skills, resource pools, equipment
   
-  📄 INFORMATION MODEL
+  INFORMATION MODEL
      Entities, documents, locations, relationships
   
-  📈 METRICS & ANALYSIS
+  METRICS & ANALYSIS
      KPIs, ROI analysis, simulation scenarios
   
-  ⛏️ PROCESS MINING
+  PROCESS MINING
      Event log integration, activity mapping, conformance checking
   
-  🎯 STRATEGY
+  STRATEGY
      Value streams, capabilities, products, services, portfolios
   
   ════════════════════════════════════════════════════════════════════════════

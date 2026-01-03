@@ -3,54 +3,51 @@ ubml: "1.0"
 entities:
   EN001:
     name: "Customer Application Form"
-    type: document
     description: "Initial application form submitted by prospective customer"
     attributes:
-      - name: applicantName
+      applicantName:
         type: string
         required: true
-      - name: email
+      email:
         type: string
         required: true
-      - name: phone
+      phone:
         type: string
         required: false
-      - name: submissionDate
+      submissionDate:
         type: date
         required: true
 
   EN002:
     name: "Customer Profile"
-    type: entity
     description: "Core customer data record"
     attributes:
-      - name: customerId
+      customerId:
         type: string
         required: true
-      - name: name
+      name:
         type: string
         required: true
-      - name: status
+      status:
         type: string
         required: true
-      - name: createdAt
+      createdAt:
         type: datetime
         required: true
 
   EN003:
     name: "Identity Document"
-    type: document
     description: "Customer identity verification document (passport, ID card, etc.)"
     attributes:
-      - name: documentType
+      documentType:
         type: string
         required: true
-      - name: documentNumber
+      documentNumber:
         type: string
         required: true
-      - name: expiryDate
+      expiryDate:
         type: date
         required: true
-      - name: verified
+      verified:
         type: boolean
         required: true

@@ -2,13 +2,39 @@
  * Semantic validation for cross-document references.
  */
 
-import { glob } from 'glob';
 import { resolve } from 'path';
-import { parseDocument } from '../parser/yaml-parser.js';
-import type { UBMLDocument } from '../parser/document.js';
-import { ALL_ID_PATTERN, isValidId } from '../schemas/loader.js';
-import { ValidationError, ValidationWarning, createError, createWarning } from './errors.js';
-import { REFERENCE_MESSAGES, ERROR_CODES } from './messages.js';
+import { type FileSystem, nodeFS } from './fs.js';
+import { parseFile } from './parser.js';
+import { isValidId, getUBMLFilePatterns } from '../generated/metadata.js';
+import type { UBMLDocument } from '../parser.js';
+
+/**
+ * Validation error for reference issues.
+ */
+export interface ReferenceError {
+  /** Error message */
+  message: string;
+  /** File path where error occurred */
+  filepath: string;
+  /** JSON path to the error location */
+  path?: string;
+  /** Error code */
+  code?: string;
+}
+
+/**
+ * Validation warning for reference issues.
+ */
+export interface ReferenceWarning {
+  /** Warning message */
+  message: string;
+  /** File path where warning occurred */
+  filepath: string;
+  /** JSON path to the warning location */
+  path?: string;
+  /** Warning code */
+  code?: string;
+}
 
 /**
  * Result of reference validation.
@@ -17,13 +43,21 @@ export interface ReferenceValidationResult {
   /** Whether all references are valid */
   valid: boolean;
   /** Validation errors for broken references */
-  errors: ValidationError[];
+  errors: ReferenceError[];
   /** Validation warnings */
-  warnings: ValidationWarning[];
+  warnings: ReferenceWarning[];
   /** All defined IDs in the workspace */
   definedIds: Map<string, string>; // ID -> filepath
   /** All referenced IDs in the workspace */
   referencedIds: Map<string, string[]>; // ID -> filepaths where referenced
+}
+
+/**
+ * Options for reference validation.
+ */
+export interface ReferenceValidateOptions {
+  /** Custom file system implementation */
+  fs?: FileSystem;
 }
 
 /**
@@ -103,9 +137,13 @@ function extractReferencedIds(
         const currentPath = path ? `${path}.${key}` : key;
         
         // Check reference fields
-        const refFields = ['responsible', 'accountable', 'consulted', 'informed', 'actor', 'actors', 
-                          'from', 'to', 'source', 'target', 'parent', 'children', 'relatedTo',
-                          'inputs', 'outputs', 'resources', 'tools', 'systems'];
+        const refFields = [
+          'responsible', 'accountable', 'consulted', 'informed', 
+          'actor', 'actors', 'from', 'to', 'source', 'target', 
+          'parent', 'children', 'relatedTo', 'inputs', 'outputs', 
+          'resources', 'tools', 'systems', 'owner', 'members',
+          'subprocess', 'skills', 'entity', 'linkedHypotheses',
+        ];
         
         if (refFields.includes(key)) {
           if (typeof value === 'string' && isValidId(value)) {
@@ -135,35 +173,59 @@ function extractReferencedIds(
 
 /**
  * Validate cross-document references in a workspace.
+ * 
+ * @param dir - Workspace directory to validate
+ * @param options - Validation options
+ * 
+ * @example
+ * ```typescript
+ * import { validateReferences } from 'ubml/node';
+ * 
+ * const result = await validateReferences('./my-workspace');
+ * if (!result.valid) {
+ *   for (const error of result.errors) {
+ *     console.error(error.message);
+ *   }
+ * }
+ * ```
  */
 export async function validateReferences(
-  workspaceDir: string
+  dir: string,
+  options: ReferenceValidateOptions = {}
 ): Promise<ReferenceValidationResult> {
-  const absoluteDir = resolve(workspaceDir);
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
+  const fs = options.fs ?? nodeFS;
+  const absoluteDir = resolve(dir);
+  const errors: ReferenceError[] = [];
+  const warnings: ReferenceWarning[] = [];
   const definedIds = new Map<string, string>();
   const referencedIds = new Map<string, string[]>();
 
   // Find all UBML files
-  const files = glob.sync('**/*.ubml.{yaml,yml}', { cwd: absoluteDir, absolute: true });
+  const patterns = getUBMLFilePatterns();
+  const files: string[] = [];
+  
+  for (const pattern of patterns) {
+    const matches = await fs.glob(pattern, { cwd: absoluteDir });
+    files.push(...matches);
+  }
 
   // Parse all documents and extract IDs
   const documents: UBMLDocument[] = [];
   for (const filepath of files) {
-    const result = await parseDocument(filepath);
-    if (result.document) {
+    const result = await parseFile(filepath, { fs });
+    if (result.ok && result.document) {
       documents.push(result.document);
       
       // Extract defined IDs
       const ids = extractDefinedIds(result.document.content, filepath);
       for (const [id, info] of ids) {
         if (definedIds.has(id)) {
-          errors.push(createError(
-            REFERENCE_MESSAGES.DUPLICATE_ID(id, definedIds.get(id)!),
-            info.filepath,
-            { path: info.path, code: ERROR_CODES.DUPLICATE_ID }
-          ));
+          errors.push({
+            message: `Duplicate ID "${id}" (also defined in ${definedIds.get(id)!})`,
+            filepath: info.filepath,
+            path: info.path,
+            code: 'ubml/duplicate-id',
+          });
         } else {
           definedIds.set(id, info.filepath);
         }
@@ -182,12 +244,13 @@ export async function validateReferences(
   // Check for undefined references
   for (const [id, filepaths] of referencedIds) {
     if (!definedIds.has(id)) {
-      for (const filepath of [...new Set(filepaths)]) {
-        errors.push(createError(
-          REFERENCE_MESSAGES.UNDEFINED_REFERENCE(id, filepath),
+      const uniqueFiles = [...new Set(filepaths)];
+      for (const filepath of uniqueFiles) {
+        errors.push({
+          message: `Reference to undefined ID "${id}"`,
           filepath,
-          { code: ERROR_CODES.UNDEFINED_REFERENCE }
-        ));
+          code: 'ubml/undefined-reference',
+        });
       }
     }
   }
@@ -195,11 +258,11 @@ export async function validateReferences(
   // Check for unused IDs (warning only)
   for (const [id, filepath] of definedIds) {
     if (!referencedIds.has(id)) {
-      warnings.push(createWarning(
-        REFERENCE_MESSAGES.UNUSED_ID(id),
+      warnings.push({
+        message: `ID "${id}" is defined but never referenced`,
         filepath,
-        { code: ERROR_CODES.UNUSED_ID }
-      ));
+        code: 'ubml/unused-id',
+      });
     }
   }
 

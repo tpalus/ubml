@@ -2,69 +2,109 @@
  * UBML - Unified Business Modeling Language
  *
  * A TypeScript library for parsing, validating, and serializing UBML documents.
+ * 
+ * This is the main entry point with browser-safe exports.
+ * For Node.js file system operations, use `ubml/node`.
  *
  * @module ubml
  *
  * @example
  * ```typescript
- * import { parseDocument, validateDocument, serializeDocument } from 'ubml';
+ * // Browser-safe API (works everywhere)
+ * import { parse, createValidator, serialize, schemas } from 'ubml';
  *
- * // Parse a UBML document
- * const result = await parseDocument('process.ubml.yaml');
- *
- * // Validate a workspace
- * const validation = await validateWorkspace('./my-workspace');
- *
- * // Serialize to YAML
- * await serializeDocument(content, 'output.ubml.yaml');
+ * const result = parse(yamlContent, 'process.ubml.yaml');
+ * if (result.ok) {
+ *   const validator = await createValidator();
+ *   const validation = validator.validateDocument(result.document);
+ *   console.log(validation.valid ? 'Valid!' : validation.errors);
+ * }
+ * ```
+ * 
+ * @example
+ * ```typescript
+ * // Node.js file operations
+ * import { parseFile, validateWorkspace, serializeToFile } from 'ubml/node';
+ * 
+ * const result = await parseFile('./process.ubml.yaml');
+ * const workspace = await validateWorkspace('./my-workspace');
+ * await serializeToFile(content, './output.ubml.yaml');
  * ```
  */
 
-// Parser exports
+// ============================================================================
+// PARSER (Browser-Safe)
+// ============================================================================
+
 export {
-  parseDocument,
-  parseDocumentFromString,
+  parse,
   type ParseResult,
   type UBMLDocument,
   type DocumentMeta,
-  type ParsedNode,
+  type ParseError,
+  type ParseWarning,
   type SourceLocation,
-} from './parser/index.js';
+} from './parser.js';
 
-// Validator exports
+// ============================================================================
+// VALIDATOR (Browser-Safe)
+// ============================================================================
+
 export {
-  validateDocument,
-  validateWorkspace,
-  validateReferences,
-  formatError,
-  formatErrors,
+  createValidator,
+  getValidator,
+  parseAndValidate,
+  type Validator,
   type ValidationResult,
-  type ValidatorOptions,
-  type ReferenceValidationResult,
   type ValidationError,
   type ValidationWarning,
-} from './validator/index.js';
+  type ParseAndValidateResult,
+} from './validator.js';
 
-// Serializer exports
+// ============================================================================
+// SERIALIZER (Browser-Safe)
+// ============================================================================
+
 export {
-  serializeDocument,
-  serializeToString,
+  serialize,
   type SerializeOptions,
-} from './serializer/index.js';
+} from './serializer.js';
 
-// Constants
-export { VERSION, PACKAGE_NAME, REPOSITORY_URL } from './constants.js';
+// ============================================================================
+// SCHEMAS (Browser-Safe)
+// ============================================================================
 
-// Schema utilities - single source of truth for all schema-related constants
 export {
-  // Document types
-  type DocumentType,
+  schemas,
+  type JSONSchema,
+} from './schemas.js';
+
+// ============================================================================
+// DOCUMENT TYPE DETECTION (Browser-Safe)
+// ============================================================================
+
+export {
+  detectDocumentType,
+  detectDocumentTypeFromContent,
+  isDocumentType,
   DOCUMENT_TYPES,
-  // Schema paths and version
+  type DocumentType,
+} from './detect.js';
+
+// ============================================================================
+// TYPES (Browser-Safe)
+// ============================================================================
+
+export * from './types.js';
+
+// ============================================================================
+// METADATA (Browser-Safe)
+// ============================================================================
+
+export {
   SCHEMA_VERSION,
-  SCHEMA_PATHS,
-  getSchemaPathForDocumentType,
-  getSchemaPathForFileSuffix,
+  FRAGMENT_NAMES,
+  type FragmentName,
   // ID patterns and validation
   ID_PREFIXES,
   type IdPrefix,
@@ -77,14 +117,16 @@ export {
   // Validation patterns
   DURATION_PATTERN,
   TIME_PATTERN,
-  // Document type detection
-  detectDocumentType,
+  // File patterns
   getUBMLFilePatterns,
   isUBMLFile,
-  // Schema loading
-  loadSchema,
-  loadRootSchema,
-  loadDefsSchema,
-  getSchemasDirectory,
-  getSchemaPath,
-} from './schemas/loader.js';
+  getSchemaPathForFileSuffix,
+  getSchemaPathForDocumentType,
+  SCHEMA_PATHS,
+} from './generated/metadata.js';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+export { VERSION, PACKAGE_NAME, REPOSITORY_URL } from './constants.js';

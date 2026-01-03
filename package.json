@@ -32,11 +32,18 @@
     "ubml": "./dist/cli.js"
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./parser": "./dist/parser/index.js",
-    "./validator": "./dist/validator/index.js",
-    "./serializer": "./dist/serializer/index.js",
-    "./eslint": "./dist/eslint/index.js",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node/index.d.ts",
+      "import": "./dist/node/index.js"
+    },
+    "./eslint": {
+      "types": "./dist/eslint/index.d.ts",
+      "import": "./dist/eslint/index.js"
+    },
     "./schemas/*": "./schemas/*"
   },
   "files": [
@@ -46,8 +53,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
-    "validate": "node --loader ts-node/esm bin/validate-schemas.ts",
+    "build": "npm run generate && tsup",
+    "generate": "node --loader ts-node/esm bin/generate-all.ts",
     "validate:example": "node --loader ts-node/esm bin/ubml.ts validate ./example",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -55,12 +62,13 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "docs": "typedoc src/index.ts --out docs/api",
-    "prepublishOnly": "npm run build && npm run validate && npm run test"
+    "prepublishOnly": "npm run build && npm run test"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@types/node": "^20.0.0",
     "eslint": "^8.0.0",
+    "json-schema-to-typescript": "^15.0.4",
     "ts-node": "^10.9.0",
     "tsup": "^8.0.0",
     "typedoc": "^0.25.0",

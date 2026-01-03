@@ -41,3 +41,9 @@ pnpm-debug.log*
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Auto-generated files (run 'npm run generate' to recreate)
+src/generated/
+
+# Local samples (not part of the package)
+samples/

@@ -2,17 +2,32 @@
  * Common utilities for CLI formatters.
  */
 
-import type { ValidationResult, ValidationError, ValidationWarning } from '../../validator/index.js';
+/**
+ * Validation message structure (error or warning).
+ */
+export interface ValidationMessage {
+  code?: string;
+  message: string;
+  filepath: string;
+  line?: number;
+  column?: number;
+  path?: string;
+}
 
 /**
- * Union type for validation messages.
+ * Result type expected by formatters.
  */
-export type ValidationMessage = ValidationError | ValidationWarning;
+export interface FormatterResult {
+  errors: ValidationMessage[];
+  warnings: ValidationMessage[];
+  filesValidated: number;
+  valid: boolean;
+}
 
 /**
  * Iterate over all validation messages (errors first, then warnings).
  */
-export function* iterateMessages(result: ValidationResult): Generator<ValidationMessage> {
+export function* iterateMessages(result: FormatterResult): Generator<ValidationMessage> {
   for (const error of result.errors) {
     yield error;
   }
@@ -25,7 +40,7 @@ export function* iterateMessages(result: ValidationResult): Generator<Validation
  * Group messages by filepath for formatted output.
  */
 export function groupMessagesByFile(
-  result: ValidationResult,
+  result: FormatterResult,
   options: { includeWarnings?: boolean } = {}
 ): Map<string, { errors: ValidationMessage[]; warnings: ValidationMessage[] }> {
   const { includeWarnings = true } = options;
@@ -63,3 +78,23 @@ export function formatLocation(message: ValidationMessage): string {
 export function formatPath(message: ValidationMessage): string {
   return message.path ? ` (${message.path})` : '';
 }
+
+/**
+ * Success messages for different validation contexts.
+ */
+export const SUCCESS_MESSAGES = {
+  allFilesValid: (count: number) => `✓ ${count} file${count === 1 ? '' : 's'} validated successfully`,
+  noFilesFound: 'No UBML files found to validate',
+};
+
+/**
+ * Error codes for categorization.
+ */
+export const ERROR_CODES = {
+  PARSE_ERROR: 'PARSE_ERROR',
+  SCHEMA_ERROR: 'SCHEMA_ERROR',
+  REFERENCE_ERROR: 'REFERENCE_ERROR',
+  FILE_NOT_FOUND: 'FILE_NOT_FOUND',
+  IO_ERROR: 'IO_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+};
