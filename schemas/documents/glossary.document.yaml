@@ -1,0 +1,178 @@
+# ============================================================================
+# UBML Glossary Document Schema
+# ============================================================================
+# Schema for .glossary.ubml.yaml files - terminology and definitions.
+#
+# VERSION: 1.0
+# FILE PATTERN: *.glossary.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/documents/glossary.document.yaml"
+title: "UBML Glossary Document"
+description: |
+  Glossary documents define business terminology and definitions.
+  
+  WHY A GLOSSARY?
+  A glossary ensures consistent terminology across:
+  - Process documentation
+  - Stakeholder communication
+  - Team collaboration
+  - Training materials
+  
+  GLOSSARY ENTRIES:
+  Each entry includes:
+  - Term: The word or phrase
+  - Definition: Clear explanation
+  - Aliases: Alternative names
+  - Context: Where/how it's used
+  
+  FILE NAMING: *.glossary.ubml.yaml
+  Examples:
+    - business-terms.glossary.ubml.yaml
+    - technical-glossary.glossary.ubml.yaml
+    - domain-vocabulary.glossary.ubml.yaml
+  
+  GETTING STARTED:
+  1. Identify key terms in your domain
+  2. Write clear, concise definitions
+  3. Add aliases for common variations
+  4. Categorize for easier navigation
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.0" for this schema version.
+    type: string
+    const: "1.0"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what terminology is covered in this glossary.
+    type: string
+  
+  terms:
+    description: |
+      Glossary term definitions.
+      
+      Example:
+        terms:
+          - term: "Order Fulfillment"
+            definition: "The complete process from receiving an order to delivering the product"
+            aliases: ["Order Processing", "Order Completion"]
+            category: "Process"
+          - term: "SLA"
+            definition: "Service Level Agreement - contractual commitment for service delivery"
+            aliases: ["Service Level Agreement"]
+            category: "Governance"
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [term, definition]
+      properties:
+        term:
+          description: "The term being defined."
+          type: string
+        
+        definition:
+          description: "Clear, concise definition of the term."
+          type: string
+        
+        aliases:
+          description: "Alternative names or abbreviations."
+          type: array
+          items:
+            type: string
+        
+        category:
+          description: |
+            Category for grouping terms.
+            
+            Examples: "Process", "Technical", "Business", "Legal"
+          type: string
+        
+        context:
+          description: "Where or how this term is used."
+          type: string
+        
+        examples:
+          description: "Usage examples."
+          type: array
+          items:
+            type: string
+        
+        relatedTerms:
+          description: "Related glossary terms."
+          type: array
+          items:
+            type: string
+        
+        source:
+          description: "Source or authority for the definition."
+          type: string
+        
+        tags:
+          description: "Tags for filtering."
+          type: array
+          items:
+            type: string
+  
+  categories:
+    description: |
+      Category definitions for organizing terms.
+      
+      Example:
+        categories:
+          - name: "Process"
+            description: "Process-related terminology"
+          - name: "Technical"
+            description: "Technical and IT terms"
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+  
+  metadata:
+    description: "Document metadata."
+    type: object
+    additionalProperties: false
+    properties:
+      createdAt:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedAt:
+        type: string
+        format: date-time
+      updatedBy:
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"

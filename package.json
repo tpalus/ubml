@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@ubml/schema",
+  "version": "1.0.0",
+  "description": "UBML - Unified Business Modeling Language schema definitions",
+  "keywords": [
+    "ubml",
+    "business-modeling",
+    "process-modeling",
+    "yaml-schema",
+    "json-schema",
+    "bpmn",
+    "dsl"
+  ],
+  "homepage": "https://github.com/TALXIS/ubml",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TALXIS/ubml.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TALXIS/ubml/issues"
+  },
+  "license": "MIT",
+  "author": "NETWORG (https://networg.com)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./schemas/*": "./schemas/*"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "validate": "node scripts/validate-schemas.js",
+    "validate:example": "node scripts/validate-workspace.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts",
+    "docs": "typedoc src/index.ts --out docs/api",
+    "prepublishOnly": "npm run build && npm run validate"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.1",
+    "eslint": "^8.0.0",
+    "tsup": "^8.0.0",
+    "typedoc": "^0.25.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "yaml": "^2.3.0"
+  },
+  "peerDependencies": {
+    "ajv": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ajv": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

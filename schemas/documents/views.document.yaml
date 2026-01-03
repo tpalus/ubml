@@ -1,0 +1,117 @@
+# ============================================================================
+# UBML Views Document Schema
+# ============================================================================
+# Schema for .views.ubml.yaml files - custom view and diagram configurations.
+#
+# VERSION: 1.0
+# FILE PATTERN: *.views.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/documents/views.document.yaml"
+title: "UBML Views Document"
+description: |
+  View documents define custom perspectives and diagram configurations.
+  
+  WHAT IS A VIEW?
+  A view is a filtered, styled perspective on the process model:
+  - Executive views (high-level, key metrics)
+  - Operational views (detailed, full RACI)
+  - System views (integrations, data flows)
+  - Comparison views (as-is vs. to-be)
+  
+  WHY DEFINE VIEWS?
+  Views enable:
+  - Stakeholder-specific presentations
+  - Focused documentation
+  - Diagram customization
+  - Comparison and analysis
+  
+  FILE NAMING: *.views.ubml.yaml
+  Examples:
+    - executive-dashboard.views.ubml.yaml
+    - training-materials.views.ubml.yaml
+    - comparison-views.views.ubml.yaml
+  
+  GETTING STARTED:
+  1. Identify your target audience
+  2. Create a view with appropriate filters
+  3. Configure what to show/hide
+  4. Add custom styling if needed
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.0" for this schema version.
+    type: string
+    const: "1.0"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what views are defined in this file.
+    type: string
+  
+  views:
+    description: |
+      View definitions, keyed by view ID.
+      
+      View IDs follow the VW### pattern (e.g., VW001, VW002).
+      
+      Example:
+        views:
+          VW001:
+            name: "Executive Overview"
+            description: "High-level process view for leadership"
+            type: process
+            process: PR001
+            filters:
+              - type: kind
+                include: [milestone, subprocess, event]
+            show:
+              steps: true
+              links: true
+              actors: false
+              metrics: true
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^VW\\d{3,}$":
+        $ref: "../fragments/view.fragment.yaml#/$defs/View"
+  
+  metadata:
+    description: "Document metadata."
+    type: object
+    additionalProperties: false
+    properties:
+      createdAt:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedAt:
+        type: string
+        format: date-time
+      updatedBy:
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"

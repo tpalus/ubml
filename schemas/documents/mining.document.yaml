@@ -1,0 +1,119 @@
+# ============================================================================
+# UBML Mining Document Schema
+# ============================================================================
+# Schema for .mining.ubml.yaml files - process mining configuration.
+#
+# VERSION: 1.0
+# FILE PATTERN: *.mining.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/documents/mining.document.yaml"
+title: "UBML Mining Document"
+description: |
+  Mining documents configure process mining data sources and mappings.
+  
+  WHAT IS PROCESS MINING?
+  Process mining extracts insights from system event logs to:
+  - Discover actual process flows
+  - Compare reality vs. documented processes
+  - Identify bottlenecks and variations
+  - Validate process improvements
+  
+  WHY MINING CONFIGURATION?
+  Mining configuration enables:
+  - Connecting event log data to UBML models
+  - Mapping activities to steps
+  - Mapping resources to actors
+  - Conformance checking
+  
+  FILE NAMING: *.mining.ubml.yaml
+  Examples:
+    - sap-order-mining.mining.ubml.yaml
+    - crm-ticket-mining.mining.ubml.yaml
+    - erp-integration.mining.ubml.yaml
+  
+  GETTING STARTED:
+  1. Define the data source (CSV, database, API)
+  2. Map columns to event log fields
+  3. Map activities to UBML steps
+  4. Map resources to UBML actors
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.0" for this schema version.
+    type: string
+    const: "1.0"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what mining configuration is in this file.
+    type: string
+  
+  miningSources:
+    description: |
+      Mining source definitions, keyed by source ID.
+      
+      Mining source IDs follow the MS### pattern (e.g., MS001, MS002).
+      
+      Example:
+        miningSources:
+          MS001:
+            name: "SAP Order Log"
+            type: csv
+            columns:
+              caseId: "Order_Number"
+              activity: "Activity_Name"
+              timestamp: "Event_Time"
+              resource: "User_ID"
+            timestampFormat: "YYYY-MM-DD HH:mm:ss"
+            process: PR001
+            activityMappings:
+              - activity: "Create Order"
+                step: ST001
+              - activity: "Approve Order"
+                step: ST002
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^MS\\d{3,}$":
+        $ref: "../fragments/mining.fragment.yaml#/$defs/MiningSource"
+  
+  metadata:
+    description: "Document metadata."
+    type: object
+    additionalProperties: false
+    properties:
+      createdAt:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedAt:
+        type: string
+        format: date-time
+      updatedBy:
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"

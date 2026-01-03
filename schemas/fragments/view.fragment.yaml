@@ -1,0 +1,393 @@
+# ============================================================================
+# UBML View Fragment Schema
+# ============================================================================
+# Defines custom views and diagram configurations.
+#
+# VERSION: 1.0
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/fragments/view.fragment.yaml"
+title: "UBML View Fragment"
+description: |
+  Views are custom perspectives on the process model that highlight
+  specific aspects for different audiences or purposes.
+  
+  Views enable:
+  - Filtered views for specific stakeholders
+  - Focused diagrams for presentations
+  - Comparison views (as-is vs. to-be)
+  - Custom layouts and styling
+
+$defs:
+
+  # ==========================================================================
+  # VIEW FILTER
+  # ==========================================================================
+
+  ViewFilter:
+    description: |
+      A filter condition to include/exclude elements from a view.
+      
+      Filters can target:
+      - Specific element IDs
+      - Tags
+      - Types (step kinds, actor types, etc.)
+      - Custom properties
+      
+      EXAMPLES:
+      
+      Filter by tag:
+        - type: tag
+          include: ["customer-facing", "critical"]
+      
+      Filter by step kind:
+        - type: kind
+          property: kind
+          include: ["task", "subprocess"]
+      
+      Filter by specific IDs:
+        - type: id
+          include: ["ST001", "ST002", "ST003"]
+    type: object
+    additionalProperties: false
+    required: [type]
+    properties:
+      type:
+        description: |
+          Filter type:
+          - tag: Filter by tags
+          - kind: Filter by element kind/type
+          - id: Filter by specific IDs
+          - property: Filter by custom property value
+        type: string
+        enum: [tag, kind, id, property]
+      
+      property:
+        description: "Property name (for property filter type)."
+        type: string
+      
+      include:
+        description: "Values to include."
+        type: array
+        items:
+          type: string
+      
+      exclude:
+        description: "Values to exclude."
+        type: array
+        items:
+          type: string
+      
+      operator:
+        description: |
+          How to combine include/exclude:
+          - and: All conditions must match
+          - or: Any condition matches
+        type: string
+        enum: [and, or]
+        default: or
+
+  # ==========================================================================
+  # VIEW STYLING
+  # ==========================================================================
+
+  ViewStyling:
+    description: |
+      Custom styling rules for elements in a view.
+      
+      Styling enables visual differentiation based on:
+      - Element types
+      - Tags
+      - Properties
+      - Status or state
+    type: object
+    additionalProperties: false
+    properties:
+      selector:
+        description: |
+          CSS-like selector for targeting elements.
+          
+          Examples:
+            "[kind=task]" - All tasks
+            "[tag=critical]" - Elements with critical tag
+            "#ST001" - Specific element
+        type: string
+      
+      styles:
+        description: "Styles to apply."
+        type: object
+        additionalProperties: false
+        properties:
+          backgroundColor:
+            type: string
+          borderColor:
+            type: string
+          borderWidth:
+            type: integer
+          textColor:
+            type: string
+          fontWeight:
+            type: string
+            enum: [normal, bold]
+          opacity:
+            type: number
+            minimum: 0
+            maximum: 1
+          shape:
+            type: string
+          icon:
+            type: string
+
+  # ==========================================================================
+  # VIEW LAYOUT
+  # ==========================================================================
+
+  ViewLayout:
+    description: |
+      Layout configuration for the view.
+    type: object
+    additionalProperties: false
+    properties:
+      type:
+        description: |
+          Layout algorithm:
+          - auto: Automatic layout
+          - horizontal: Left-to-right flow
+          - vertical: Top-to-bottom flow
+          - hierarchical: Layered hierarchy
+          - manual: User-defined positions
+        type: string
+        enum: [auto, horizontal, vertical, hierarchical, manual]
+        default: auto
+      
+      direction:
+        description: "Primary flow direction."
+        type: string
+        enum: [left-to-right, right-to-left, top-to-bottom, bottom-to-top]
+      
+      spacing:
+        description: "Spacing between elements."
+        type: object
+        additionalProperties: false
+        properties:
+          horizontal:
+            type: integer
+            minimum: 0
+          vertical:
+            type: integer
+            minimum: 0
+      
+      swimlanes:
+        description: |
+          Swimlane configuration.
+          Groups elements by actor or other property.
+        type: object
+        additionalProperties: false
+        properties:
+          enabled:
+            type: boolean
+          groupBy:
+            description: "Property to group by (actor, phase, etc.)."
+            type: string
+          orientation:
+            type: string
+            enum: [horizontal, vertical]
+      
+      positions:
+        description: |
+          Manual positions for elements (layout: manual).
+          Keyed by element ID.
+        type: object
+        additionalProperties:
+          type: object
+          additionalProperties: false
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+            width:
+              type: number
+            height:
+              type: number
+
+  # ==========================================================================
+  # VIEW
+  # ==========================================================================
+
+  View:
+    description: |
+      A custom view or diagram configuration.
+      
+      Views provide different perspectives on the same underlying model:
+      - Executive summary (high-level, key metrics)
+      - Detailed operational view (all steps, RACI)
+      - System integration view (systems, data flows)
+      - Compliance view (controls, approvals)
+      
+      EXAMPLE - Executive Summary View:
+      
+        VW001:
+          name: "Executive Summary"
+          description: "High-level process overview for leadership"
+          type: process
+          process: PR001
+          
+          filters:
+            - type: kind
+              include: [milestone, subprocess, event]
+          
+          show:
+            steps: true
+            links: true
+            actors: false
+            annotations: false
+          
+          styling:
+            - selector: "[tag=critical]"
+              styles:
+                backgroundColor: "#FF0000"
+                fontWeight: bold
+      
+      EXAMPLE - Comparison View:
+      
+        VW002:
+          name: "As-Is vs To-Be Comparison"
+          type: comparison
+          baseScenario: SC001
+          compareScenario: SC002
+          highlightDifferences: true
+    type: object
+    additionalProperties: false
+    required: [name, type]
+    properties:
+      name:
+        description: "View name."
+        type: string
+      
+      description:
+        description: "View description and purpose."
+        type: string
+      
+      type:
+        description: |
+          View type:
+          - process: Process diagram view
+          - capability: Capability map view
+          - value-stream: Value stream map
+          - entity: Entity relationship diagram
+          - actor: Actor/organization view
+          - comparison: Side-by-side comparison
+          - metrics: Metrics dashboard
+          - custom: Custom view type
+        type: string
+        enum: [process, capability, value-stream, entity, actor, comparison, metrics, custom]
+      
+      process:
+        description: "Process to display (for process views)."
+        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+      
+      valueStream:
+        description: "Value stream to display (for value-stream views)."
+        $ref: "../common/defs.schema.yaml#/$defs/ValueStreamRef"
+      
+      filters:
+        description: "Filters to apply to the view."
+        type: array
+        items:
+          $ref: "#/$defs/ViewFilter"
+      
+      show:
+        description: "What elements to show/hide."
+        type: object
+        additionalProperties: false
+        properties:
+          steps:
+            type: boolean
+            default: true
+          links:
+            type: boolean
+            default: true
+          actors:
+            type: boolean
+            default: true
+          phases:
+            type: boolean
+            default: true
+          blocks:
+            type: boolean
+            default: true
+          annotations:
+            type: boolean
+            default: true
+          metrics:
+            type: boolean
+            default: false
+          timing:
+            type: boolean
+            default: false
+      
+      layout:
+        description: "Layout configuration."
+        $ref: "#/$defs/ViewLayout"
+      
+      styling:
+        description: "Custom styling rules."
+        type: array
+        items:
+          $ref: "#/$defs/ViewStyling"
+      
+      # Comparison view properties
+      baseScenario:
+        description: "Base scenario for comparison views."
+        $ref: "../common/defs.schema.yaml#/$defs/ScenarioRef"
+      
+      compareScenario:
+        description: "Comparison scenario."
+        $ref: "../common/defs.schema.yaml#/$defs/ScenarioRef"
+      
+      highlightDifferences:
+        description: "Whether to highlight differences in comparison."
+        type: boolean
+        default: true
+      
+      # Metrics view properties
+      kpis:
+        description: "KPIs to display (for metrics views)."
+        type: array
+        items:
+          $ref: "../common/defs.schema.yaml#/$defs/KPIRef"
+      
+      audience:
+        description: |
+          Intended audience for this view.
+          
+          Examples: "executive", "operations", "IT", "compliance"
+        type: string
+      
+      purpose:
+        description: |
+          Purpose of this view.
+          
+          Examples: "decision-making", "training", "audit", "presentation"
+        type: string
+      
+      lastGenerated:
+        description: "When this view was last generated."
+        type: string
+        format: date-time
+      
+      owner:
+        description: "View owner."
+        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+      
+      tags:
+        description: "Tags for filtering and views."
+        type: array
+        items:
+          type: string
+      
+      custom:
+        description: "User-defined custom fields."
+        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"

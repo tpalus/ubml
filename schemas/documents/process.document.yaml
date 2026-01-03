@@ -1,0 +1,114 @@
+# ============================================================================
+# UBML Process Document Schema
+# ============================================================================
+# Schema for .process.ubml.yaml files - process definitions.
+#
+# VERSION: 1.0
+# FILE PATTERN: *.process.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/documents/process.document.yaml"
+title: "UBML Process Document"
+description: |
+  Process documents define business processes with steps, links, and control flow.
+  
+  WHAT IS A PROCESS DOCUMENT?
+  A process document contains one or more related processes that describe
+  how work flows through an organization. Processes can be hierarchical
+  (L1 strategic to L4 work instructions) and can reference each other.
+  
+  PROCESS COMPONENTS:
+  - Steps: Activities, tasks, decisions, events, milestones
+  - Links: Connections between steps (routing and scheduling)
+  - Blocks: Control flow groupings (parallel, alternative, loops)
+  - Phases: Organizational groupings (lifecycle, delivery)
+  
+  FILE NAMING: *.process.ubml.yaml
+  Examples:
+    - order-fulfillment.process.ubml.yaml
+    - customer-onboarding.process.ubml.yaml
+    - invoice-processing.process.ubml.yaml
+  
+  GETTING STARTED:
+  1. Define the process with id, name, and description
+  2. Add steps for each activity in the process
+  3. Add links to connect steps and define flow
+  4. Optionally add phases and blocks for organization
+
+type: object
+additionalProperties: false
+required: [ubml, processes]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.0" for this schema version.
+    type: string
+    const: "1.0"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what processes are contained in this file.
+    type: string
+  
+  processes:
+    description: |
+      Process definitions, keyed by process ID.
+      
+      Process IDs follow the PR### pattern (e.g., PR001, PR002).
+      
+      Example:
+        processes:
+          PR001:
+            name: "Order Fulfillment"
+            description: "End-to-end order processing"
+            steps:
+              ST001:
+                name: "Receive Order"
+                kind: event
+              ST002:
+                name: "Validate Order"
+                kind: task
+            links:
+              - from: ST001
+                to: ST002
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^PR\\d{3,}$":
+        $ref: "../fragments/process.fragment.yaml#/$defs/Process"
+  
+  metadata:
+    description: "Document metadata."
+    type: object
+    additionalProperties: false
+    properties:
+      createdAt:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedAt:
+        type: string
+        format: date-time
+      updatedBy:
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"

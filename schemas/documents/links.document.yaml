@@ -1,0 +1,106 @@
+# ============================================================================
+# UBML Links Document Schema
+# ============================================================================
+# Schema for .links.ubml.yaml files - cross-process link definitions.
+#
+# VERSION: 1.0
+# FILE PATTERN: *.links.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/documents/links.document.yaml"
+title: "UBML Links Document"
+description: |
+  Link documents define relationships between steps across processes.
+  
+  WHEN TO USE LINK DOCUMENTS?
+  Links within a single process are defined in the process document.
+  Use a separate links document when:
+  - Connecting steps across different process files
+  - Managing complex cross-process dependencies
+  - Keeping interface definitions separate from processes
+  
+  LINK TYPES:
+  - Routing: Control flow connections
+  - Scheduling: Timing dependencies
+  - Data flow: Information passing
+  
+  FILE NAMING: *.links.ubml.yaml
+  Examples:
+    - cross-process-links.links.ubml.yaml
+    - order-to-fulfillment.links.ubml.yaml
+    - integration-links.links.ubml.yaml
+  
+  GETTING STARTED:
+  1. Identify cross-process connections
+  2. Define links with source and target steps
+  3. Add conditions or scheduling as needed
+  4. Document data bindings if applicable
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.0" for this schema version.
+    type: string
+    const: "1.0"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what links are defined in this file.
+    type: string
+  
+  links:
+    description: |
+      Cross-process link definitions.
+      
+      Example:
+        links:
+          - from: ST015
+            to: ST101
+            condition: "order.approved"
+            schedule:
+              type: finish-to-start
+              lag: "1h"
+            dataBindings:
+              orderId: approvedOrderId
+    type: array
+    items:
+      $ref: "../fragments/link.fragment.yaml#/$defs/Link"
+  
+  metadata:
+    description: "Document metadata."
+    type: object
+    additionalProperties: false
+    properties:
+      createdAt:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedAt:
+        type: string
+        format: date-time
+      updatedBy:
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"

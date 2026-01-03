@@ -1,0 +1,759 @@
+# ============================================================================
+# UBML Common Definitions Schema
+# ============================================================================
+# Contains all reusable type definitions, references, and common patterns
+# used across UBML document schemas.
+#
+# This file is the foundation of the UBML type system. All other schemas
+# import definitions from here.
+#
+# VERSION: 1.0
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/common/defs.schema.yaml"
+title: "UBML Common Definitions"
+description: |
+  Shared type definitions for UBML (Unified Business Modeling Language).
+  
+  This schema defines:
+  - Reference types for linking between model elements
+  - Primitive types for durations, money, rates
+  - Expression language specification
+  - Common enums and value types
+
+$defs:
+
+  # ==========================================================================
+  # REFERENCE TYPES
+  # ==========================================================================
+  # Reference types enable linking between model elements with type safety.
+  # Each reference uses a typed ID pattern (prefix + digits) for clarity.
+  # ==========================================================================
+  
+  ActorRef:
+    description: |
+      Reference to an actor (AC### pattern).
+      
+      Actors represent WHO does work in your processes:
+      - People, roles, teams, organizations
+      - Systems and external parties
+      
+      Examples: AC001, AC042, AC100
+    type: string
+    pattern: "^AC\\d{3,}$"
+
+  StepRef:
+    description: |
+      Reference to a step (ST### pattern).
+      
+      Steps are the individual activities within a process.
+      
+      Examples: ST001, ST015, ST200
+    type: string
+    pattern: "^ST\\d{3,}$"
+
+  ProcessRef:
+    description: |
+      Reference to a process (PR### pattern).
+      
+      Processes are workflows containing steps, links, and control flow.
+      
+      Examples: PR001, PR010, PR100
+    type: string
+    pattern: "^PR\\d{3,}$"
+
+  EntityRef:
+    description: |
+      Reference to an entity (EN### pattern).
+      
+      Entities are core business objects like Order, Customer, Contract.
+      
+      Examples: EN001, EN015, EN100
+    type: string
+    pattern: "^EN\\d{3,}$"
+
+  DocumentRef:
+    description: |
+      Reference to a document (DC### pattern).
+      
+      Documents are representations of entities:
+      - Forms, contracts, reports, invoices
+      - Files, templates, signed documents
+      
+      Examples: DC001, DC010, DC100
+    type: string
+    pattern: "^DC\\d{3,}$"
+
+  SkillRef:
+    description: |
+      Reference to a skill (SK### pattern).
+      
+      Skills define what people can do:
+      - Certifications (HGV license, crane operator)
+      - Competencies (negotiation, technical review)
+      
+      Examples: SK001, SK010, SK100
+    type: string
+    pattern: "^SK\\d{3,}$"
+
+  ServiceRef:
+    description: |
+      Reference to a service (SV### pattern).
+      
+      Services are offerings in the service catalog.
+      
+      Examples: SV001, SV010, SV100
+    type: string
+    pattern: "^SV\\d{3,}$"
+
+  ScenarioRef:
+    description: |
+      Reference to a scenario (SC### pattern).
+      
+      Scenarios define simulation configurations for what-if analysis.
+      
+      Examples: SC001, SC010, SC100
+    type: string
+    pattern: "^SC\\d{3,}$"
+
+  HypothesisRef:
+    description: |
+      Reference to a hypothesis node (HY### pattern).
+      
+      Hypotheses are nodes in the SCQH hypothesis tree.
+      
+      Examples: HY001, HY010, HY100
+    type: string
+    pattern: "^HY\\d{3,}$"
+
+  EvidenceRef:
+    description: |
+      Reference to evidence (EV### pattern).
+      
+      Evidence items are structured workshop findings:
+      - Quotes, observations, pain points
+      - Assumptions, metrics, insights
+      
+      Examples: EV001, EV010, EV100
+    type: string
+    pattern: "^EV\\d{3,}$"
+
+  KpiRef:
+    description: |
+      Reference to a KPI (KP### pattern).
+      
+      KPIs are key performance indicators with targets.
+      
+      Examples: KP001, KP010, KP100
+    type: string
+    pattern: "^KP\\d{3,}$"
+
+  CapabilityRef:
+    description: |
+      Reference to a capability (CP### pattern).
+      
+      Capabilities describe what the organization can do.
+      
+      Examples: CP001, CP010, CP100
+    type: string
+    pattern: "^CP\\d{3,}$"
+
+  ValueStreamRef:
+    description: |
+      Reference to a value stream (VS### pattern).
+      
+      Value streams show end-to-end value flows across processes.
+      
+      Examples: VS001, VS010, VS100
+    type: string
+    pattern: "^VS\\d{3,}$"
+
+  ProductRef:
+    description: |
+      Reference to a product (PD### pattern).
+      
+      Products are bundled offerings to customers.
+      
+      Examples: PD001, PD010, PD100
+    type: string
+    pattern: "^PD\\d{3,}$"
+
+  PortfolioRef:
+    description: |
+      Reference to a portfolio (PF### pattern).
+      
+      Portfolios group related products, services, or process types.
+      They enable executive-level views and organizational structuring:
+      - Product portfolios: "Consumer Products", "Enterprise Solutions"
+      - Service portfolios: "Professional Services", "Support Services"
+      - Project portfolios: "Infrastructure Projects", "Digital Transformation"
+      
+      Portfolios can be hierarchical (parent portfolios contain sub-portfolios).
+      
+      Examples: PF001, PF010, PF100
+    type: string
+    pattern: "^PF\\d{3,}$"
+
+  EquipmentRef:
+    description: |
+      Reference to equipment (EQ### pattern).
+      
+      Equipment represents physical assets used to perform work:
+      - Vehicles: trucks, forklifts, cranes
+      - Machines: production lines, CNC machines, 3D printers
+      - Tools: specialized equipment, testing devices
+      - Devices: scanners, tablets, measurement instruments
+      
+      Equipment is separate from actors because:
+      1. Equipment cannot be accountable (RACI only has people/roles)
+      2. Equipment requires operators with specific skills
+      3. Equipment has physical location constraints
+      4. Equipment has capacity/throughput characteristics
+      
+      Examples: EQ001, EQ010, EQ100
+    type: string
+    pattern: "^EQ\\d{3,}$"
+
+  LocationRef:
+    description: |
+      Reference to a location (LC### pattern).
+      
+      Locations answer WHERE work happens or equipment is stationed:
+      - Sites: construction sites, customer premises
+      - Facilities: factories, warehouses, offices
+      - Regions: geographic areas for service coverage
+      - Zones: areas within a facility (assembly line, loading dock)
+      
+      Locations are separate from actors because:
+      1. A location is not a participant - it's a place
+      2. Multiple actors can work at the same location
+      3. Equipment is stationed at locations
+      4. Some steps are location-specific (on-site vs remote)
+      
+      Examples: LC001, LC010, LC100
+    type: string
+    pattern: "^LC\\d{3,}$"
+
+  BlockRef:
+    description: |
+      Reference to a control flow block (BK### pattern).
+      
+      Blocks define EXECUTION semantics - how steps run together:
+      - par: parallel execution
+      - alt: alternative paths (branching)
+      - loop: repeated execution
+      - opt: optional execution
+      
+      Examples: BK001, BK010, BK100
+    type: string
+    pattern: "^BK\\d{3,}$"
+
+  PhaseRef:
+    description: |
+      Reference to a process phase (PH### pattern).
+      
+      Phases are ORGANIZATIONAL overlays on the process graph:
+      - lifecycle: project stages like Design → Build → Test
+      - delivery: release scopes like MVP, Phase 1, Future
+      
+      Phases do NOT affect execution - they're purely for visualization
+      and stakeholder communication. Use blocks for execution semantics.
+      
+      Examples: PH001, PH010, PH100
+    type: string
+    pattern: "^PH\\d{3,}$"
+
+  PersonaRef:
+    description: |
+      Reference to a persona (PS### pattern).
+      
+      Personas are stakeholder archetypes with goals and pain points.
+      
+      Examples: PS001, PS010, PS100
+    type: string
+    pattern: "^PS\\d{3,}$"
+
+  ResourcePoolRef:
+    description: |
+      Reference to a resource pool (RP### pattern).
+      
+      Resource pools group interchangeable resources for simulation.
+      
+      Examples: RP001, RP010, RP100
+    type: string
+    pattern: "^RP\\d{3,}$"
+
+  ViewRef:
+    description: |
+      Reference to a view (VW### pattern).
+      
+      Views are saved diagram configurations.
+      
+      Examples: VW001, VW010, VW100
+    type: string
+    pattern: "^VW\\d{3,}$"
+
+  # ==========================================================================
+  # DATA OBJECT REFERENCES
+  # ==========================================================================
+  # References to entities or documents with optional state information.
+  # Used for step inputs and outputs.
+  # ==========================================================================
+
+  DataObjectInput:
+    description: |
+      Reference to an entity or document as step input.
+      
+      Inputs are read-only and don't change document state.
+      Use 'inState' to require the document be in a specific lifecycle state.
+      
+      Examples:
+        # Simple reference
+        - ref: DC001
+        
+        # With required state
+        - ref: DC002
+          inState: approved
+    type: object
+    additionalProperties: false
+    required: [ref]
+    properties:
+      ref:
+        description: "Entity or document ID."
+        oneOf:
+          - $ref: "#/$defs/EntityRef"
+          - $ref: "#/$defs/DocumentRef"
+      inState:
+        description: |
+          Required document state (precondition).
+          Must match a state from the document's lifecycle array.
+          Optional - omit if any state is acceptable.
+        type: string
+
+  DataObjectOutput:
+    description: |
+      Reference to an entity or document as step output.
+      
+      Outputs can change document state. Lifecycle progression:
+      - First output of a document → created in first lifecycle state
+      - Subsequent outputs → document advances to next lifecycle state
+      - Use explicit toState for non-linear flows (rejection, rework)
+      
+      Examples:
+        # Simple reference (auto-advance state)
+        - ref: DC001
+        
+        # With explicit target state (for rejection/rework)
+        - ref: DC002
+          toState: draft
+    type: object
+    additionalProperties: false
+    required: [ref]
+    properties:
+      ref:
+        description: "Entity or document ID."
+        oneOf:
+          - $ref: "#/$defs/EntityRef"
+          - $ref: "#/$defs/DocumentRef"
+      toState:
+        description: |
+          Target document state after this step completes.
+          Must match a state from the document's lifecycle array.
+          
+          Use only for non-linear flows (rejection, rework, cancellation).
+          For normal forward progression, omit this - the tool infers
+          the next state from the document's lifecycle order.
+        type: string
+
+  # ==========================================================================
+  # CUSTOM FIELDS
+  # ==========================================================================
+
+  CustomFields:
+    description: |
+      User-defined key-value pairs for extensibility.
+      
+      Custom fields allow adding domain-specific metadata without
+      schema changes. Values can be strings, numbers, booleans,
+      or arrays of strings/numbers.
+      
+      Examples:
+        custom:
+          region: "EMEA"
+          priority: 1
+          isLegacy: true
+          tags: ["urgent", "customer-facing"]
+    type: object
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: array
+          items:
+            oneOf:
+              - type: string
+              - type: number
+
+  # ==========================================================================
+  # MONETARY TYPES
+  # ==========================================================================
+
+  Money:
+    description: |
+      Monetary amount with currency.
+      
+      Uses ISO 4217 currency codes.
+      
+      Examples:
+        amount: 1500.00
+        currency: "EUR"
+    type: object
+    additionalProperties: false
+    required: [amount, currency]
+    properties:
+      amount:
+        description: "Monetary amount (decimal)."
+        type: number
+      currency:
+        description: "ISO 4217 currency code."
+        type: string
+        examples: ["USD", "EUR", "CZK", "GBP"]
+
+  Rate:
+    description: |
+      Cost rate with currency and time unit.
+      
+      Used for actor/resource costing in simulation.
+      
+      Examples:
+        # Hourly rate
+        amount: 75
+        currency: "EUR"
+        per: h
+        
+        # Daily rate
+        amount: 500
+        currency: "USD"
+        per: d
+    type: object
+    additionalProperties: false
+    required: [amount, currency, per]
+    properties:
+      amount:
+        description: "Rate amount per time unit."
+        type: number
+      currency:
+        description: "ISO 4217 currency code."
+        type: string
+      per:
+        description: "Time unit for rate."
+        type: string
+        enum: [h, d, wk, mo]
+
+  # ==========================================================================
+  # DURATION TYPES
+  # ==========================================================================
+
+  DurationString:
+    description: |
+      Duration string in format: number + unit.
+      
+      Supported units:
+      - min: minutes
+      - h: hours
+      - d: days
+      - wk: weeks
+      - mo: months
+      
+      Examples: "2d", "4h", "30min", "1.5wk", "3mo"
+    type: string
+    pattern: "^[0-9]+(\\.[0-9]+)?(min|h|d|wk|mo)$"
+
+  Duration:
+    description: |
+      Duration value: literal string or expression.
+      
+      Three forms (pick one):
+      
+      1. Direct string (shorthand for fixed literal):
+         duration: "2d"
+         duration: "4h"
+      
+      2. Object with fixed literal:
+         duration: { fixed: "2d" }
+      
+      3. Object with expression (calculation or work attribute):
+         duration: { expr: "tri(d(1),d(2),d(4))" }   # distribution
+         duration: { expr: "baseEffort * 1.5" }      # calculation
+         duration: { expr: adjustedEffort }          # work attribute
+    oneOf:
+      - $ref: "#/$defs/DurationString"
+      - type: object
+        additionalProperties: false
+        required: [fixed]
+        properties:
+          fixed:
+            description: "Fixed duration literal."
+            $ref: "#/$defs/DurationString"
+      - type: object
+        additionalProperties: false
+        required: [expr]
+        properties:
+          expr:
+            description: |
+              Expression that evaluates to a duration.
+              Can be a calculation, distribution, or work attribute.
+              
+              Examples:
+                tri(d(1),d(2),d(4))    # triangular distribution
+                baseEffort * 1.5       # calculation
+                adjustedEffort         # work attribute
+            type: string
+
+  # ==========================================================================
+  # TIME FORMATS
+  # ==========================================================================
+
+  TimeString:
+    description: |
+      Time in HH:MM format (24-hour).
+      
+      Examples: "08:00", "17:30", "00:00", "23:59"
+    type: string
+    pattern: "^[0-2][0-9]:[0-5][0-9]$"
+
+  DateString:
+    description: |
+      Date in ISO 8601 format (YYYY-MM-DD).
+      
+      Examples: "2026-01-03", "2025-12-31"
+    type: string
+    format: date
+
+  # ==========================================================================
+  # CALENDAR TYPES
+  # ==========================================================================
+
+  Month:
+    description: |
+      Three-letter month abbreviation.
+      Used for scenario arrival patterns.
+    type: string
+    enum: [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+
+  Weekday:
+    description: |
+      Three-letter weekday abbreviation.
+      Used for calendar work day configuration.
+    type: string
+    enum: [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+
+  # ==========================================================================
+  # EXPRESSION TYPE
+  # ==========================================================================
+
+  Expression:
+    description: |
+      TypeScript-subset expression string (ts-subset-v1).
+      
+      Expressions can be:
+      - Calculations: "orderValue > 50000 && customer.segment == 'enterprise'"
+      - Work attribute references: isHighValue (a simple variable name)
+      
+      WORK ATTRIBUTES:
+      Expressions can reference work attributes defined in workAttributes[]:
+      - bindsTo: keys that map to information model attributes
+      - expr: computed keys that derive values from other attributes
+      
+      USAGE EXAMPLES:
+        # In guards
+        guard: "isHighValue && customer.segment == 'enterprise'"
+        guard: isHighValue
+        
+        # In durations
+        duration: { expr: "adjustedEffort * 1.2" }
+        duration: { expr: adjustedEffort }
+      
+      ALLOWED SYNTAX:
+      - Literals: number, string, boolean, null
+      - Operators: + - * / %, comparisons, && || !, ternary (cond ? a : b)
+      - Property access: customer.region, order.value
+      - Work attribute keys: orderValue, isHighValue, adjustedEffort
+      - Built-in functions: tri(min,mode,max), min(...), max(...), 
+        clamp(x,lo,hi), round(x,digits?), floor(x), ceil(x)
+      - Duration helpers: min(x), h(x), d(x), wk(x), mo(x)
+      
+      DISALLOWED:
+      - Assignments, loops, if statements
+      - new, classes, imports
+      - Global access (window, globalThis, etc.)
+    type: string
+
+  # ==========================================================================
+  # ANNOTATION TYPE
+  # ==========================================================================
+
+  Annotation:
+    description: |
+      Notes and markers attached to steps or blocks.
+      
+      Use annotations for:
+      - note: free-form documentation or clarification
+      - compliance: regulatory/compliance markers (e.g., SOX, GDPR)
+      - sla: service level agreement markers
+      - warning: cautions or risk indicators
+      
+      IMPORTANT: Milestones are NOT annotations. Use Step.kind = 'milestone'
+      to create a real milestone node in the process graph. Milestones are
+      significant process checkpoints that can be referenced by Phases.
+      
+      Examples:
+        annotations:
+          - type: compliance
+            text: "GDPR data handling requirements"
+            code: "GDPR-Art17"
+          - type: sla
+            text: "Must complete within 4 hours"
+            code: "SLA-RESP-4H"
+    type: object
+    additionalProperties: false
+    required: [text]
+    properties:
+      type:
+        description: |
+          Annotation type. Each type may be rendered differently in diagrams:
+          - note: informational callout
+          - compliance: regulatory badge with code reference
+          - sla: timing/performance indicator
+          - warning: alert/caution marker
+        type: string
+        enum: [note, compliance, sla, warning]
+      text:
+        description: "The annotation content displayed to users."
+        type: string
+      code:
+        description: |
+          External reference code for traceability.
+          Examples: "FAST 1.1", "SOX-42", "GDPR-Art17", "SLA-RESP-4H"
+        type: string
+
+  # ==========================================================================
+  # STEP LIFECYCLE EVENTS
+  # ==========================================================================
+
+  StepLifecycleEvent:
+    description: |
+      Events in a step's lifecycle that can trigger notifications or actions.
+      
+      Used by:
+      - Notification.trigger: when to send alerts
+      - Future: automation hooks, audit logging
+      
+      EVENTS:
+      - onStart: step begins execution
+      - onComplete: step finishes successfully
+      - onError: step fails or encounters an error
+      - onAssign: step is assigned to a resource
+      - onReassign: step is reassigned to different resource
+      - onOutcome: specific approval/decision outcome reached
+      - onReviewComplete: all required reviews received
+      - onDeadlineWarning: approaching deadline (requires threshold)
+      - onDeadlineBreach: deadline exceeded
+    type: string
+    enum:
+      - onStart
+      - onComplete
+      - onError
+      - onAssign
+      - onReassign
+      - onOutcome
+      - onReviewComplete
+      - onDeadlineWarning
+      - onDeadlineBreach
+
+  # ==========================================================================
+  # PROCESS TRIGGER EVENTS
+  # ==========================================================================
+
+  ProcessTriggerEvent:
+    description: |
+      Events that can trigger cross-process orchestration.
+      
+      Used by ProcessTrigger.event to start another process.
+      
+      EVENTS:
+      - onComplete: source step finishes successfully
+      - onStart: source step begins execution
+      - onError: source step fails or encounters an error
+    type: string
+    enum:
+      - onComplete
+      - onStart
+      - onError
+
+  # ==========================================================================
+  # STANDARD APPROVAL OUTCOMES
+  # ==========================================================================
+
+  StandardOutcome:
+    description: |
+      Common approval/decision outcomes for consistency across processes.
+      
+      These are the recommended standard outcomes. Custom outcomes can
+      still be defined in Approval.outcomes as strings.
+      
+      STANDARD OUTCOMES:
+      - approved: request accepted, proceed with next steps
+      - rejected: request denied, typically ends the flow or returns
+      - returned: sent back for revision (not denied, needs rework)
+      - deferred: decision postponed to a later time
+      - escalated: decision elevated to higher authority
+      - timeout: deadline breached without decision
+    type: string
+    enum:
+      - approved
+      - rejected
+      - returned
+      - deferred
+      - escalated
+      - timeout
+
+  # ==========================================================================
+  # PRIORITY LEVELS
+  # ==========================================================================
+
+  Priority:
+    description: |
+      Priority levels for notifications, tasks, and work items.
+      
+      LEVELS:
+      - low: informational, can be batched or delayed
+      - normal: standard handling (default)
+      - high: prompt attention, visual emphasis
+      - urgent: immediate action required, may trigger escalation
+    type: string
+    enum:
+      - low
+      - normal
+      - high
+      - urgent
+
+  # ==========================================================================
+  # COMMENT REQUIREMENT
+  # ==========================================================================
+
+  CommentRequirement:
+    description: |
+      When comments are required from approvers or reviewers.
+      
+      VALUES:
+      - never: comments optional (default)
+      - onNegative: required when rejecting, returning, or flagging issues
+      - always: required for all responses
+    type: string
+    enum:
+      - never
+      - onNegative
+      - always

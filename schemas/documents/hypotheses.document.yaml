@@ -1,0 +1,118 @@
+# ============================================================================
+# UBML Hypotheses Document Schema
+# ============================================================================
+# Schema for .hypotheses.ubml.yaml files - hypothesis tree definitions.
+#
+# VERSION: 1.0
+# FILE PATTERN: *.hypotheses.ubml.yaml
+# ============================================================================
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://ubml.io/schemas/1.0/documents/hypotheses.document.yaml"
+title: "UBML Hypotheses Document"
+description: |
+  Hypothesis documents define hypothesis trees for structured problem framing.
+  
+  WHAT IS A HYPOTHESIS TREE?
+  A hypothesis tree decomposes a main hypothesis into sub-hypotheses
+  that can be independently validated. It uses the SCQH framework:
+  - Situation: Current state/context
+  - Complication: What changed/problem
+  - Question: Key question arising
+  - Hypothesis: Proposed answer
+  
+  WHY USE HYPOTHESIS TREES?
+  Hypothesis trees enable:
+  - Structured problem decomposition
+  - Evidence-based decision making
+  - Clear communication of reasoning
+  - Progress tracking on analysis
+  
+  FILE NAMING: *.hypotheses.ubml.yaml
+  Examples:
+    - process-improvement.hypotheses.ubml.yaml
+    - market-entry.hypotheses.ubml.yaml
+    - cost-reduction.hypotheses.ubml.yaml
+  
+  GETTING STARTED:
+  1. Define the SCQH context
+  2. Create the root hypothesis
+  3. Decompose into sub-hypotheses
+  4. Track validation status as you gather evidence
+
+type: object
+additionalProperties: false
+required: [ubml]
+
+properties:
+  ubml:
+    description: |
+      UBML version identifier.
+      Must be "1.0" for this schema version.
+    type: string
+    const: "1.0"
+  
+  name:
+    description: |
+      Optional document name.
+      If not provided, the filename is used.
+    type: string
+  
+  description:
+    description: |
+      Document description.
+      Explain what analysis is contained in this file.
+    type: string
+  
+  hypothesisTrees:
+    description: |
+      Hypothesis tree definitions, keyed by tree ID.
+      
+      Hypothesis tree IDs follow the HT### pattern (e.g., HT001, HT002).
+      
+      Example:
+        hypothesisTrees:
+          HT001:
+            name: "Process Optimization Analysis"
+            scqh:
+              situation: "Current process takes 5 days"
+              complication: "Customers expect 2 days"
+              question: "How can we reduce to 2 days?"
+              hypothesis: "Streamline approvals and automate"
+            root:
+              id: H001
+              text: "We can achieve 2-day processing"
+              children:
+                - id: H002
+                  text: "Approvals can be streamlined"
+    type: object
+    additionalProperties: false
+    patternProperties:
+      "^HT\\d{3,}$":
+        $ref: "../fragments/hypothesis.fragment.yaml#/$defs/HypothesisTree"
+  
+  metadata:
+    description: "Document metadata."
+    type: object
+    additionalProperties: false
+    properties:
+      createdAt:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedAt:
+        type: string
+        format: date-time
+      updatedBy:
+        type: string
+  
+  tags:
+    description: "Tags for filtering and organization."
+    type: array
+    items:
+      type: string
+  
+  custom:
+    description: "User-defined custom fields."
+    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
