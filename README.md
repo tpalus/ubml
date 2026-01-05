@@ -1,6 +1,6 @@
 # UBML — Unified Business Modeling Language
 
-[![npm version](https://img.shields.io/npm/v/@ubml/core.svg)](https://www.npmjs.com/package/@ubml/core)
+[![npm version](https://img.shields.io/npm/v/ubml.svg)](https://www.npmjs.com/package/ubml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 **A notation for understanding how organizations create and deliver value.**
@@ -112,12 +112,12 @@ See the [example/](./example) directory for a complete workspace.
 
 **CLI (for validation):**
 ```bash
-npm install -g @ubml/cli
+npm install -g ubml-cli
 ```
 
 **Library (for integration):**
 ```bash
-npm install @ubml/core
+npm install ubml
 ```
 
 ### Initialize a workspace
@@ -143,14 +143,14 @@ Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName
 ```json
 {
   "yaml.schemas": {
-    "node_modules/@ubml/core/schemas/documents/workspace.document.yaml": "*.workspace.ubml.yaml",
-    "node_modules/@ubml/core/schemas/documents/process.document.yaml": ["*.process.ubml.yaml", "process.ubml.yaml"],
-    "node_modules/@ubml/core/schemas/documents/actors.document.yaml": ["*.actors.ubml.yaml", "actors.ubml.yaml"],
-    "node_modules/@ubml/core/schemas/documents/entities.document.yaml": ["*.entities.ubml.yaml", "entities.ubml.yaml"],
-    "node_modules/@ubml/core/schemas/documents/metrics.document.yaml": ["*.metrics.ubml.yaml", "metrics.ubml.yaml"],
-    "node_modules/@ubml/core/schemas/documents/hypotheses.document.yaml": ["*.hypotheses.ubml.yaml", "hypotheses.ubml.yaml"],
-    "node_modules/@ubml/core/schemas/documents/strategy.document.yaml": ["*.strategy.ubml.yaml", "strategy.ubml.yaml"],
-    "node_modules/@ubml/core/schemas/documents/scenarios.document.yaml": ["*.scenarios.ubml.yaml", "scenarios.ubml.yaml"]
+    "node_modules/ubml/schemas/documents/workspace.document.yaml": "*.workspace.ubml.yaml",
+    "node_modules/ubml/schemas/documents/process.document.yaml": ["*.process.ubml.yaml", "process.ubml.yaml"],
+    "node_modules/ubml/schemas/documents/actors.document.yaml": ["*.actors.ubml.yaml", "actors.ubml.yaml"],
+    "node_modules/ubml/schemas/documents/entities.document.yaml": ["*.entities.ubml.yaml", "entities.ubml.yaml"],
+    "node_modules/ubml/schemas/documents/metrics.document.yaml": ["*.metrics.ubml.yaml", "metrics.ubml.yaml"],
+    "node_modules/ubml/schemas/documents/hypotheses.document.yaml": ["*.hypotheses.ubml.yaml", "hypotheses.ubml.yaml"],
+    "node_modules/ubml/schemas/documents/strategy.document.yaml": ["*.strategy.ubml.yaml", "strategy.ubml.yaml"],
+    "node_modules/ubml/schemas/documents/scenarios.document.yaml": ["*.scenarios.ubml.yaml", "scenarios.ubml.yaml"]
   }
 }
 ```
@@ -179,19 +179,19 @@ ubml validate . --format json
 
 ```typescript
 // Parse, validate, serialize (works everywhere - browser, Node, Deno, Bun)
-import { parse, validate, serialize, schemas } from '@ubml/core';
+import { parse, validate, serialize, schemas } from 'ubml';
 
 // Node.js file operations
-import { parseFile, validateWorkspace, serializeToFile } from '@ubml/core/node';
+import { parseFile, validateWorkspace, serializeToFile } from 'ubml/node';
 
 // ESLint plugin
-import ubml from '@ubml/core/eslint';
+import ubml from 'ubml/eslint';
 ```
 
 ### Parse and Validate
 
 ```typescript
-import { parse, validate } from '@ubml/core';
+import { parse, validate } from 'ubml';
 
 // Parse documents
 const actors = parse(actorsYaml, 'actors.actors.ubml.yaml');
@@ -215,7 +215,7 @@ for (const warning of result.warnings) {
 ### Validate Workspace (Node.js)
 
 ```typescript
-import { validateWorkspace } from '@ubml/core/node';
+import { validateWorkspace } from 'ubml/node';
 
 // Validate all UBML files in a directory (schema + references)
 const result = await validateWorkspace('./my-workspace');
@@ -233,7 +233,7 @@ if (!result.valid) {
 ### TypeScript Types
 
 ```typescript
-import type { Process, Step, Actor, ProcessDocument } from '@ubml/core';
+import type { Process, Step, Actor, ProcessDocument } from 'ubml';
 
 const process: Process = {
   id: 'PR001',
@@ -252,7 +252,7 @@ const process: Process = {
 
 ```javascript
 // eslint.config.js
-import ubml from '@ubml/core/eslint';
+import ubml from 'ubml/eslint';
 
 export default [
   {
@@ -285,8 +285,8 @@ This monorepo contains two packages:
 
 | Package | Description | npm |
 |---------|-------------|-----|
-| [@ubml/core](./packages/core) | Core library for parsing, validation, and serialization | [![npm](https://img.shields.io/npm/v/@ubml/core.svg)](https://www.npmjs.com/package/@ubml/core) |
-| [@ubml/cli](./packages/cli) | Command-line interface | [![npm](https://img.shields.io/npm/v/@ubml/cli.svg)](https://www.npmjs.com/package/@ubml/cli) |
+| [ubml](./packages/core) | Core library for parsing, validation, and serialization | [![npm](https://img.shields.io/npm/v/ubml.svg)](https://www.npmjs.com/package/ubml) |
+| [ubml-cli](./packages/cli) | Command-line interface | [![npm](https://img.shields.io/npm/v/ubml-cli.svg)](https://www.npmjs.com/package/ubml-cli) |
 
 ---
 
