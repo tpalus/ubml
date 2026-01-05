@@ -159,7 +159,7 @@ function getTypeString(schema: Record<string, unknown>): string {
  * Get information about a document type.
  */
 export function getDocumentTypeInfo(type: DocumentType): DocumentTypeInfo {
-  const schema = documentSchemas[type];
+  const schema = documentSchemas[type] as any;
   const metadata = getCliMetadata(type);
 
   // Extract sections from properties
