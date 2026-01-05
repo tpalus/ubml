@@ -42,6 +42,10 @@ $defs:
       Examples: AC001, AC042, AC100
     type: string
     pattern: "^AC\\d{3,}$"
+    examples:
+      - "AC001"
+      - "AC010"
+      - "AC100"
 
   StepRef:
     description: |
@@ -52,6 +56,10 @@ $defs:
       Examples: ST001, ST015, ST200
     type: string
     pattern: "^ST\\d{3,}$"
+    examples:
+      - "ST001"
+      - "ST010"
+      - "ST100"
 
   ProcessRef:
     description: |
@@ -62,6 +70,10 @@ $defs:
       Examples: PR001, PR010, PR100
     type: string
     pattern: "^PR\\d{3,}$"
+    examples:
+      - "PR001"
+      - "PR010"
+      - "PR100"
 
   EntityRef:
     description: |
@@ -72,6 +84,10 @@ $defs:
       Examples: EN001, EN015, EN100
     type: string
     pattern: "^EN\\d{3,}$"
+    examples:
+      - "EN001"
+      - "EN010"
+      - "EN100"
 
   DocumentRef:
     description: |
@@ -412,6 +428,13 @@ $defs:
     type: object
     additionalProperties: false
     required: [amount, currency]
+    examples:
+      - amount: 1500
+        currency: "EUR"
+      - amount: 2500.50
+        currency: "USD"
+      - amount: 75000
+        currency: "CZK"
     properties:
       amount:
         description: "Monetary amount (decimal)."
@@ -440,6 +463,16 @@ $defs:
     type: object
     additionalProperties: false
     required: [amount, currency, per]
+    examples:
+      - amount: 75
+        currency: "EUR"
+        per: h
+      - amount: 500
+        currency: "USD"
+        per: d
+      - amount: 3000
+        currency: "GBP"
+        per: mo
     properties:
       amount:
         description: "Rate amount per time unit."
@@ -470,6 +503,12 @@ $defs:
       Examples: "2d", "4h", "30min", "1.5wk", "3mo"
     type: string
     pattern: "^[0-9]+(\\.[0-9]+)?(min|h|d|wk|mo)$"
+    examples:
+      - "30min"
+      - "2h"
+      - "1.5d"
+      - "1wk"
+      - "3mo"
 
   Duration:
     description: |
@@ -590,6 +629,12 @@ $defs:
       - new, classes, imports
       - Global access (window, globalThis, etc.)
     type: string
+    examples:
+      - "orderValue > 50000"
+      - "isHighValue"
+      - "customer.segment == 'enterprise'"
+      - "tri(d(1), d(2), d(4))"
+      - "baseEffort * 1.5"
 
   # ==========================================================================
   # ANNOTATION TYPE

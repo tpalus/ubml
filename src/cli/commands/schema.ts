@@ -52,6 +52,22 @@ function code(text: string): string {
   return chalk.cyan(text);
 }
 
+/**
+ * Get human-readable hint for common regex patterns.
+ */
+function getPatternHint(pattern: string): string | undefined {
+  const hints: Record<string, string> = {
+    '^[A-Z]{2}\\\\d{3,}$': 'Format: Two uppercase letters + 3+ digits',
+    '^AC\\\\d{3,}$': 'Format: AC + 3+ digits (e.g., AC001, AC010)',
+    '^ST\\\\d{3,}$': 'Format: ST + 3+ digits (e.g., ST001, ST010)',
+    '^PR\\\\d{3,}$': 'Format: PR + 3+ digits (e.g., PR001, PR010)',
+    '^EN\\\\d{3,}$': 'Format: EN + 3+ digits (e.g., EN001, EN010)',
+    '^[0-9]+(\\\\.[0-9]+)?(min|h|d|wk|mo)$': 'Format: Number + unit (min/h/d/wk/mo)',
+  };
+  
+  return hints[pattern];
+}
+
 // =============================================================================
 // Display Functions
 // =============================================================================
@@ -219,6 +235,19 @@ function displayElementProperties(docInfo: DocumentTypeInfo): void {
       }
       if (prop.enumValues) {
         console.log(INDENT + INDENT + '  ' + dim('Values: ') + prop.enumValues.join(', '));
+      }
+      if (prop.examples && prop.examples.length > 0) {
+        const examplesStr = prop.examples
+          .slice(0, 3) // Show max 3 examples
+          .map((ex) => (typeof ex === 'string' ? `"${ex}"` : JSON.stringify(ex)))
+          .join(', ');
+        console.log(INDENT + INDENT + '  ' + dim('Examples: ') + examplesStr);
+      }
+      if (prop.pattern) {
+        const hint = getPatternHint(prop.pattern);
+        if (hint) {
+          console.log(INDENT + INDENT + '  ' + dim(hint));
+        }
       }
     }
     console.log();

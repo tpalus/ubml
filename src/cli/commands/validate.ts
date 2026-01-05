@@ -19,6 +19,7 @@ export interface ValidateOptions {
   strict: boolean;
   quiet: boolean;
   suppressUnused: boolean;
+  explain: boolean;
 }
 
 /**
@@ -57,6 +58,7 @@ export function validateCommand(): Command {
     .option('-f, --format <format>', 'Output format: stylish, json, sarif', 'stylish')
     .option('-s, --strict', 'Treat warnings as errors', false)
     .option('-q, --quiet', 'Only output errors', false)
+    .option('--explain', 'Show detailed explanations for errors', false)
     .option('--suppress-unused', 'Suppress unused-id warnings (useful for catalog documents)', false)
     .action(async (path: string, options: ValidateOptions) => {
       const absolutePath = resolve(path);
@@ -113,7 +115,7 @@ export function validateCommand(): Command {
           break;
         case 'stylish':
         default:
-          output = formatStylish(result, { quiet: options.quiet });
+          output = formatStylish(result, { quiet: options.quiet, explain: options.explain });
           break;
       }
 

@@ -554,17 +554,35 @@ $defs:
       
       kind:
         description: |
-          Step type:
-          - action: work that transforms inputs to outputs
-          - milestone: significant checkpoint in the process
-          - decision: routing decision point (gateway)
-          - subprocess: grouped work with nested steps
-          - wait: waiting for external event or time
-          - handoff: transfer to another actor/team
-          - start: process entry point
-          - end: process exit point
+          Step type. Most steps are 'action' (the default).
+          
+          WHEN TO USE EACH:
+          - action: Work that transforms inputs to outputs (default)
+          - decision: Routing choice with multiple outcomes
+          - milestone: Significant checkpoint (zero duration)
+          - wait: Pause for external event or time
+          - handoff: Transfer to another team/actor
+          - subprocess: Container for nested steps
+          - start/end: Process boundaries
+          
+          COMMON MISTAKE: Using 'milestone' for approval gates.
+          Use 'action' with 'approval:' instead.
+          
+          Examples of each:
+            action: "Review Purchase Order", "Install Equipment"
+            decision: "Route by Order Value", "Check Eligibility"
+            milestone: "Contract Signed", "Phase 1 Complete"
+            wait: "Wait for Parts Delivery", "Wait 30 Days"
+            handoff: "Transfer to Field Team", "Escalate to Manager"
+            subprocess: "Customer Onboarding", "Quality Inspection"
+            start: "Service Request Received"
+            end: "Service Complete"
         type: string
         enum: [action, milestone, decision, subprocess, wait, handoff, start, end]
+        examples:
+          - action
+          - decision
+          - milestone
       
       systems:
         description: |
@@ -784,15 +802,32 @@ $defs:
       operator:
         description: |
           Block operator defining execution semantics.
-          - seq: sequential (default)
-          - par: parallel
-          - alt: alternative paths
-          - opt: optional
-          - loop: repeated
-          - break: exit enclosing block
+          
+          WHEN TO USE EACH:
+          - seq: Steps run one after another (default)
+          - par: Steps run at the same time (concurrent work)
+          - alt: Exactly one path chosen based on conditions
+          - opt: Path may or may not execute based on condition
+          - loop: Repeat steps until condition is false
+          - break: Exit the enclosing block early
+          
+          COMMON MISTAKE: Using 'alt' when you mean 'opt'.
+          Use 'alt' for mutually exclusive paths (only ONE executes).
+          Use 'opt' for optional work (might skip entirely).
+          
+          Examples:
+            seq: "First approve, then notify, then close"
+            par: "Inspect electrical AND inspect plumbing simultaneously"
+            alt: "Route by priority: urgent path OR normal path"
+            opt: "If high-value customer, perform extra validation"
+            loop: "Repeat rework cycle until quality threshold met"
         type: string
         enum: [seq, par, alt, opt, loop, break]
         default: seq
+        examples:
+          - seq
+          - par
+          - alt
       
       guard:
         description: |

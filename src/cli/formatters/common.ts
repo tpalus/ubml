@@ -2,6 +2,8 @@
  * Common utilities for CLI formatters.
  */
 
+import type { ErrorObject } from 'ajv';
+
 /**
  * Validation message structure (error or warning).
  */
@@ -12,6 +14,8 @@ export interface ValidationMessage {
   line?: number;
   column?: number;
   path?: string;
+  ajvError?: ErrorObject;
+  schema?: any;
 }
 
 /**

@@ -4,10 +4,12 @@
 
 import type { FormatterResult } from './common';
 import { groupMessagesByFile, formatLocation, formatPath, SUCCESS_MESSAGES } from './common';
+import { formatValidationError } from './validation-errors';
 
 export interface StylishOptions {
   quiet?: boolean;
   colors?: boolean;
+  explain?: boolean;
 }
 
 /**
@@ -31,7 +33,19 @@ export function formatStylish(
     for (const error of messages.errors) {
       const location = formatLocation(error);
       const path = formatPath(error);
-      lines.push(`  ${location}  error  ${error.message}${path}`);
+      
+      if (options.explain && error.ajvError) {
+        // Use enhanced error formatter
+        const enhancedMessage = formatValidationError(error.ajvError, error.schema);
+        const formattedLines = enhancedMessage.split('\n');
+        lines.push(`  ${location}  error`);
+        for (const line of formattedLines) {
+          lines.push(`    ${line}`);
+        }
+      } else {
+        // Standard format
+        lines.push(`  ${location}  error  ${error.message}${path}`);
+      }
     }
     
     for (const warning of messages.warnings) {

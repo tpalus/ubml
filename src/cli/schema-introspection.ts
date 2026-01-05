@@ -85,6 +85,8 @@ export interface PropertyInfo {
   description: string;
   required: boolean;
   enumValues?: string[];
+  examples?: unknown[];
+  pattern?: string;
   default?: unknown;
 }
 
@@ -297,6 +299,8 @@ export function getElementTypeInfo(elementType: string): ElementTypeInfo | null 
             description: (propSchema.description as string)?.split('\n')[0] ?? '',
             required: required.includes(propName),
             enumValues: propSchema.enum as string[] | undefined,
+            examples: propSchema.examples as unknown[] | undefined,
+            pattern: propSchema.pattern as string | undefined,
             default: propSchema.default,
           });
         }
