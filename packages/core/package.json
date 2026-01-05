@@ -42,10 +42,6 @@
       "types": "./dist/eslint/index.d.ts",
       "import": "./dist/eslint/index.js"
     },
-    "./cli": {
-      "types": "./dist/cli/index.d.ts",
-      "import": "./dist/cli/index.js"
-    },
     "./generated/metadata": {
       "types": "./dist/generated/metadata.d.ts",
       "import": "./dist/generated/metadata.js"
