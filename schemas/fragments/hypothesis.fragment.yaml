@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines hypothesis trees and the SCQH problem framing framework.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/hypothesis.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/hypothesis.fragment.yaml"
 title: "UBML Hypothesis Fragment"
 description: |
   Hypothesis trees provide structured problem framing using the SCQH 
@@ -81,6 +80,20 @@ $defs:
             reliability matters more than speed.
     type: object
     additionalProperties: false
+    x-ubml:
+      humanName: "SCQH Framework"
+      nestedProperties:
+        - situation
+        - complication
+        - question
+        - hypothesis
+      misplacementHint: "These properties belong inside 'scqh:', not at the tree level"
+      misplacementExample: |
+        scqh:
+          situation: "Current state description"
+          complication: "What changed"
+          question: "Key question"
+          hypothesis: "Proposed answer"
     properties:
       situation:
         description: |
@@ -180,14 +193,8 @@ $defs:
             └── "Parallel instead of sequential approvals" (recommendation)
     type: object
     additionalProperties: false
-    required: [id, text]
+    required: [text]
     properties:
-      id:
-        description: |
-          Unique node identifier.
-          Typically follows HY### pattern.
-        type: string
-      
       text:
         description: |
           The hypothesis, question, or insight text.
@@ -199,6 +206,24 @@ $defs:
         type: string
         enum: [hypothesis, question, evidence, insight, recommendation]
         default: hypothesis
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            answer:
+              value: "answer"
+              hint: "Use 'hypothesis' for proposed answers, or 'recommendation' for actionable conclusions."
+            finding:
+              value: "finding"
+              hint: "Use 'evidence' for findings and observations, or 'insight' for derived conclusions."
+            conclusion:
+              value: "conclusion"
+              hint: "Use 'insight' for conclusions, or 'recommendation' for actionable outcomes."
+            data:
+              value: "data"
+              hint: "Use 'evidence' for data points and observations."
+            action:
+              value: "action"
+              hint: "Use 'recommendation' for suggested actions."
       
       status:
         description: |
@@ -207,6 +232,27 @@ $defs:
         type: string
         enum: [untested, validated, invalidated, partial]
         default: untested
+        x-ubml:
+          propertyNames: ["status"]
+          valueMistakes:
+            confirmed:
+              value: "confirmed"
+              hint: "Use 'validated' for confirmed hypotheses."
+            rejected:
+              value: "rejected"
+              hint: "Use 'invalidated' for rejected/disproven hypotheses."
+            pending:
+              value: "pending"
+              hint: "Use 'untested' for hypotheses not yet validated."
+            open:
+              value: "open"
+              hint: "Use 'untested' for open/unverified hypotheses."
+            "true":
+              value: "true"
+              hint: "Use 'validated' to indicate the hypothesis was proven true."
+            "false":
+              value: "false"
+              hint: "Use 'invalidated' to indicate the hypothesis was proven false."
       
       confidence:
         description: |
@@ -225,6 +271,18 @@ $defs:
         type: string
         enum: [and, or, mece]
         default: and
+        x-ubml:
+          propertyNames: ["operator"]
+          valueMistakes:
+            all:
+              value: "all"
+              hint: "Use 'and' to require all children to be true."
+            any:
+              value: "any"
+              hint: "Use 'or' to require any child to be true."
+            exclusive:
+              value: "exclusive"
+              hint: "Use 'mece' for Mutually Exclusive, Collectively Exhaustive groupings."
       
       priority:
         description: |
@@ -260,9 +318,12 @@ $defs:
       children:
         description: |
           Child nodes (sub-hypotheses, supporting evidence, etc.).
-        type: array
-        items:
-          $ref: "#/$defs/HypothesisNode"
+          Keyed by node ID (HY### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^HY\\d{5,}$":
+            $ref: "#/$defs/HypothesisNode"
       
       tags:
         description: "Tags for filtering and views."
@@ -299,7 +360,7 @@ $defs:
       EXAMPLE - Complete Tree:
       
         hypothesisTrees:
-          HT001:
+          HT00001:
             name: "Process Optimization Analysis"
             scqh:
               situation: "Current order processing takes 5 days"
@@ -334,8 +395,14 @@ $defs:
         $ref: "#/$defs/SCQHContext"
       
       root:
-        description: "Root node of the hypothesis tree."
-        $ref: "#/$defs/HypothesisNode"
+        description: |
+          Root node of the hypothesis tree.
+          Keyed by node ID (HY### pattern). Typically has one entry.
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^HY\\d{5,}$":
+            $ref: "#/$defs/HypothesisNode"
       
       status:
         description: |

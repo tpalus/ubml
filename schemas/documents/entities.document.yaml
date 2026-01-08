@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .entities.ubml.yaml files - information model definitions.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.entities.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/entities.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/entities.document.yaml"
 title: "Entities"
 description: |
   Entity documents define the information model - the data objects,
@@ -58,9 +57,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -78,11 +77,11 @@ properties:
     description: |
       Entity definitions, keyed by entity ID.
       
-      Entity IDs follow the EN### pattern (e.g., EN001, EN002).
+      Entity IDs follow the EN### pattern (e.g., EN00001, EN00002).
       
       Example:
         entities:
-          EN001:
+          EN00001:
             name: "Sales Order"
             description: "Customer order with line items"
             attributes:
@@ -93,12 +92,12 @@ properties:
                 type: money
             relationships:
               customer:
-                target: EN002
+                target: EN00002
                 type: many-to-one
     type: object
     additionalProperties: false
     patternProperties:
-      "^EN\\d{3,}$":
+      "^EN\\d{5,}$":
         $ref: "../fragments/entity.fragment.yaml#/$defs/Entity"
   
   documents:
@@ -116,7 +115,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^DC\\d{3,}$":
+      "^DC\\d{5,}$":
         $ref: "../fragments/entity.fragment.yaml#/$defs/Document"
   
   locations:
@@ -134,7 +133,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^LO\\d{3,}$":
+      "^LO\\d{5,}$":
         $ref: "../fragments/entity.fragment.yaml#/$defs/Location"
   
   metadata:

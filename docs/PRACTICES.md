@@ -74,20 +74,20 @@ Reserve ID ranges for logical groupings:
 
 ```yaml
 # Actors
-# AC001-AC099: Internal roles
-# AC100-AC199: External parties
-# AC200-AC299: Systems
+# AC00001-AC00999: Internal roles
+# AC01000-AC01999: External parties
+# AC02000-AC02999: Systems
 
 actors:
-  AC001:
+  AC00001:
     name: "Operations Manager"
     type: role
   
-  AC100:
+  AC01000:
     name: "Partner Bank"
     type: external
   
-  AC200:
+  AC02000:
     name: "Core Banking System"
     type: system
 ```
@@ -97,11 +97,11 @@ actors:
 ```yaml
 # Leave room for related additions
 steps:
-  ST001:
+  ST00010:
     name: "Receive Application"
-  ST005:  # Gap for intake-related steps
+  ST00020:  # Gap for intake-related steps
     name: "Validate Application"
-  ST010:  # Gap for validation-related steps
+  ST00030:  # Gap for validation-related steps
     name: "Begin Verification"
 ```
 
@@ -114,14 +114,14 @@ Each process file should model one coherent workflow:
 ```yaml
 ✅ Good - Focused process
 processes:
-  PR001:
+  PR00001:
     name: "Customer Onboarding"
     description: "From application to account activation"
     # 10-15 steps covering one journey
 
 ❌ Avoid - Everything in one process
 processes:
-  PR001:
+  PR00001:
     name: "All Customer Operations"
     # 50+ steps covering multiple journeys
 ```
@@ -131,23 +131,23 @@ processes:
 ```yaml
 steps:
   # Start with an event
-  ST001:
+  ST00001:
     type: startEvent
     name: "Order Received"
   
   # Use tasks for actual work
-  ST002:
+  ST00002:
     type: task
     name: "Validate Order"
   
   # Use gateways for decisions
-  ST003:
+  ST00003:
     type: gateway
     gatewayType: exclusive
     name: "Order Valid?"
   
   # Use blocks for structured control flow
-  ST004:
+  ST00004:
     type: block
     operator: par
     name: "Parallel Checks"
@@ -157,7 +157,7 @@ steps:
 
 ```yaml
 steps:
-  ST002:
+  ST00002:
     name: "Validate Order"
     businessRules:
       - "Minimum order value is $100"
@@ -192,31 +192,31 @@ scqh:
 
 ```yaml
 hypotheses:
-  HY001:
+  HY00001:
     name: "Root Hypothesis"
     type: root
     children:
-      - HY002  # Supporting hypothesis 1
-      - HY003  # Supporting hypothesis 2
+      - HY00002  # Supporting hypothesis 1
+      - HY00003  # Supporting hypothesis 2
   
-  HY002:
+  HY00002:
     name: "Sub-Hypothesis A"
     type: supporting
     children:
-      - HY004  # Assumption
-      - HY005  # Assumption
+      - HY00004  # Assumption
+      - HY00005  # Assumption
 ```
 
 ### Link Evidence to Hypotheses
 
 ```yaml
 evidence:
-  EV001:
+  EV00001:
     type: observation
     title: "Workshop Finding"
     linkedHypotheses:
-      - HY002
-      - HY005
+      - HY00002
+      - HY00005
 ```
 
 ## Documentation
@@ -225,7 +225,7 @@ evidence:
 
 ```yaml
 processes:
-  PR001:
+  PR00001:
     name: "Customer Onboarding"
     description: |
       End-to-end process for onboarding new retail customers.
@@ -244,7 +244,7 @@ processes:
 
 ```yaml
 steps:
-  ST005:
+  ST00050:
     name: "Credit Check"
     assumptions:
       - "Credit bureau API available 99.9%"
@@ -259,15 +259,15 @@ steps:
 ```yaml
 # Define once
 actors:
-  AC001:
+  AC00001:
     name: "Customer Service Rep"
 
 # Reference everywhere
 steps:
-  ST001:
-    responsible: AC001  # Reference, not copy
-  ST002:
-    responsible: AC001
+  ST00001:
+    responsible: AC00001  # Reference, not copy
+  ST00002:
+    responsible: AC00001
 ```
 
 ### Keep Files Reasonably Sized

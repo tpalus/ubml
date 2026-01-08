@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines steps, blocks, and step-related constructs (RACI, approvals, etc.)
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/step.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/step.fragment.yaml"
 title: "UBML Step Fragment"
 description: |
   Steps are the building blocks of processes.
@@ -92,7 +91,7 @@ $defs:
       misplacementHint: "These properties belong inside 'raci:', not at the step level"
       misplacementExample: |
         raci:
-          responsible: [AC001]
+          responsible: [AC00001]
     properties:
       responsible:
         description: |
@@ -186,7 +185,7 @@ $defs:
       Step can only be performed by actors whose skill level >= required level.
       
       Example:
-        skill: SK001
+        skill: SK00001
         level: 3  # Requires at least Intermediate level
     type: object
     additionalProperties: false
@@ -288,13 +287,13 @@ $defs:
         # Warn approvers 1 day before deadline
         - trigger: onDeadlineWarning
           threshold: "1d"
-          recipients: [AC002, AC007]
+          recipients: [AC00002, AC007]
           priority: high
         
         # Notify customer on rejection
         - trigger: onOutcome
           outcome: rejected
-          recipients: [AC001]
+          recipients: [AC00001]
     type: object
     additionalProperties: false
     required: [trigger]
@@ -705,7 +704,7 @@ $defs:
         type: object
         additionalProperties: false
         patternProperties:
-          "^ST\\d{3,}$":
+          "^ST\\d{5,}$":
             $ref: "#/$defs/Step"
       
       processRef:
@@ -820,13 +819,8 @@ $defs:
       └─────────────┴─────────────────────────┴─────────────────────────┘
     type: object
     additionalProperties: false
-    required: [id, name]
+    required: [name]
     properties:
-      id:
-        description: "Unique block ID (BK### pattern)."
-        type: string
-        pattern: "^BK\\d{3,}$"
-      
       name:
         description: "Human-readable block name."
         type: string
@@ -860,6 +854,36 @@ $defs:
           - seq
           - par
           - alt
+        x-ubml:
+          propertyNames: ["operator"]
+          valueMistakes:
+            parallel:
+              value: "parallel"
+              hint: "Use 'par' for parallel execution."
+            alternative:
+              value: "alternative"
+              hint: "Use 'alt' for alternative/exclusive paths."
+            optional:
+              value: "optional"
+              hint: "Use 'opt' for optional execution."
+            sequence:
+              value: "sequence"
+              hint: "Use 'seq' for sequential execution."
+            xor:
+              value: "xor"
+              hint: "Use 'alt' for exclusive choice. BPMN XOR gateway maps to 'alt' blocks."
+            and:
+              value: "and"
+              hint: "Use 'par' for AND/parallel splits."
+            or:
+              value: "or"
+              hint: "For inclusive OR, use 'opt' blocks. For exclusive choice, use 'alt'."
+            exclusive:
+              value: "exclusive"
+              hint: "Use 'alt' for exclusive gateway semantics."
+            gateway:
+              value: "gateway"
+              hint: "Use 'alt' for exclusive, 'par' for parallel. Gateway is a BPMN term."
       
       guard:
         description: |
@@ -881,10 +905,14 @@ $defs:
           $ref: "../common/defs.schema.yaml#/$defs/StepRef"
       
       operands:
-        description: "Nested blocks (for alt branches or parallel regions)."
-        type: array
-        items:
-          $ref: "#/$defs/Block"
+        description: |
+          Nested blocks (for alt branches or parallel regions).
+          Keyed by block ID (BK### pattern).
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^BK\\d{5,}$":
+            $ref: "#/$defs/Block"
       
       annotations:
         description: "Notes and markers attached to this block."

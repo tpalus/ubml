@@ -9,10 +9,10 @@ describe('validate', () => {
   it('should validate schema and references together', async () => {
     // Actor document
     const actorsYaml = `
-ubml: "1.0"
+ubml: "1.1"
 name: "Test Actors"
 actors:
-  AC001:
+  AC00001:
     name: "Project Manager"
     type: role
     kind: human
@@ -20,19 +20,18 @@ actors:
     
     // Process referencing the actor
     const processYaml = `
-ubml: "1.0"
+ubml: "1.1"
 name: "Test Process"
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Sample Process"
     steps:
-      ST001:
+      ST00001:
         kind: action
         name: "Do Work"
         raci:
           accountable:
-            - AC001
+            - AC00001
 `;
     
     const actors = parse(actorsYaml, 'actors.actors.ubml.yaml');
@@ -50,18 +49,17 @@ processes:
 
   it('should detect undefined references', async () => {
     const processYaml = `
-ubml: "1.0"
+ubml: "1.1"
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Test"
     steps:
-      ST001:
+      ST00001:
         kind: action
         name: "Step"
         raci:
           accountable:
-            - AC999
+            - AC99999
 `;
     
     const process = parse(processYaml, 'process.process.ubml.yaml');
@@ -69,23 +67,23 @@ processes:
     
     expect(result.valid).toBe(false);
     expect(result.errors.some(e => e.code === 'ubml/undefined-reference')).toBe(true);
-    expect(result.errors.some(e => e.message.includes('AC999'))).toBe(true);
+    expect(result.errors.some(e => e.message.includes('AC99999'))).toBe(true);
   });
 
   it('should detect duplicate IDs', async () => {
     const actors1 = parse(`
-ubml: "1.0"
+ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "Manager"
     type: role
     kind: human
 `, 'actors1.actors.ubml.yaml');
     
     const actors2 = parse(`
-ubml: "1.0"
+ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "Different Manager"
     type: role
     kind: human
@@ -99,9 +97,9 @@ actors:
 
   it('should warn about unused IDs with line numbers', async () => {
     const actorsYaml = `
-ubml: "1.0"
+ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "Unused Actor"
     type: role
     kind: human
@@ -119,9 +117,9 @@ actors:
 
   it('should suppress unused warnings when requested', async () => {
     const actorsYaml = `
-ubml: "1.0"
+ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "Catalog Actor"
     type: role
     kind: human
@@ -138,10 +136,9 @@ actors:
 
   it('should detect schema validation errors', async () => {
     const invalidYaml = `
-ubml: "1.0"
+ubml: "1.1"
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Test"
     level: 999
 `;
@@ -155,27 +152,26 @@ processes:
 
   it('should validate multiple document types', async () => {
     const actors = parse(`
-ubml: "1.0"
+ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "PM"
     type: role
     kind: human
 `, 'actors.actors.ubml.yaml');
     
     const process = parse(`
-ubml: "1.0"
+ubml: "1.1"
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Process"
     steps:
-      ST001:
+      ST00001:
         kind: action
         name: "Step"
         raci:
           accountable:
-            - AC001
+            - AC00001
 `, 'process.process.ubml.yaml');
     
     const result = await validate([

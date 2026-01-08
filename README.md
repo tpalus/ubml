@@ -72,31 +72,31 @@ Whether you're figuring out *what to build* or *why it matters*, UBML provides a
 
 ```yaml
 # process.ubml.yaml
-ubml: "1.0"
+ubml: "1.1"
 
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
+    id: "PR00001"
     name: "Customer Onboarding"
     description: "End-to-end onboarding from application to activation"
     level: 3
 
     steps:
-      ST001:
+      ST00001:
         name: "Receive Application"
         kind: action
         description: "Receive and log new application"
 
-      ST002:
+      ST00002:
         name: "Verify Identity"
         kind: action
         description: "Verify customer identity documents"
         inputs:
-          - ref: DC001
+          - ref: DC00001
         outputs:
-          - ref: DC002
+          - ref: DC00002
 
-      ST003:
+      ST00003:
         name: "Approved?"
         kind: decision
         description: "Decision point for application approval"
@@ -236,11 +236,11 @@ if (!result.valid) {
 import type { Process, Step, Actor, ProcessDocument } from 'ubml';
 
 const process: Process = {
-  id: 'PR001',
+  id: 'PR00001',
   name: 'Customer Onboarding',
   level: 3,
   steps: {
-    ST001: {
+    ST00001: {
       name: 'Receive Application',
       kind: 'action',
     }

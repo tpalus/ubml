@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines processes, phases, and cross-process triggers.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/process.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/process.fragment.yaml"
 title: "UBML Process Fragment"
 description: |
   Processes are the core workflows containing steps, links, and control flow.
@@ -77,6 +76,24 @@ $defs:
             Examples: "MVP", "Release 1.0", "Sprint 3", "Future Backlog"
         type: string
         enum: [lifecycle, delivery]
+        x-ubml:
+          propertyNames: ["kind"]
+          valueMistakes:
+            stage:
+              value: "stage"
+              hint: "Use 'lifecycle' for process stages. 'stage' is not a valid phase kind."
+            release:
+              value: "release"
+              hint: "Use 'delivery' for releases and iterations."
+            sprint:
+              value: "sprint"
+              hint: "Use 'delivery' for sprints and iterations."
+            phase:
+              value: "phase"
+              hint: "Phase kind must be 'lifecycle' or 'delivery', not 'phase' itself."
+            milestone:
+              value: "milestone"
+              hint: "Phases group steps; milestones are step kinds. Use 'lifecycle' or 'delivery'."
       
       description:
         description: |
@@ -198,13 +215,8 @@ $defs:
       - L4: Work instructions (task-level detail)
     type: object
     additionalProperties: false
-    required: [id, name, steps]
+    required: [name, steps]
     properties:
-      id:
-        description: "Unique process ID (PR### pattern)."
-        type: string
-        pattern: "^PR\\d{3,}$"
-      
       name:
         description: |
           Short label for diagrams.
@@ -260,7 +272,7 @@ $defs:
         type: object
         additionalProperties: false
         patternProperties:
-          "^ST\\d{3,}$":
+          "^ST\\d{5,}$":
             $ref: "step.fragment.yaml#/$defs/Step"
       
       links:
@@ -274,10 +286,13 @@ $defs:
       blocks:
         description: |
           Control flow blocks with EXECUTION semantics.
+          Keyed by block ID (BK### pattern).
           For organizational grouping, use 'phases' instead.
-        type: array
-        items:
-          $ref: "step.fragment.yaml#/$defs/Block"
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^BK\\d{5,}$":
+            $ref: "step.fragment.yaml#/$defs/Block"
       
       phases:
         description: |
@@ -286,7 +301,7 @@ $defs:
         type: object
         additionalProperties: false
         patternProperties:
-          "^PH\\d{3,}$":
+          "^PH\\d{5,}$":
             $ref: "#/$defs/Phase"
       
       subprocesses:
@@ -296,7 +311,7 @@ $defs:
         type: object
         additionalProperties: false
         patternProperties:
-          "^PR\\d{3,}$":
+          "^PR\\d{5,}$":
             $ref: "#/$defs/Process"
       
       tags:

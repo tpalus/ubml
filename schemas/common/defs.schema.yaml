@@ -7,11 +7,10 @@
 # This file is the foundation of the UBML type system. All other schemas
 # import definitions from here.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/common/defs.schema.yaml"
+$id: "https://ubml.io/schemas/1.1/common/defs.schema.yaml"
 title: "UBML Common Definitions"
 description: |
   Shared type definitions for UBML (Unified Business Modeling Language).
@@ -21,6 +20,23 @@ description: |
   - Primitive types for durations, money, rates
   - Expression language specification
   - Common enums and value types
+
+# ==========================================================================
+# ID GENERATION CONFIGURATION
+# ==========================================================================
+# Central configuration for ID patterns used across UBML tooling.
+# This is read by the code generator to create consistent ID utilities.
+# ==========================================================================
+x-ubml-id-config:
+  digitLength: 5          # Zero-padded digit length (5 = 00001-99999)
+  pattern: "^[A-Z]+\\d{5,}$"  # Pattern for validation
+  initOffset: 1           # Starting number for 'ubml init' templates (00001)
+  addOffset: 1000         # Starting number for 'ubml add' templates (01000)
+  description: |
+    IDs are formatted as PREFIX + zero-padded digits.
+    - Init templates start at 00001 (e.g., AC00001, PR00001)
+    - Add templates start at 01000 (e.g., AC0001000, PR0001000)
+    - This allows ~1000 manually added items before collision
 
 $defs:
 
@@ -39,17 +55,17 @@ $defs:
       - People, roles, teams, organizations
       - Systems and external parties
       
-      Examples: AC001, AC042, AC100
+      Examples: AC00001, AC00042, AC0000100
     type: string
-    pattern: "^AC\\d{3,}$"
+    pattern: "^AC\\d{5,}$"
     examples:
-      - "AC001"
-      - "AC010"
-      - "AC100"
+      - "AC00001"
+      - "AC00010"
+      - "AC0000100"
     x-ubml:
       prefix: "AC"
       humanName: "Actor ID"
-      errorHint: "AC + 3+ digits (e.g., AC001, AC010)"
+      errorHint: "AC + 5+ digits (e.g., AC00001, AC00010)"
 
   StepRef:
     description: |
@@ -57,13 +73,13 @@ $defs:
       
       Steps are the individual activities within a process.
       
-      Examples: ST001, ST015, ST200
+      Examples: ST00001, ST00015, ST0000200
     type: string
-    pattern: "^ST\\d{3,}$"
+    pattern: "^ST\\d{5,}$"
     examples:
-      - "ST001"
-      - "ST010"
-      - "ST100"
+      - "ST00001"
+      - "ST00010"
+      - "ST0000100"
 
   ProcessRef:
     description: |
@@ -71,13 +87,13 @@ $defs:
       
       Processes are workflows containing steps, links, and control flow.
       
-      Examples: PR001, PR010, PR100
+      Examples: PR00001, PR00010, PR0000100
     type: string
-    pattern: "^PR\\d{3,}$"
+    pattern: "^PR\\d{5,}$"
     examples:
-      - "PR001"
-      - "PR010"
-      - "PR100"
+      - "PR00001"
+      - "PR00010"
+      - "PR0000100"
 
   EntityRef:
     description: |
@@ -85,13 +101,13 @@ $defs:
       
       Entities are core business objects like Order, Customer, Contract.
       
-      Examples: EN001, EN015, EN100
+      Examples: EN00001, EN015, EN0000100
     type: string
-    pattern: "^EN\\d{3,}$"
+    pattern: "^EN\\d{5,}$"
     examples:
-      - "EN001"
-      - "EN010"
-      - "EN100"
+      - "EN00001"
+      - "EN00010"
+      - "EN0000100"
 
   DocumentRef:
     description: |
@@ -103,7 +119,7 @@ $defs:
       
       Examples: DC001, DC010, DC100
     type: string
-    pattern: "^DC\\d{3,}$"
+    pattern: "^DC\\d{5,}$"
 
   SkillRef:
     description: |
@@ -113,9 +129,9 @@ $defs:
       - Certifications (HGV license, crane operator)
       - Competencies (negotiation, technical review)
       
-      Examples: SK001, SK010, SK100
+      Examples: SK00001, SK010, SK100
     type: string
-    pattern: "^SK\\d{3,}$"
+    pattern: "^SK\\d{5,}$"
 
   ServiceRef:
     description: |
@@ -125,7 +141,7 @@ $defs:
       
       Examples: SV001, SV010, SV100
     type: string
-    pattern: "^SV\\d{3,}$"
+    pattern: "^SV\\d{5,}$"
 
   ScenarioRef:
     description: |
@@ -133,9 +149,9 @@ $defs:
       
       Scenarios define simulation configurations for what-if analysis.
       
-      Examples: SC001, SC010, SC100
+      Examples: SC00001, SC010, SC100
     type: string
-    pattern: "^SC\\d{3,}$"
+    pattern: "^SC\\d{5,}$"
 
   HypothesisRef:
     description: |
@@ -143,9 +159,9 @@ $defs:
       
       Hypotheses are nodes in the SCQH hypothesis tree.
       
-      Examples: HY001, HY010, HY100
+      Examples: HY00001, HY010, HY100
     type: string
-    pattern: "^HY\\d{3,}$"
+    pattern: "^HY\\d{5,}$"
 
   EvidenceRef:
     description: |
@@ -157,7 +173,7 @@ $defs:
       
       Examples: EV001, EV010, EV100
     type: string
-    pattern: "^EV\\d{3,}$"
+    pattern: "^EV\\d{5,}$"
 
   KpiRef:
     description: |
@@ -165,9 +181,9 @@ $defs:
       
       KPIs are key performance indicators with targets.
       
-      Examples: KP001, KP010, KP100
+      Examples: KP00001, KP010, KP100
     type: string
-    pattern: "^KP\\d{3,}$"
+    pattern: "^KP\\d{5,}$"
 
   CapabilityRef:
     description: |
@@ -175,9 +191,9 @@ $defs:
       
       Capabilities describe what the organization can do.
       
-      Examples: CP001, CP010, CP100
+      Examples: CP00001, CP010, CP100
     type: string
-    pattern: "^CP\\d{3,}$"
+    pattern: "^CP\\d{5,}$"
 
   ValueStreamRef:
     description: |
@@ -185,9 +201,9 @@ $defs:
       
       Value streams show end-to-end value flows across processes.
       
-      Examples: VS001, VS010, VS100
+      Examples: VS00001, VS010, VS100
     type: string
-    pattern: "^VS\\d{3,}$"
+    pattern: "^VS\\d{5,}$"
 
   ProductRef:
     description: |
@@ -197,7 +213,7 @@ $defs:
       
       Examples: PD001, PD010, PD100
     type: string
-    pattern: "^PD\\d{3,}$"
+    pattern: "^PD\\d{5,}$"
 
   PortfolioRef:
     description: |
@@ -213,7 +229,7 @@ $defs:
       
       Examples: PF001, PF010, PF100
     type: string
-    pattern: "^PF\\d{3,}$"
+    pattern: "^PF\\d{5,}$"
 
   EquipmentRef:
     description: |
@@ -231,9 +247,9 @@ $defs:
       3. Equipment has physical location constraints
       4. Equipment has capacity/throughput characteristics
       
-      Examples: EQ001, EQ010, EQ100
+      Examples: EQ00001, EQ010, EQ100
     type: string
-    pattern: "^EQ\\d{3,}$"
+    pattern: "^EQ\\d{5,}$"
 
   LocationRef:
     description: |
@@ -253,7 +269,7 @@ $defs:
       
       Examples: LC001, LC010, LC100
     type: string
-    pattern: "^LC\\d{3,}$"
+    pattern: "^LC\\d{5,}$"
 
   BlockRef:
     description: |
@@ -267,7 +283,7 @@ $defs:
       
       Examples: BK001, BK010, BK100
     type: string
-    pattern: "^BK\\d{3,}$"
+    pattern: "^BK\\d{5,}$"
 
   PhaseRef:
     description: |
@@ -282,7 +298,7 @@ $defs:
       
       Examples: PH001, PH010, PH100
     type: string
-    pattern: "^PH\\d{3,}$"
+    pattern: "^PH\\d{5,}$"
 
   PersonaRef:
     description: |
@@ -292,7 +308,7 @@ $defs:
       
       Examples: PS001, PS010, PS100
     type: string
-    pattern: "^PS\\d{3,}$"
+    pattern: "^PS\\d{5,}$"
 
   ResourcePoolRef:
     description: |
@@ -300,9 +316,9 @@ $defs:
       
       Resource pools group interchangeable resources for simulation.
       
-      Examples: RP001, RP010, RP100
+      Examples: RP00001, RP010, RP100
     type: string
-    pattern: "^RP\\d{3,}$"
+    pattern: "^RP\\d{5,}$"
 
   ViewRef:
     description: |
@@ -310,9 +326,9 @@ $defs:
       
       Views are saved diagram configurations.
       
-      Examples: VW001, VW010, VW100
+      Examples: VW00001, VW010, VW100
     type: string
-    pattern: "^VW\\d{3,}$"
+    pattern: "^VW\\d{5,}$"
 
   # ==========================================================================
   # DATA OBJECT REFERENCES

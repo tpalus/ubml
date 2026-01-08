@@ -41,7 +41,7 @@ describe('Generated Metadata', () => {
       expect(REFERENCE_FIELDS).toContain('from');
       expect(REFERENCE_FIELDS).toContain('to');
       expect(REFERENCE_FIELDS).toContain('parent');
-      expect(REFERENCE_FIELDS).toContain('children');
+      // Note: 'children' removed per P1.1 principle (no dual hierarchy)
     });
 
     it('should not contain duplicates', () => {
@@ -78,32 +78,32 @@ describe('Generated Metadata', () => {
 
   describe('ID Pattern Validation', () => {
     it('should validate actor IDs', () => {
-      expect(isValidId('AC001')).toBe(true);
-      expect(isValidId('AC999')).toBe(true);
-      expect(isValidId('AC1234')).toBe(true);
-      expect(isValidId('AC01')).toBe(false); // Too short
+      expect(isValidId('AC00001')).toBe(true);
+      expect(isValidId('AC99999')).toBe(true);
+      expect(isValidId('AC123456')).toBe(true); // 6+ digits also valid
+      expect(isValidId('AC0001')).toBe(false); // Too short (4 digits)
       expect(isValidId('AC')).toBe(false);
-      expect(isValidId('ac001')).toBe(false); // Lowercase
+      expect(isValidId('ac00001')).toBe(false); // Lowercase
     });
 
     it('should validate step IDs', () => {
-      expect(isValidId('ST001')).toBe(true);
-      expect(isValidId('ST100')).toBe(true);
+      expect(isValidId('ST00001')).toBe(true);
+      expect(isValidId('ST10000')).toBe(true);
     });
 
     it('should validate entity IDs', () => {
-      expect(isValidId('EN001')).toBe(true);
-      expect(isValidId('EN250')).toBe(true);
+      expect(isValidId('EN00001')).toBe(true);
+      expect(isValidId('EN25000')).toBe(true);
     });
 
     it('should validate KPI IDs', () => {
-      expect(isValidId('KP001')).toBe(true);
-      expect(isValidId('KP024')).toBe(true);
+      expect(isValidId('KP00001')).toBe(true);
+      expect(isValidId('KP00024')).toBe(true);
     });
 
     it('should reject invalid IDs', () => {
       expect(isValidId('')).toBe(false);
-      expect(isValidId('XY001')).toBe(false); // Invalid prefix
+      expect(isValidId('XY00001')).toBe(false); // Invalid prefix
       expect(isValidId('AC')).toBe(false);
       expect(isValidId('123')).toBe(false);
       expect(isValidId('INVALID')).toBe(false);
@@ -112,16 +112,16 @@ describe('Generated Metadata', () => {
 
   describe('getElementTypeFromId', () => {
     it('should extract element type from actor ID', () => {
-      expect(getElementTypeFromId('AC001')).toBe('actor');
+      expect(getElementTypeFromId('AC00001')).toBe('actor');
       expect(getElementTypeFromId('AC123')).toBe('actor');
     });
 
     it('should extract element type from step ID', () => {
-      expect(getElementTypeFromId('ST001')).toBe('step');
+      expect(getElementTypeFromId('ST00001')).toBe('step');
     });
 
     it('should extract element type from entity ID', () => {
-      expect(getElementTypeFromId('EN001')).toBe('entity');
+      expect(getElementTypeFromId('EN00001')).toBe('entity');
     });
 
     it('should return undefined for invalid IDs', () => {

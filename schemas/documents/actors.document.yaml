@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .actors.ubml.yaml files - actor and organization definitions.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.actors.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/actors.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/actors.document.yaml"
 title: "Actors"
 description: |
   Actor documents define the people, roles, teams, and systems that 
@@ -59,9 +58,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -79,15 +78,15 @@ properties:
     description: |
       Actor definitions, keyed by actor ID.
       
-      Actor IDs follow the AC### pattern (e.g., AC001, AC002).
+      Actor IDs follow the AC### pattern (e.g., AC00001, AC00002).
       
       Example:
         actors:
-          AC001:
+          AC00001:
             name: "Sales Representative"
             type: role
             skills:
-              - skill: SK001
+              - skill: SK00001
                 level: expert
             availability:
               hoursPerDay: 8
@@ -95,7 +94,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^AC\\d{3,}$":
+      "^AC\\d{5,}$":
         $ref: "../fragments/actor.fragment.yaml#/$defs/Actor"
   
   skills:
@@ -106,14 +105,14 @@ properties:
       
       Example:
         skills:
-          SK001:
+          SK00001:
             name: "Customer Communication"
             category: soft-skill
             description: "Ability to communicate effectively with customers"
     type: object
     additionalProperties: false
     patternProperties:
-      "^SK\\d{3,}$":
+      "^SK\\d{5,}$":
         $ref: "../fragments/resource.fragment.yaml#/$defs/Skill"
   
   resourcePools:
@@ -124,15 +123,15 @@ properties:
       
       Example:
         resourcePools:
-          RP001:
+          RP00001:
             name: "Order Processing Team"
-            members: [AC001, AC002, AC003]
+            members: [AC00001, AC00002, AC00003]
             capacity: 24
             capacityUnit: hours-per-day
     type: object
     additionalProperties: false
     patternProperties:
-      "^RP\\d{3,}$":
+      "^RP\\d{5,}$":
         $ref: "../fragments/resource.fragment.yaml#/$defs/ResourcePool"
   
   equipment:
@@ -143,7 +142,7 @@ properties:
       
       Example:
         equipment:
-          EQ001:
+          EQ00001:
             name: "Forklift"
             type: vehicle
             capacity: 2000
@@ -151,7 +150,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^EQ\\d{3,}$":
+      "^EQ\\d{5,}$":
         $ref: "../fragments/resource.fragment.yaml#/$defs/Equipment"
   
   metadata:

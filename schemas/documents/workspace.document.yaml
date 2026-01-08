@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .workspace.ubml.yaml files - the root workspace configuration.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.workspace.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/workspace.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/workspace.document.yaml"
 title: "Workspace"
 description: |
   The workspace document is the root configuration file for a UBML project.
@@ -49,9 +48,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |

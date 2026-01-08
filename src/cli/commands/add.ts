@@ -17,7 +17,21 @@ import {
   getSuggestedNextStep,
   getSuggestedWorkflow,
 } from '../schema-introspection';
-import { DOCUMENT_TYPES, type DocumentType, detectDocumentType } from '../../generated/metadata';
+import { 
+  DOCUMENT_TYPES, 
+  type DocumentType, 
+  type IdPrefix,
+  detectDocumentType,
+  ID_CONFIG,
+  SCHEMA_VERSION,
+  formatId,
+} from '../../generated/metadata';
+import {
+  TEMPLATE_DATA,
+  createMinimalDocument,
+  getDocumentHeader,
+  getSectionComment,
+} from '../../generated/templates';
 
 // =============================================================================
 // Helpers
@@ -83,167 +97,367 @@ function getExistingTypes(dir: string): DocumentType[] {
 }
 
 // =============================================================================
-// Templates
+// Schema-Driven Template Generation
+// =============================================================================
+// Templates are generated from schema metadata extracted at build time.
+// This ensures templates always match the current schema.
 // =============================================================================
 
 /**
- * Create template with custom name.
+ * Create a YAML template with helpful inline comments.
+ * Uses schema-derived metadata for property info and comments.
  */
-function createTemplate(type: DocumentType, name: string): Record<string, unknown> {
-  const template = getMinimalTemplate(type);
-
-  // Customize based on type
-  switch (type) {
-    case 'workspace':
-      return {
-        ...template,
-        name,
-        description: `${name} workspace`,
-      };
-
-    case 'process': {
-      const processName = name.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-      return {
-        ubml: '1.0',
-        processes: {
-          PR001: {
-            name: processName,
-            description: `${processName} process`,
-            level: 3,
-            steps: {
-              ST001: {
-                name: 'Start',
-                kind: 'event',
-                description: 'Process start event',
-              },
-              ST002: {
-                name: 'First Activity',
-                kind: 'action',
-                description: 'First activity in the process',
-              },
-              ST003: {
-                name: 'End',
-                kind: 'event',
-                description: 'Process end event',
-              },
-            },
-            links: [
-              { from: 'ST001', to: 'ST002' },
-              { from: 'ST002', to: 'ST003' },
-            ],
-          },
-        },
-      };
-    }
-
-    case 'actors':
-      return {
-        ubml: '1.0',
-        actors: {
-          AC001: {
-            name: 'Business User',
-            type: 'role',
-            kind: 'human',
-            description: 'Primary business user role',
-          },
-        },
-        skills: {
-          SK001: {
-            name: 'Domain Knowledge',
-            description: 'Knowledge of business domain',
-          },
-        },
-      };
-
-    case 'entities':
-      return {
-        ubml: '1.0',
-        entities: {
-          EN001: {
-            name: 'Primary Entity',
-            description: 'Main business entity',
-          },
-        },
-      };
-
-    case 'hypotheses':
-      return {
-        ubml: '1.0',
-        hypothesisTrees: {
-          HT001: {
-            name: 'Improvement Analysis',
-            situation: 'Describe the current situation',
-            complication: 'What is causing problems or inefficiency?',
-            question: 'What problem should we solve?',
-            hypotheses: {
-              HY001: {
-                name: 'Primary Hypothesis',
-                statement: 'We believe that...',
-                status: 'open',
-              },
-            },
-          },
-        },
-      };
-
-    case 'metrics':
-      return {
-        ubml: '1.0',
-        kpis: {
-          KP001: {
-            name: 'Process Cycle Time',
-            description: 'Total time from start to finish',
-            unit: 'hours',
-            direction: 'lower-is-better',
-          },
-          KP002: {
-            name: 'Throughput',
-            description: 'Number of completed cases per period',
-            unit: 'cases/day',
-            direction: 'higher-is-better',
-          },
-        },
-      };
-
-    case 'scenarios':
-      return {
-        ubml: '1.0',
-        scenarios: {
-          SC001: {
-            name: 'Current State',
-            description: 'Baseline scenario representing current operations',
-            type: 'baseline',
-          },
-          SC002: {
-            name: 'Improved State',
-            description: 'Target scenario after improvements',
-            type: 'target',
-          },
-        },
-      };
-
-    case 'strategy':
-      return {
-        ubml: '1.0',
-        valueStreams: {
-          VS001: {
-            name: 'Core Value Delivery',
-            description: 'Primary value stream to customers',
-          },
-        },
-        capabilities: {
-          CP001: {
-            name: 'Core Capability',
-            description: 'Essential business capability',
-          },
-        },
-      };
-
-    default:
-      return template;
+function createCommentedTemplate(type: DocumentType, name: string): string {
+  const templateInfo = TEMPLATE_DATA[type];
+  if (!templateInfo || templateInfo.sections.length === 0) {
+    // Fallback to minimal document from schema
+    const doc = createMinimalDocument(type, name);
+    return serialize(doc);
   }
+
+  // Build YAML with comments
+  const lines: string[] = [];
+  
+  // Header with description and quick reference
+  lines.push(getDocumentHeader(type, formatDisplayName(name)));
+  lines.push(`ubml: "${SCHEMA_VERSION}"`);
+  lines.push('');
+
+  // Generate each section
+  for (const section of templateInfo.sections) {
+    lines.push(...generateSectionYaml(type, section, name));
+    lines.push('');
+  }
+
+  return lines.join('\n');
 }
 
+/**
+ * Format a name for display in comments.
+ */
+function formatDisplayName(name: string): string {
+  return name
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
+ * Generate YAML for a document section with comments.
+ */
+function generateSectionYaml(
+  docType: DocumentType,
+  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number],
+  name: string
+): string[] {
+  const lines: string[] = [];
+  
+  // Section header with available properties
+  lines.push(`${section.name}:`);
+  lines.push(getSectionComment(docType, section.name));
+  
+  // Generate sample items based on section type
+  const items = generateSectionItems(docType, section, name);
+  
+  for (const item of items) {
+    lines.push(`  ${item.id}:`);
+    
+    // Check for raw YAML content (pre-formatted)
+    const rawContent = item.properties.__raw;
+    if (rawContent && typeof rawContent === 'string') {
+      // Output raw content as-is (already properly indented)
+      lines.push(rawContent);
+    } else {
+      // Output regular properties
+      for (const [key, value] of Object.entries(item.properties)) {
+        const propInfo = section.properties.find(p => p.name === key);
+        const comment = propInfo?.enumValues 
+          ? `  # ${propInfo.enumValues.join(' | ')}`
+          : '';
+        lines.push(`    ${key}: ${formatValue(value)}${comment}`);
+      }
+      if (item.commentedProps) {
+        for (const [key, value] of Object.entries(item.commentedProps)) {
+          lines.push(`    # ${key}: ${formatValue(value)}`);
+        }
+      }
+    }
+  }
+  
+  return lines;
+}
+
+interface SectionItem {
+  id: string;
+  properties: Record<string, unknown>;
+  commentedProps?: Record<string, unknown>;
+}
+
+/**
+ * Generate sample items for a section based on document type and section.
+ */
+function generateSectionItems(
+  docType: DocumentType,
+  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number],
+  name: string
+): SectionItem[] {
+  const items: SectionItem[] = [];
+  const prefix = section.idPrefix;
+  
+  // Build required properties from schema
+  const requiredProps: Record<string, unknown> = {};
+  const optionalProps: Record<string, unknown> = {};
+  
+  for (const prop of section.properties) {
+    if (prop.required) {
+      if (prop.name === 'name') {
+        requiredProps.name = 'TODO: Add name';
+      } else if (prop.name === 'id') {
+        // id will be set from the key
+        requiredProps.id = formatId(prefix as IdPrefix, ID_CONFIG.addOffset);
+      } else if (prop.enumValues && prop.enumValues.length > 0) {
+        // Use first enum value as default, or schema default
+        requiredProps[prop.name] = prop.default ?? prop.enumValues[0];
+      } else if (prop.default !== undefined) {
+        requiredProps[prop.name] = prop.default;
+      } else if (prop.type === 'ref') {
+        // Reference fields should use a placeholder ID pattern
+        // Uses addOffset series to avoid conflicts with init templates
+        requiredProps[prop.name] = formatId('AC', ID_CONFIG.addOffset);
+      } else {
+        requiredProps[prop.name] = 'TODO';
+      }
+    } else {
+      // Collect interesting optional props to show as comments
+      if (['description', 'duration', 'unit', 'target', 'baseline'].includes(prop.name)) {
+        if (prop.enumValues && prop.enumValues.length > 0) {
+          optionalProps[prop.name] = prop.enumValues[0];
+        } else if (prop.type === 'string') {
+          optionalProps[prop.name] = '...';
+        } else if (prop.type === 'number') {
+          optionalProps[prop.name] = 0;
+        }
+      }
+    }
+  }
+  
+  // Apply section defaults from schema
+  if (section.defaults) {
+    Object.assign(requiredProps, section.defaults);
+  }
+  
+  // Handle special cases per document/section type
+  switch (docType) {
+    case 'process':
+      if (section.name === 'processes') {
+        return generateProcessItems(section, name);
+      }
+      break;
+    case 'actors':
+      if (section.name === 'actors') {
+        return generateActorItems(section);
+      }
+      if (section.name === 'skills') {
+        return generateSkillItems(section);
+      }
+      break;
+    case 'hypotheses':
+      if (section.name === 'hypothesisTrees') {
+        return generateHypothesisTreeItems(section, name);
+      }
+      break;
+  }
+  
+  // Default: single item with required props
+  // Uses addOffset series to avoid conflicts with init templates
+  items.push({
+    id: formatId(prefix as IdPrefix, ID_CONFIG.addOffset),
+    properties: requiredProps,
+    commentedProps: Object.keys(optionalProps).length > 0 ? optionalProps : undefined,
+  });
+  
+  return items;
+}
+
+/**
+ * Generate process items with proper step structure.
+ */
+function generateProcessItems(
+  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number],
+  name: string
+): SectionItem[] {
+  const displayName = formatDisplayName(name);
+  
+  // Use centralized ID generation with addOffset
+  const offset = ID_CONFIG.addOffset;
+  const prId = formatId('PR', offset);
+  const st1 = formatId('ST', offset);
+  const st2 = formatId('ST', offset + 1);
+  const stEnd = formatId('ST', offset + 199);
+  const acRef = formatId('AC', offset);
+  
+  // Build steps inline - processes need nested structure
+  const processContent = `
+    id: ${prId}
+    name: "${displayName}"
+    description: "TODO: Describe what this process achieves"
+    level: 3
+    steps:
+      ${st1}:
+        name: "Start"
+        kind: start
+        description: "Process entry point"
+      ${st2}:
+        name: "First Activity"
+        kind: action
+        description: "TODO: What happens in this step?"
+        # duration: "1h"
+        # raci:
+        #   responsible: [${acRef}]
+      ${stEnd}:
+        name: "End"
+        kind: end
+        description: "Process completes"
+    links:
+      - from: ${st1}
+        to: ${st2}
+      - from: ${st2}
+        to: ${stEnd}`;
+  
+  // Return as raw YAML to preserve nesting
+  return [{
+    id: prId,
+    properties: {
+      __raw: processContent,
+    },
+  }];
+}
+
+/**
+ * Generate actor items with different types.
+ */
+function generateActorItems(
+  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number]
+): SectionItem[] {
+  const defaults = section.defaults || {};
+  const offset = ID_CONFIG.addOffset;
+  
+  return [
+    {
+      id: formatId('AC', offset),
+      properties: {
+        name: 'Process Owner',
+        type: defaults.type ?? 'role',
+        kind: defaults.kind ?? 'human',
+        description: 'Responsible for process outcomes',
+      },
+    },
+    {
+      id: formatId('AC', offset + 10),
+      properties: {
+        name: 'Core System',
+        type: 'system',
+        kind: 'system',
+        description: 'Primary application',
+      },
+    },
+  ];
+}
+
+/**
+ * Generate skill items.
+ */
+function generateSkillItems(
+  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number]
+): SectionItem[] {
+  return [
+    {
+      id: formatId('SK', ID_CONFIG.addOffset),
+      properties: {
+        name: 'Domain Expertise',
+        description: 'Deep knowledge of the business domain',
+      },
+    },
+  ];
+}
+
+/**
+ * Generate hypothesis tree items with proper nested structure.
+ */
+function generateHypothesisTreeItems(
+  section: typeof TEMPLATE_DATA[DocumentType]['sections'][number],
+  name: string
+): SectionItem[] {
+  const displayName = formatDisplayName(name);
+  const offset = ID_CONFIG.addOffset;
+  const htId = formatId('HT', offset);
+  
+  // H prefix is used for hypothesis nodes within a tree
+  const h1 = `H${String(offset).padStart(ID_CONFIG.digitLength - 1, '0')}`;
+  const h2 = `H${String(offset + 1).padStart(ID_CONFIG.digitLength - 1, '0')}`;
+  const h3 = `H${String(offset + 2).padStart(ID_CONFIG.digitLength - 1, '0')}`;
+  
+  const treeContent = `
+    name: "${displayName} Analysis"
+    scqh:
+      situation: "TODO: Current state description"
+      complication: "TODO: What problem exists?"
+      question: "How can we improve?"
+      hypothesis: "By doing X we can achieve Y"
+    root:
+      id: ${h1}
+      text: "Main hypothesis to validate"
+      type: hypothesis
+      status: untested
+      children:
+        - id: ${h2}
+          text: "Sub-hypothesis 1"
+          type: hypothesis
+          status: untested
+        - id: ${h3}
+          text: "Sub-hypothesis 2"
+          type: hypothesis
+          status: untested`;
+  
+  return [{
+    id: htId,
+    properties: {
+      __raw: treeContent,
+    },
+  }];
+}
+
+/**
+ * Format a value for YAML output.
+ */
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined) return '~';
+  if (typeof value === 'string') {
+    // Check if it's raw YAML (starts with newline)
+    if (value.startsWith('\n')) return value;
+    // Quote strings that need it
+    if (value.includes(':') || value.includes('#') || value.includes('\n')) {
+      return `"${value.replace(/"/g, '\\"')}"`;
+    }
+    return `"${value}"`;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) return '[]';
+    return `[${value.map(v => formatValue(v)).join(', ')}]`;
+  }
+  if (typeof value === 'object') {
+    // Check for __raw marker
+    const raw = (value as Record<string, unknown>).__raw;
+    if (raw) return String(raw);
+    return '{}';
+  }
+  return String(value);
+}
+
+// =============================================================================
+// Templates (for fallback and programmatic use)
 // =============================================================================
 // Command Actions
 // =============================================================================
@@ -326,9 +540,8 @@ function addDocument(
     process.exit(1);
   }
 
-  // Create template
-  const template = createTemplate(type, name || baseName);
-  const content = serialize(template);
+  // Create template - prefer commented template for better analyst guidance
+  const content = createCommentedTemplate(type, name || baseName);
 
   // Write file
   writeFileSync(filepath, content);

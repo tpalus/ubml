@@ -52,7 +52,7 @@ describe('formatValidationError', () => {
       const error: RawAjvError = {
         keyword: 'additionalProperties',
         params: { additionalProperty: 'unknownProp' },
-        instancePath: '/processes/PR001/steps/ST001',
+        instancePath: '/processes/PR00001/steps/ST00001',
       };
 
       const result = formatValidationError(error);
@@ -63,21 +63,21 @@ describe('formatValidationError', () => {
       const error: RawAjvError = {
         keyword: 'additionalProperties',
         params: { additionalProperty: 'responsible' },
-        instancePath: '/processes/PR001/steps/ST001',
+        instancePath: '/processes/PR00001/steps/ST00001',
       };
 
       const result = formatValidationError(error);
       expect(result.message).toBe('Unknown property: "responsible"');
       expect(result.suggestion).toBe("Did you mean to put this inside 'raci'?");
       expect(result.example).toContain('raci:');
-      expect(result.example).toContain('responsible: [AC001]');
+      expect(result.example).toContain('responsible: [AC00001]');
     });
 
     it('should suggest closest match', () => {
       const error: RawAjvError = {
         keyword: 'additionalProperties',
         params: { additionalProperty: 'naem' },
-        instancePath: '/processes/PR001/steps/ST001',
+        instancePath: '/processes/PR00001/steps/ST00001',
       };
       const context: SchemaContext = {
         validProperties: ['name', 'kind', 'duration', 'description'],
@@ -95,7 +95,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['action', 'milestone', 'decision'] },
         data: 'task',
-        instancePath: '/processes/PR001/steps/ST001/kind',
+        instancePath: '/processes/PR00001/steps/ST00001/kind',
       };
 
       const result = formatValidationError(error);
@@ -108,7 +108,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['action', 'milestone', 'decision'] },
         data: 'acton',
-        instancePath: '/processes/PR001/steps/ST001/kind',
+        instancePath: '/processes/PR00001/steps/ST00001/kind',
       };
 
       const result = formatValidationError(error);
@@ -120,7 +120,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['action', 'milestone', 'decision', 'subprocess', 'wait', 'handoff', 'start', 'end'] },
         data: 'task',
-        instancePath: '/processes/PR001/steps/ST001/kind',
+        instancePath: '/processes/PR00001/steps/ST00001/kind',
       };
 
       const result = formatValidationError(error);
@@ -134,7 +134,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['action', 'milestone', 'decision', 'subprocess', 'wait', 'handoff', 'start', 'end'] },
         data: 'gateway',
-        instancePath: '/processes/PR001/steps/ST001/kind',
+        instancePath: '/processes/PR00001/steps/ST00001/kind',
       };
 
       const result = formatValidationError(error);
@@ -148,7 +148,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['action', 'milestone', 'decision', 'subprocess', 'wait', 'handoff', 'start', 'end'] },
         data: 'event',
-        instancePath: '/processes/PR001/steps/ST001/kind',
+        instancePath: '/processes/PR00001/steps/ST00001/kind',
       };
 
       const result = formatValidationError(error);
@@ -161,7 +161,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['person', 'role', 'team', 'system', 'organization', 'external', 'customer'] },
         data: 'user',
-        instancePath: '/actors/AC001/type',
+        instancePath: '/actors/AC00001/type',
       };
 
       const result = formatValidationError(error);
@@ -175,7 +175,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['person', 'role', 'team', 'system', 'organization', 'external', 'customer'] },
         data: 'service',
-        instancePath: '/actors/AC001/type',
+        instancePath: '/actors/AC00001/type',
       };
 
       const result = formatValidationError(error);
@@ -189,7 +189,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['person', 'role', 'team', 'system', 'organization', 'external', 'customer'] },
         data: 'human',
-        instancePath: '/actors/AC001/type',
+        instancePath: '/actors/AC00001/type',
       };
 
       const result = formatValidationError(error);
@@ -216,7 +216,7 @@ describe('formatValidationError', () => {
         keyword: 'enum',
         params: { allowedValues: ['action', 'milestone'] },
         // data is undefined
-        instancePath: '/processes/PR001/steps/ST001/kind',
+        instancePath: '/processes/PR00001/steps/ST00001/kind',
       };
 
       const result = formatValidationError(error);
@@ -229,7 +229,7 @@ describe('formatValidationError', () => {
     it('should format actor ID pattern error', () => {
       const error: RawAjvError = {
         keyword: 'pattern',
-        params: { pattern: '^AC\\d{3,}$' },
+        params: { pattern: '^AC\\d{5,}$' },
         data: 'AC01',
         instancePath: '/actors/AC01',
       };
@@ -237,8 +237,8 @@ describe('formatValidationError', () => {
       const result = formatValidationError(error);
       expect(result.message).toBe('Invalid format: "AC01"');
       expect(result.hint).toContain('AC');
-      expect(result.hint).toContain('3+ digits');
-      expect(result.example).toContain('AC001');
+      expect(result.hint).toContain('5+ digits');
+      expect(result.example).toContain('AC00001');
     });
 
     it('should format duration pattern error', () => {
@@ -246,7 +246,7 @@ describe('formatValidationError', () => {
         keyword: 'pattern',
         params: { pattern: '^[0-9]+(\\.[0-9]+)?(min|h|d|wk|mo)$' },
         data: '2 hours',
-        instancePath: '/processes/PR001/steps/ST001/duration',
+        instancePath: '/processes/PR00001/steps/ST00001/duration',
       };
 
       const result = formatValidationError(error);
@@ -261,7 +261,7 @@ describe('formatValidationError', () => {
         keyword: 'pattern',
         params: { pattern: '^[0-9]+(\\.[0-9]+)?(min|h|d|wk|mo)$' },
         data: '30',
-        instancePath: '/processes/PR001/steps/ST001/duration',
+        instancePath: '/processes/PR00001/steps/ST00001/duration',
       };
 
       const result = formatValidationError(error);
@@ -273,7 +273,7 @@ describe('formatValidationError', () => {
         keyword: 'pattern',
         params: { pattern: '^ST\\d{3,}$' },
         data: 'ST01',
-        instancePath: '/processes/PR001/steps/ST01',
+        instancePath: '/processes/PR00001/steps/ST01',
       };
 
       const result = formatValidationError(error);
@@ -286,7 +286,7 @@ describe('formatValidationError', () => {
       const error: RawAjvError = {
         keyword: 'required',
         params: { missingProperty: 'name' },
-        instancePath: '/processes/PR001',
+        instancePath: '/processes/PR00001',
       };
 
       const result = formatValidationError(error);
@@ -304,7 +304,7 @@ describe('formatValidationError', () => {
 
       const result = formatValidationError(error);
       expect(result.hint).toContain('ubml');
-      expect(result.example).toContain('ubml: "1.0"');
+      expect(result.example).toContain('ubml: "1.1"');
     });
   });
 
@@ -313,8 +313,8 @@ describe('formatValidationError', () => {
       const error: RawAjvError = {
         keyword: 'type',
         params: { type: 'array' },
-        data: 'AC001',
-        instancePath: '/processes/PR001/steps/ST001/raci/responsible',
+        data: 'AC00001',
+        instancePath: '/processes/PR00001/steps/ST00001/raci/responsible',
       };
 
       const result = formatValidationError(error);

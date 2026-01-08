@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .metrics.ubml.yaml files - KPIs and ROI analysis definitions.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.metrics.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/metrics.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/metrics.document.yaml"
 title: "Metrics"
 description: |
   Metrics documents define Key Performance Indicators (KPIs) and 
@@ -53,9 +52,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -73,11 +72,11 @@ properties:
     description: |
       KPI definitions, keyed by KPI ID.
       
-      KPI IDs follow the KP### pattern (e.g., KP001, KP002).
+      KPI IDs follow the KP### pattern (e.g., KP00001, KP00002).
       
       Example:
         kpis:
-          KP001:
+          KP00001:
             name: "Order Cycle Time"
             description: "Time from order to delivery"
             type: process
@@ -94,7 +93,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^KP\\d{3,}$":
+      "^KP\\d{5,}$":
         $ref: "../fragments/metrics.fragment.yaml#/$defs/KPI"
   
   roiAnalyses:
@@ -121,7 +120,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^ROI\\d{3,}$":
+      "^ROI\\d{5,}$":
         $ref: "../fragments/metrics.fragment.yaml#/$defs/ROI"
   
   metadata:

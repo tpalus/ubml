@@ -12,7 +12,13 @@ import chalk from 'chalk';
 import { mkdirSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'fs';
 import { join, resolve, basename } from 'path';
 import { serialize } from '../../index';
-import { DOCUMENT_TYPES, SCHEMA_VERSION, SCHEMA_PATHS } from '../../generated/metadata';
+import { 
+  DOCUMENT_TYPES, 
+  SCHEMA_VERSION, 
+  SCHEMA_PATHS,
+  ID_CONFIG,
+  formatId,
+} from '../../generated/metadata';
 
 // =============================================================================
 // Helpers
@@ -127,44 +133,53 @@ function createDocumentTemplate(type: TemplateType, name?: string): unknown {
         },
       };
 
-    case 'process':
+    case 'process': {
+      // Use centralized ID generation with initOffset
+      const offset = ID_CONFIG.initOffset;
+      const prId = formatId('PR', offset);
+      const st1 = formatId('ST', offset);
+      const st2 = formatId('ST', offset + 1);
+      const st3 = formatId('ST', offset + 2);
+      
       return {
         ...base,
         processes: {
-          PR001: {
+          [prId]: {
             name: 'Sample Process',
             description: 'A sample business process - replace with your actual process',
             level: 3,
             steps: {
-              ST001: {
+              [st1]: {
                 name: 'Start',
-                kind: 'event',
-                description: 'Process start event',
+                kind: 'start',
+                description: 'Process entry point',
               },
-              ST002: {
+              [st2]: {
                 name: 'First Activity',
                 kind: 'action',
                 description: 'First activity - describe what happens here',
               },
-              ST003: {
+              [st3]: {
                 name: 'End',
-                kind: 'event',
-                description: 'Process end event',
+                kind: 'end',
+                description: 'Process exit point',
               },
             },
             links: [
-              { from: 'ST001', to: 'ST002' },
-              { from: 'ST002', to: 'ST003' },
+              { from: st1, to: st2 },
+              { from: st2, to: st3 },
             ],
           },
         },
       };
+    }
 
-    case 'actors':
+    case 'actors': {
+      const acId = formatId('AC', ID_CONFIG.initOffset);
       return {
         ...base,
         actors: {
-          AC001: {
+          [acId]: {
             name: 'Business User',
             type: 'role',
             kind: 'human',
@@ -172,6 +187,7 @@ function createDocumentTemplate(type: TemplateType, name?: string): unknown {
           },
         },
       };
+    }
   }
 }
 

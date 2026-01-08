@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines custom views and diagram configurations.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/view.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/view.fragment.yaml"
 title: "UBML View Fragment"
 description: |
   Views are custom perspectives on the process model that highlight
@@ -48,7 +47,7 @@ $defs:
       
       Filter by specific IDs:
         - type: id
-          include: ["ST001", "ST002", "ST003"]
+          include: ["ST00001", "ST00002", "ST00003"]
     type: object
     additionalProperties: false
     required: [type]
@@ -62,6 +61,21 @@ $defs:
           - property: Filter by custom property value
         type: string
         enum: [tag, kind, id, property]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            label:
+              value: "label"
+              hint: "Use 'tag' for tag-based filtering."
+            name:
+              value: "name"
+              hint: "Use 'id' for ID-based filtering, or 'property' for name properties."
+            type:
+              value: "type"
+              hint: "Use 'kind' for type/kind-based filtering."
+            attribute:
+              value: "attribute"
+              hint: "Use 'property' for attribute-based filtering."
       
       property:
         description: "Property name (for property filter type)."
@@ -111,7 +125,7 @@ $defs:
           Examples:
             "[kind=task]" - All tasks
             "[tag=critical]" - Elements with critical tag
-            "#ST001" - Specific element
+            "#ST00001" - Specific element
         type: string
       
       styles:
@@ -160,6 +174,21 @@ $defs:
         type: string
         enum: [auto, horizontal, vertical, hierarchical, manual]
         default: auto
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            left-right:
+              value: "left-right"
+              hint: "Use 'horizontal' for left-to-right layout."
+            top-down:
+              value: "top-down"
+              hint: "Use 'vertical' for top-to-bottom layout."
+            tree:
+              value: "tree"
+              hint: "Use 'hierarchical' for tree-like layouts."
+            free:
+              value: "free"
+              hint: "Use 'manual' for free-form manual positioning."
       
       direction:
         description: "Primary flow direction."
@@ -228,11 +257,11 @@ $defs:
       
       EXAMPLE - Executive Summary View:
       
-        VW001:
+        VW00001:
           name: "Executive Summary"
           description: "High-level process overview for leadership"
           type: process
-          process: PR001
+          process: PR00001
           
           filters:
             - type: kind
@@ -252,11 +281,11 @@ $defs:
       
       EXAMPLE - Comparison View:
       
-        VW002:
+        VW00002:
           name: "As-Is vs To-Be Comparison"
           type: comparison
-          baseScenario: SC001
-          compareScenario: SC002
+          baseScenario: SC00001
+          compareScenario: SC00002
           highlightDifferences: true
     type: object
     additionalProperties: false
@@ -283,6 +312,27 @@ $defs:
           - custom: Custom view type
         type: string
         enum: [process, capability, value-stream, entity, actor, comparison, metrics, custom]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            flowchart:
+              value: "flowchart"
+              hint: "Use 'process' for process/flowchart diagrams."
+            diagram:
+              value: "diagram"
+              hint: "Specify view type: 'process', 'capability', 'entity', etc."
+            bpmn:
+              value: "bpmn"
+              hint: "Use 'process' for process diagrams. UBML renders to multiple notations."
+            erd:
+              value: "erd"
+              hint: "Use 'entity' for entity relationship diagrams."
+            organization:
+              value: "organization"
+              hint: "Use 'actor' for organization/actor views."
+            dashboard:
+              value: "dashboard"
+              hint: "Use 'metrics' for dashboard-style views."
       
       process:
         description: "Process to display (for process views)."

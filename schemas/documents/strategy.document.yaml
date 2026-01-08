@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .strategy.ubml.yaml files - strategic element definitions.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.strategy.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/strategy.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/strategy.document.yaml"
 title: "Strategy"
 description: |
   Strategy documents define strategic elements that provide context
@@ -56,9 +55,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -76,31 +75,31 @@ properties:
     description: |
       Value stream definitions, keyed by value stream ID.
       
-      Value stream IDs follow the VS### pattern (e.g., VS001, VS002).
+      Value stream IDs follow the VS### pattern (e.g., VS00001, VS00002).
       
       Example:
         valueStreams:
-          VS001:
+          VS00001:
             name: "Order to Cash"
             description: "From order to payment collection"
-            customer: AC001
+            customer: AC00001
             triggeringEvent: "Customer places order"
             endingEvent: "Payment received"
     type: object
     additionalProperties: false
     patternProperties:
-      "^VS\\d{3,}$":
+      "^VS\\d{5,}$":
         $ref: "../fragments/strategy.fragment.yaml#/$defs/ValueStream"
   
   capabilities:
     description: |
       Capability definitions, keyed by capability ID.
       
-      Capability IDs follow the CP### pattern (e.g., CP001, CP002).
+      Capability IDs follow the CP### pattern (e.g., CP00001, CP00002).
       
       Example:
         capabilities:
-          CP001:
+          CP00001:
             name: "Manage Customer Orders"
             level: 2
             maturity: 3
@@ -109,7 +108,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^CP\\d{3,}$":
+      "^CP\\d{5,}$":
         $ref: "../fragments/strategy.fragment.yaml#/$defs/Capability"
   
   products:
@@ -128,7 +127,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^PD\\d{3,}$":
+      "^PD\\d{5,}$":
         $ref: "../fragments/strategy.fragment.yaml#/$defs/Product"
   
   services:
@@ -147,7 +146,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^SV\\d{3,}$":
+      "^SV\\d{5,}$":
         $ref: "../fragments/strategy.fragment.yaml#/$defs/Service"
   
   portfolios:
@@ -165,7 +164,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^PF\\d{3,}$":
+      "^PF\\d{5,}$":
         $ref: "../fragments/strategy.fragment.yaml#/$defs/Portfolio"
   
   metadata:

@@ -64,7 +64,7 @@ export interface SchemaContext {
 export interface ValidationError {
   /** Error message */
   message: string;
-  /** JSON path to the error location (e.g., "/processes/PR001/steps/ST001") */
+  /** JSON path to the error location (e.g., "/processes/PR00001/steps/ST00001") */
   path?: string;
   /** Error code/keyword for programmatic handling */
   code?: string;

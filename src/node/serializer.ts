@@ -32,7 +32,7 @@ export interface SerializeToFileOptions extends SerializeOptions {
  * 
  * await serializeToFile({
  *   ubml: '1.0',
- *   processes: { PR001: { name: 'My Process' } }
+ *   processes: { PR00001: { name: 'My Process' } }
  * }, './output.process.ubml.yaml');
  * ```
  */

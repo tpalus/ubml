@@ -23,7 +23,7 @@ describe('Example Workspace', () => {
       expect(result.errors).toHaveLength(0);
       expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
-      expect(result.document?.content).toHaveProperty('ubml', '1.0');
+      expect(result.document?.content).toHaveProperty('ubml', '1.1');
     });
 
     it('should parse actors file', async () => {

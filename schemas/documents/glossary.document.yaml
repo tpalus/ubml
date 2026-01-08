@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .glossary.ubml.yaml files - terminology and definitions.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.glossary.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/glossary.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/glossary.document.yaml"
 title: "Glossary"
 description: |
   Glossary documents define business terminology and definitions.
@@ -54,9 +53,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |

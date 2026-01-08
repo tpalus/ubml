@@ -127,44 +127,44 @@ ${dim('────────────────────────�
 Every element in UBML has a typed ID prefix:
 
 ${subheader('Process Elements')}
-  ${highlight('PR###')}  Process           ${dim('PR001, PR002...')}
-  ${highlight('ST###')}  Step              ${dim('ST001, ST002...')}
-  ${highlight('PH###')}  Phase             ${dim('PH001, PH002...')}
-  ${highlight('BK###')}  Block             ${dim('BK001, BK002...')}
+  ${highlight('PR###')}  Process           ${dim('PR00001, PR00002...')}
+  ${highlight('ST###')}  Step              ${dim('ST00001, ST00002...')}
+  ${highlight('PH###')}  Phase             ${dim('PH00001, PH00002...')}
+  ${highlight('BK###')}  Block             ${dim('BK00001, BK00002...')}
 
 ${subheader('Actors & Resources')}
-  ${highlight('AC###')}  Actor             ${dim('AC001, AC002...')}
-  ${highlight('SK###')}  Skill             ${dim('SK001, SK002...')}
-  ${highlight('RP###')}  Resource Pool     ${dim('RP001, RP002...')}
-  ${highlight('EQ###')}  Equipment         ${dim('EQ001, EQ002...')}
-  ${highlight('PS###')}  Persona           ${dim('PS001, PS002...')}
+  ${highlight('AC###')}  Actor             ${dim('AC00001, AC00002...')}
+  ${highlight('SK###')}  Skill             ${dim('SK00001, SK00002...')}
+  ${highlight('RP###')}  Resource Pool     ${dim('RP00001, RP00002...')}
+  ${highlight('EQ###')}  Equipment         ${dim('EQ00001, EQ00002...')}
+  ${highlight('PS###')}  Persona           ${dim('PS00001, PS00002...')}
 
 ${subheader('Information Model')}
-  ${highlight('EN###')}  Entity            ${dim('EN001, EN002...')}
-  ${highlight('DC###')}  Document          ${dim('DC001, DC002...')}
-  ${highlight('LC###')}  Location          ${dim('LC001, LC002...')}
+  ${highlight('EN###')}  Entity            ${dim('EN00001, EN00002...')}
+  ${highlight('DC###')}  Document          ${dim('DC00001, DC00002...')}
+  ${highlight('LC###')}  Location          ${dim('LC00001, LC00002...')}
 
 ${subheader('Strategy')}
-  ${highlight('VS###')}  Value Stream      ${dim('VS001, VS002...')}
-  ${highlight('CP###')}  Capability        ${dim('CP001, CP002...')}
-  ${highlight('PD###')}  Product           ${dim('PD001, PD002...')}
-  ${highlight('SV###')}  Service           ${dim('SV001, SV002...')}
-  ${highlight('PF###')}  Portfolio         ${dim('PF001, PF002...')}
+  ${highlight('VS###')}  Value Stream      ${dim('VS00001, VS00002...')}
+  ${highlight('CP###')}  Capability        ${dim('CP00001, CP00002...')}
+  ${highlight('PD###')}  Product           ${dim('PD00001, PD00002...')}
+  ${highlight('SV###')}  Service           ${dim('SV00001, SV00002...')}
+  ${highlight('PF###')}  Portfolio         ${dim('PF00001, PF00002...')}
 
 ${subheader('Analysis')}
-  ${highlight('HY###')}  Hypothesis        ${dim('HY001, HY002...')}
-  ${highlight('HT###')}  Hypothesis Tree   ${dim('HT001, HT002...')}
-  ${highlight('EV###')}  Evidence          ${dim('EV001, EV002...')}
-  ${highlight('SC###')}  Scenario          ${dim('SC001, SC002...')}
-  ${highlight('KP###')}  KPI               ${dim('KP001, KP002...')}
+  ${highlight('HY###')}  Hypothesis        ${dim('HY00001, HY00002...')}
+  ${highlight('HT###')}  Hypothesis Tree   ${dim('HT00001, HT00002...')}
+  ${highlight('EV###')}  Evidence          ${dim('EV00001, EV00002...')}
+  ${highlight('SC###')}  Scenario          ${dim('SC00001, SC00002...')}
+  ${highlight('KP###')}  KPI               ${dim('KP00001, KP00002...')}
 
 ${subheader('Other')}
-  ${highlight('VW###')}  View              ${dim('VW001, VW002...')}
-  ${highlight('MS###')}  Mining Source     ${dim('MS001, MS002...')}
-  ${highlight('ROI###')} ROI Analysis      ${dim('ROI001, ROI002...')}
+  ${highlight('VW###')}  View              ${dim('VW00001, VW00002...')}
+  ${highlight('MS###')}  Mining Source     ${dim('MS00001, MS00002...')}
+  ${highlight('ROI###')} ROI Analysis      ${dim('ROI00001, ROI00002...')}
 
 ${dim('────────────────────────────────────────────────────────────')}
-${dim('Tip: Leave gaps in IDs for future additions (ST001, ST005, ST010...)')}
+${dim('Tip: Leave gaps in IDs for future additions (ST00010, ST00020, ST00030...)')}
 `;
 
 const EXAMPLES = `
@@ -176,45 +176,45 @@ ${subheader('Simple Process')}
 ${dim('# order-fulfillment.process.ubml.yaml')}
 ${highlight('ubml')}: "1.0"
 ${highlight('processes')}:
-  ${code('PR001')}:
+  ${code('PR00001')}:
     ${highlight('name')}: "Order Fulfillment"
     ${highlight('description')}: "Process customer orders from receipt to delivery"
     ${highlight('level')}: 3
     ${highlight('steps')}:
-      ${code('ST001')}:
+      ${code('ST00001')}:
         ${highlight('name')}: "Receive Order"
         ${highlight('kind')}: event
-      ${code('ST002')}:
+      ${code('ST00002')}:
         ${highlight('name')}: "Validate Order"
         ${highlight('kind')}: action
-        ${highlight('responsible')}: AC001
-      ${code('ST003')}:
+        ${highlight('responsible')}: AC00001
+      ${code('ST00003')}:
         ${highlight('name')}: "Ship Order"
         ${highlight('kind')}: action
     ${highlight('links')}:
-      - ${highlight('from')}: ST001
-        ${highlight('to')}: ST002
-      - ${highlight('from')}: ST002
-        ${highlight('to')}: ST003
+      - ${highlight('from')}: ST00001
+        ${highlight('to')}: ST00002
+      - ${highlight('from')}: ST00002
+        ${highlight('to')}: ST00003
 
 ${subheader('Actors File')}
 
 ${dim('# actors.ubml.yaml')}
 ${highlight('ubml')}: "1.0"
 ${highlight('actors')}:
-  ${code('AC001')}:
+  ${code('AC00001')}:
     ${highlight('name')}: "Order Processor"
     ${highlight('type')}: role
     ${highlight('kind')}: human
     ${highlight('skills')}:
-      - SK001
-  ${code('AC002')}:
+      - SK00001
+  ${code('AC00002')}:
     ${highlight('name')}: "ERP System"
     ${highlight('type')}: system
     ${highlight('kind')}: system
 
 ${highlight('skills')}:
-  ${code('SK001')}:
+  ${code('SK00001')}:
     ${highlight('name')}: "Order Management"
     ${highlight('description')}: "Knowledge of order processing procedures"
 

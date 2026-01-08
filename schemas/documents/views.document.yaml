@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .views.ubml.yaml files - custom view and diagram configurations.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.views.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/views.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/views.document.yaml"
 title: "Views"
 description: |
   View documents define custom perspectives and diagram configurations.
@@ -54,9 +53,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -74,15 +73,15 @@ properties:
     description: |
       View definitions, keyed by view ID.
       
-      View IDs follow the VW### pattern (e.g., VW001, VW002).
+      View IDs follow the VW### pattern (e.g., VW00001, VW00002).
       
       Example:
         views:
-          VW001:
+          VW00001:
             name: "Executive Overview"
             description: "High-level process view for leadership"
             type: process
-            process: PR001
+            process: PR00001
             filters:
               - type: kind
                 include: [milestone, subprocess, event]
@@ -94,7 +93,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^VW\\d{3,}$":
+      "^VW\\d{5,}$":
         $ref: "../fragments/view.fragment.yaml#/$defs/View"
   
   metadata:

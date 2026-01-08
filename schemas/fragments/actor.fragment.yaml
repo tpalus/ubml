@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines actors and personas - the participants in business processes.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/actor.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/actor.fragment.yaml"
 title: "UBML Actor Fragment"
 description: |
   Actors represent WHO does work in your business processes.
@@ -153,8 +152,8 @@ $defs:
           Skills this actor has, optionally with proficiency levels.
           
           Two forms supported:
-          1. Simple reference: "SK001"
-          2. With proficiency: { skill: "SK001", level: 3 }
+          1. Simple reference: "SK00001"
+          2. With proficiency: { skill: "SK00001", level: 3 }
           
           Proficiency levels (1-5) match step.requiresSkills.level:
           1 = Novice, 2 = Basic, 3 = Intermediate, 4 = Advanced, 5 = Expert
@@ -193,7 +192,7 @@ $defs:
       Actor can perform step if actor.skill.level >= step.requiresSkills.level
       
       Example:
-        skill: SK001
+        skill: SK00001
         level: 3
     type: object
     additionalProperties: false
@@ -281,13 +280,8 @@ $defs:
           - "Team efficiency"
     type: object
     additionalProperties: false
-    required: [id, name]
+    required: [name]
     properties:
-      id:
-        description: "Unique persona ID (PS### pattern)."
-        type: string
-        pattern: "^PS\\d{3,}$"
-      
       name:
         description: |
           Persona name - a memorable label for this archetype.

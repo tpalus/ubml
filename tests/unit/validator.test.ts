@@ -17,13 +17,12 @@ describe('Validator', () => {
     it('should validate valid process document', async () => {
       const validator = await createValidator();
       const content = {
-        ubml: '1.0',
+        ubml: '1.1',
         processes: {
-          PR001: {
-            id: 'PR001',
+          PR00001: {
             name: 'Test Process',
             steps: {
-              ST001: {
+              ST00001: {
                 kind: 'action',
                 name: 'First Step',
               },
@@ -39,13 +38,12 @@ describe('Validator', () => {
 
     it('should validate parsed document', async () => {
       const yaml = `
-ubml: "1.0"
+ubml: "1.1"
 processes:
-  PR001:
-    id: PR001
+  PR00001:
     name: "Test Process"
     steps:
-      ST001:
+      ST00001:
         kind: action
         name: "First Step"
 `;
@@ -60,7 +58,7 @@ processes:
     it('should detect invalid document structure', async () => {
       const validator = await createValidator();
       const content = {
-        ubml: '1.0',
+        ubml: '1.1',
         // Missing required processes field or invalid structure
         invalid: 'field',
       };

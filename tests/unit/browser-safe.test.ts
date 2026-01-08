@@ -25,13 +25,13 @@ describe('Browser-Safe API', () => {
   describe('parse()', () => {
     it('should parse valid YAML content', () => {
       const yaml = `
-ubml: "1.0"
+ubml: "1.1"
 processes:
-  PR001:
-    id: PR001
+  PR00001:
+    id: PR00001
     name: "Test Process"
     steps:
-      ST001:
+      ST00001:
         kind: action
         name: "First Step"
 `;
@@ -39,20 +39,20 @@ processes:
       
       expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
-      expect(result.document?.content).toHaveProperty('ubml', '1.0');
+      expect(result.document?.content).toHaveProperty('ubml', '1.1');
       expect(result.document?.meta.type).toBe('process');
       expect(result.errors).toHaveLength(0);
     });
 
     it('should detect document type from filename', () => {
-      const yaml = `ubml: "1.0"\nactors: {}`;
+      const yaml = `ubml: "1.1"\nactors: {}`;
       const result = parse(yaml, 'my-org.actors.ubml.yaml');
       
       expect(result.document?.meta.type).toBe('actors');
     });
 
     it('should return errors for invalid YAML', () => {
-      const invalidYaml = `ubml: "1.0"\n  invalid: indentation`;
+      const invalidYaml = `ubml: "1.1"\n  invalid: indentation`;
       const result = parse(invalidYaml);
       
       expect(result.ok).toBe(false);
@@ -72,13 +72,12 @@ processes:
     it('should validate content against document type', async () => {
       const validator = await createValidator();
       const content = {
-        ubml: '1.0',
+        ubml: '1.1',
         processes: {
-          PR001: {
-            id: 'PR001',
+          PR00001: {
             name: 'Test',
             steps: {
-              ST001: { kind: 'action', name: 'Step' },
+              ST00001: { kind: 'action', name: 'Step' },
             },
           },
         },
@@ -92,9 +91,9 @@ processes:
     it('should return errors for invalid content', async () => {
       const validator = await createValidator();
       const content = {
-        ubml: '1.0',
+        ubml: '1.1',
         processes: {
-          PR001: {
+          PR00001: {
             // Missing required: id, name, steps
           },
         },
@@ -118,13 +117,12 @@ processes:
   describe('parseAndValidate()', () => {
     it('should parse and validate in one call', async () => {
       const yaml = `
-ubml: "1.0"
+ubml: "1.1"
 processes:
-  PR001:
-    id: PR001
+  PR00001:
     name: "Test"
     steps:
-      ST001:
+      ST00001:
         kind: action
         name: "Step"
 `;
@@ -140,15 +138,15 @@ processes:
   describe('serialize()', () => {
     it('should serialize object to YAML string', () => {
       const content = {
-        ubml: '1.0',
-        processes: { PR001: { id: 'PR001', name: 'Test', steps: {} } },
+        ubml: '1.1',
+        processes: { PR00001: { name: 'Test', steps: {} } },
       };
       
       const yaml = serialize(content);
       
       expect(yaml).toContain('ubml:');
       expect(yaml).toContain('processes:');
-      expect(yaml).toContain('PR001:');
+      expect(yaml).toContain('PR00001:');
     });
 
     it('should respect serialization options', () => {

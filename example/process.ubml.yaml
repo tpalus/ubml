@@ -1,62 +1,61 @@
-ubml: "1.0"
+ubml: "1.1"
 
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Customer Onboarding"
     description: "End-to-end process for onboarding new customers"
     level: 3
     
     steps:
-      ST001:
+      ST00001:
         name: "Receive Customer Application"
         kind: action
         description: "Receive and log new customer application"
         inputs:
-          - ref: EN001
+          - ref: EN00001
         outputs:
-          - ref: EN002
+          - ref: EN00002
           
-      ST002:
+      ST00002:
         name: "Verify Customer Identity"
         kind: action
         description: "Verify customer identity documents"
         inputs:
-          - ref: EN002
-          - ref: EN003
+          - ref: EN00002
+          - ref: EN00003
           
-      ST003:
+      ST00003:
         name: "Perform Background Check"
         kind: action
         description: "Run background and credit checks"
         systems:
-          - AC003
+          - AC00003
         
-      ST004:
+      ST00004:
         name: "Review Application"
         kind: decision
         description: "Decision point for application approval"
         
-      ST005:
+      ST00005:
         name: "Create Customer Account"
         kind: action
         description: "Create customer account in CRM"
         systems:
-          - AC003
+          - AC00003
           
-      ST006:
+      ST00006:
         name: "Send Welcome Package"
         kind: action
         description: "Send welcome email and documentation"
     
     links:
-      - from: ST001
-        to: ST002
-      - from: ST002
-        to: ST003
-      - from: ST003
-        to: ST004
-      - from: ST004
-        to: ST005
-      - from: ST005
-        to: ST006
+      - from: ST00001
+        to: ST00002
+      - from: ST00002
+        to: ST00003
+      - from: ST00003
+        to: ST00004
+      - from: ST00004
+        to: ST00005
+      - from: ST00005
+        to: ST00006

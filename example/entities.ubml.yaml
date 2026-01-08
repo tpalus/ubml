@@ -1,7 +1,7 @@
-ubml: "1.0"
+ubml: "1.1"
 
 entities:
-  EN001:
+  EN00001:
     name: "Customer Application Form"
     description: "Initial application form submitted by prospective customer"
     attributes:
@@ -18,7 +18,7 @@ entities:
         type: date
         required: true
 
-  EN002:
+  EN00002:
     name: "Customer Profile"
     description: "Core customer data record"
     attributes:
@@ -35,7 +35,7 @@ entities:
         type: datetime
         required: true
 
-  EN003:
+  EN00003:
     name: "Identity Document"
     description: "Customer identity verification document (passport, ID card, etc.)"
     attributes:

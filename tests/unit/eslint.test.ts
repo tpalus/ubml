@@ -73,13 +73,12 @@ describe('ESLint Plugin', () => {
     });
 
     it('should process UBML files', async () => {
-      const source = `ubml: "1.0"
+      const source = `ubml: "1.1"
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Test Process"
     steps:
-      ST001:
+      ST00001:
         name: "Step 1"
         kind: action
 `;
@@ -92,7 +91,7 @@ processes:
     });
 
     it('should report parse errors with line numbers', async () => {
-      const source = `ubml: "1.0"
+      const source = `ubml: "1.1"
   invalid: indentation
 `;
       const { context, reports } = createMockContext('test.process.ubml.yaml', source);
@@ -114,12 +113,12 @@ processes:
     });
 
     it('should report validation errors with line numbers', async () => {
-      const source = `ubml: "1.0"
+      const source = `ubml: "1.1"
 processes:
-  PR001:
+  PR00001:
     name: "Test Process"
     steps:
-      ST001:
+      ST00001:
         name: "Step without kind"
 `;
       const { context, reports } = createMockContext('test.process.ubml.yaml', source);
@@ -145,17 +144,17 @@ processes:
     it('should report correct line numbers for nested errors', async () => {
       // Line 1: ubml
       // Line 2: processes
-      // Line 3:   PR001
-      // Line 4:     name (PR001 value starts here - missing 'id')
+      // Line 3:   PR00001
+      // Line 4:     name (PR00001 value starts here)
       // Line 5:     steps
-      // Line 6:       ST001
-      // Line 7:         name (ST001 value starts here - missing 'kind')
-      const source = `ubml: "1.0"
+      // Line 6:       ST00001
+      // Line 7:         name (ST00001 value starts here - missing 'kind')
+      const source = `ubml: "1.1"
 processes:
-  PR001:
+  PR00001:
     name: "Test"
     steps:
-      ST001:
+      ST00001:
         name: "Step 1"
 `;
       const { context, reports } = createMockContext('test.process.ubml.yaml', source);
@@ -166,31 +165,24 @@ processes:
         await (listeners.Program as any)(mockProgramNode);
       }
       
-      // Should have multiple validation errors
-      expect(reports.length).toBeGreaterThanOrEqual(2);
+      // Should have at least one validation error (missing 'kind' on step)
+      expect(reports.length).toBeGreaterThanOrEqual(1);
       
-      // Find errors by path
-      const pr001Error = reports.find(r => 
-        r.data?.path?.includes('/processes/PR001') && 
-        !r.data?.path?.includes('/steps')
-      );
+      // Find step error
       const st001Error = reports.find(r => 
-        r.data?.path?.includes('/steps/ST001')
+        r.data?.path?.includes('/steps/ST00001')
       );
       
-      // Both should have line numbers
-      if (pr001Error?.loc) {
-        expect(pr001Error.loc.start.line).toBe(4); // PR001 value starts at line 4
-      }
+      // Step error should have line number
       if (st001Error?.loc) {
-        expect(st001Error.loc.start.line).toBe(7); // ST001 value starts at line 7
+        expect(st001Error.loc.start.line).toBe(7); // ST00001 value starts at line 7
       }
     });
 
     it('should validate actors document', async () => {
-      const source = `ubml: "1.0"
+      const source = `ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "Test Actor"
     type: role
 `;
@@ -208,13 +200,13 @@ actors:
       );
       expect(kindError).toBeDefined();
       expect(kindError!.loc).toBeDefined();
-      expect(kindError!.loc!.start.line).toBe(4); // AC001 value starts at line 4
+      expect(kindError!.loc!.start.line).toBe(4); // AC00001 value starts at line 4
     });
 
     it('should pass valid documents without errors', async () => {
-      const source = `ubml: "1.0"
+      const source = `ubml: "1.1"
 actors:
-  AC001:
+  AC00001:
     name: "Test Actor"
     type: role
     kind: human

@@ -12,6 +12,7 @@ import {
   getPatternHint, 
   shouldBeNested,
   getEnumValueMistakeHint,
+  SCHEMA_VERSION,
   type PatternHint,
 } from '../../generated/metadata.js';
 
@@ -256,8 +257,8 @@ function formatRequiredError(
   // Add hints for common required properties
   const requiredHints: Record<string, string> = {
     'name': 'Every element needs a descriptive name.',
-    'id': 'Every element needs a unique ID matching its key (e.g., AC001).',
-    'ubml': 'Add `ubml: "1.0"` at the top of the file.',
+    'id': 'Every element needs a unique ID matching its key (e.g., AC00001).',
+    'ubml': `Add \`ubml: "${SCHEMA_VERSION}"\` at the top of the file.`,
     'type': 'Specify the document or element type.',
     'steps': 'A process needs at least one step. Add a `steps:` section.',
     'to': 'Links need a target. Specify the `to:` step ID.',
@@ -271,8 +272,8 @@ function formatRequiredError(
   // Add example for some common cases
   const requiredExamples: Record<string, string> = {
     'name': 'name: "My Process Name"',
-    'ubml': 'ubml: "1.0"',
-    'steps': 'steps:\n  ST001:\n    name: "First Step"',
+    'ubml': `ubml: "${SCHEMA_VERSION}"`,
+    'steps': 'steps:\n  ST00001:\n    name: "First Step"',
   };
   
   if (requiredExamples[missingProp]) {

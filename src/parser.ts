@@ -74,12 +74,12 @@ export interface UBMLDocument<T = unknown> {
   /**
    * Get source location for a JSON path.
    * 
-   * @param path - JSON pointer path (e.g., "/processes/PR001/steps/ST001")
+   * @param path - JSON pointer path (e.g., "/processes/PR00001/steps/ST00001")
    * @returns Source location or undefined if path not found
    * 
    * @example
    * ```typescript
-   * const loc = document.getSourceLocation('/processes/PR001/name');
+   * const loc = document.getSourceLocation('/processes/PR00001/name');
    * console.log(`Line ${loc?.line}, column ${loc?.column}`);
    * ```
    */
@@ -181,7 +181,7 @@ export function parse<T = unknown>(content: string, filename?: string): ParseRes
   }
 
   // Extract UBML version
-  const ubmlVersion = (parsedContent as Record<string, unknown>)?.['ubml'] as string ?? '1.0';
+  const ubmlVersion = (parsedContent as Record<string, unknown>)?.['ubml'] as string ?? '1.1';
 
   const meta: DocumentMeta = {
     version: ubmlVersion,

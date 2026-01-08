@@ -8,22 +8,22 @@ import { serialize } from '../../src/index.js';
 describe('Serializer', () => {
   describe('serialize', () => {
     it('should serialize simple objects', () => {
-      const obj = { ubml: '1.0', name: 'Test' };
+      const obj = { ubml: '1.1', name: 'Test' };
       const yaml = serialize(obj);
       
-      expect(yaml).toContain('ubml: "1.0"');
+      expect(yaml).toContain('ubml: "1.1"');
       expect(yaml).toContain('name: Test');
       expect(yaml.endsWith('\n')).toBe(true);
     });
 
     it('should serialize nested objects', () => {
       const obj = {
-        ubml: '1.0',
+        ubml: '1.1',
         processes: {
-          PR001: {
+          PR00001: {
             name: 'Test Process',
             steps: {
-              ST001: { name: 'Step 1' },
+              ST00001: { name: 'Step 1' },
             },
           },
         },
@@ -31,7 +31,7 @@ describe('Serializer', () => {
       
       const yaml = serialize(obj);
       expect(yaml).toContain('processes:');
-      expect(yaml).toContain('PR001:');
+      expect(yaml).toContain('PR00001:');
       expect(yaml).toContain('steps:');
     });
 

@@ -25,7 +25,7 @@ import { initCommand } from './commands/init';
 import { schemaCommand } from './commands/schema';
 import { addCommand } from './commands/add';
 import { docsCommand } from './commands/docs';
-import { syntaxCommand, examplesCommand, idsCommand, enumsCommand } from './commands/ref';
+import { syntaxCommand, examplesCommand, idsCommand, enumsCommand, nextidCommand } from './commands/ref';
 
 /**
  * Create and configure the CLI program.
@@ -65,6 +65,7 @@ ${chalk.dim('Documentation: https://ubml.io/docs')}
   program.addCommand(examplesCommand());  // Show examples
   program.addCommand(idsCommand());       // ID patterns
   program.addCommand(enumsCommand());     // Enum values
+  program.addCommand(nextidCommand());    // Next available ID
 
   return program;
 }

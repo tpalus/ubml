@@ -3,11 +3,10 @@
 # ============================================================================
 # Unified link type for routing, scheduling, and dependencies.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/link.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/link.fragment.yaml"
 title: "UBML Link Fragment"
 description: |
   Links represent relationships between steps. In UBML, links unify three 
@@ -96,35 +95,35 @@ $defs:
       EXAMPLES:
       
       Simple sequence (A → B):
-        - from: ST001
-          to: ST002
+        - from: ST00001
+          to: ST00002
       
       Conditional branch:
-        - from: ST001
-          to: ST002
+        - from: ST00001
+          to: ST00002
           condition: "amount > 10000"
-        - from: ST001
-          to: ST003
+        - from: ST00001
+          to: ST00003
           isDefault: true
       
       Probabilistic branch (for simulation):
-        - from: ST001
-          to: ST002
+        - from: ST00001
+          to: ST00002
           probability: 0.7
-        - from: ST001
-          to: ST003
+        - from: ST00001
+          to: ST00003
           probability: 0.3
       
       Scheduling dependency with lag:
-        - from: ST001
-          to: ST002
+        - from: ST00001
+          to: ST00002
           schedule:
             type: finish-to-start
             lag: "2d"
       
       Start-to-start with data binding:
-        - from: ST001
-          to: ST002
+        - from: ST00001
+          to: ST00002
           schedule:
             type: start-to-start
           dataBindings:

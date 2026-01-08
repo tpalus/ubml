@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines scenarios for simulation and work mix analysis.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/scenario.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/scenario.fragment.yaml"
 title: "UBML Scenario Fragment"
 description: |
   Scenarios enable simulation and "what-if" analysis by defining:
@@ -228,6 +227,24 @@ $defs:
           - burst: Periodic bursts of arrivals
         type: string
         enum: [poisson, uniform, scheduled, burst]
+        x-ubml:
+          propertyNames: ["pattern"]
+          valueMistakes:
+            random:
+              value: "random"
+              hint: "Use 'poisson' for random arrivals (most realistic for service processes)."
+            constant:
+              value: "constant"
+              hint: "Use 'uniform' for evenly distributed arrivals."
+            fixed:
+              value: "fixed"
+              hint: "Use 'scheduled' for fixed-time arrivals."
+            batch:
+              value: "batch"
+              hint: "Use 'scheduled' with batchSize, or 'burst' for periodic batch arrivals."
+            cron:
+              value: "cron"
+              hint: "Use 'scheduled' for cron-like schedules."
       
       rate:
         description: |
@@ -395,7 +412,7 @@ $defs:
       SCENARIO EXAMPLES:
       
       Current state baseline:
-        SC001:
+        SC00001:
           name: Current State
           description: "Baseline scenario from 2023 data"
           arrivals:
@@ -409,7 +426,7 @@ $defs:
               probability: 0.2
       
       Growth scenario:
-        SC002:
+        SC00002:
           name: 2x Volume
           description: "What if volume doubles?"
           arrivals:

@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .mining.ubml.yaml files - process mining configuration.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.mining.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/mining.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/mining.document.yaml"
 title: "Mining"
 description: |
   Mining documents configure process mining data sources and mappings.
@@ -54,9 +53,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -87,16 +86,16 @@ properties:
               timestamp: "Event_Time"
               resource: "User_ID"
             timestampFormat: "YYYY-MM-DD HH:mm:ss"
-            process: PR001
+            process: PR00001
             activityMappings:
               - activity: "Create Order"
-                step: ST001
+                step: ST00001
               - activity: "Approve Order"
-                step: ST002
+                step: ST00002
     type: object
     additionalProperties: false
     patternProperties:
-      "^MS\\d{3,}$":
+      "^MS\\d{5,}$":
         $ref: "../fragments/mining.fragment.yaml#/$defs/MiningSource"
   
   metadata:

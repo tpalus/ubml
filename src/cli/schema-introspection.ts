@@ -437,7 +437,7 @@ export function getAnnotatedTemplate(type: DocumentType): string {
   ];
 
   // Simple YAML serialization with comments
-  lines.push('ubml: "1.0"  # UBML version (required)');
+  lines.push('ubml: "1.1"  # UBML version (required)');
 
   if (template.name) {
     lines.push(`name: "${template.name}"`);

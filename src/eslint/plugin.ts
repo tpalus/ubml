@@ -3,6 +3,7 @@
  */
 
 import { validUbmlRule } from './rules/valid-ubml.js';
+import { VERSION } from '../constants.js';
 
 /**
  * UBML ESLint plugin.
@@ -10,7 +11,7 @@ import { validUbmlRule } from './rules/valid-ubml.js';
 export const plugin = {
   meta: {
     name: 'ubml',
-    version: '1.0.0',
+    version: VERSION,
   },
   rules: {
     'valid-ubml': validUbmlRule,

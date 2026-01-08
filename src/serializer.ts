@@ -52,7 +52,7 @@ const DEFAULT_OPTIONS: Required<SerializeOptions> = {
  * const yaml = serialize({
  *   ubml: '1.0',
  *   processes: {
- *     PR001: { name: 'My Process' }
+ *     PR00001: { name: 'My Process' }
  *   }
  * });
  * ```

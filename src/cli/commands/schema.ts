@@ -55,11 +55,11 @@ function code(text: string): string {
  */
 function getPatternHint(pattern: string): string | undefined {
   const hints: Record<string, string> = {
-    '^[A-Z]{2}\\\\d{3,}$': 'Format: Two uppercase letters + 3+ digits',
-    '^AC\\\\d{3,}$': 'Format: AC + 3+ digits (e.g., AC001, AC010)',
-    '^ST\\\\d{3,}$': 'Format: ST + 3+ digits (e.g., ST001, ST010)',
-    '^PR\\\\d{3,}$': 'Format: PR + 3+ digits (e.g., PR001, PR010)',
-    '^EN\\\\d{3,}$': 'Format: EN + 3+ digits (e.g., EN001, EN010)',
+    '^[A-Z]{2}\\\\d{5,}$': 'Format: Two uppercase letters + 5+ digits',
+    '^AC\\\\d{5,}$': 'Format: AC + 5+ digits (e.g., AC00001, AC00010)',
+    '^ST\\\\d{5,}$': 'Format: ST + 5+ digits (e.g., ST00001, ST00010)',
+    '^PR\\\\d{5,}$': 'Format: PR + 5+ digits (e.g., PR00001, PR00010)',
+    '^EN\\\\d{5,}$': 'Format: EN + 5+ digits (e.g., EN00001, EN00010)',
     '^[0-9]+(\\\\.[0-9]+)?(min|h|d|wk|mo)$': 'Format: Number + unit (min/h/d/wk/mo)',
   };
   

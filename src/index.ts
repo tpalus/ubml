@@ -125,7 +125,6 @@ export * from './types.js';
 // ============================================================================
 
 export {
-  SCHEMA_VERSION,
   FRAGMENT_NAMES,
   type FragmentName,
   // ID patterns and validation
@@ -155,4 +154,4 @@ export {
 // CONSTANTS
 // ============================================================================
 
-export { VERSION, PACKAGE_NAME, REPOSITORY_URL } from './constants.js';
+export { VERSION, SCHEMA_VERSION, PACKAGE_NAME, REPOSITORY_URL } from './constants.js';

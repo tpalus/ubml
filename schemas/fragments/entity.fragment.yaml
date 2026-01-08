@@ -3,11 +3,10 @@
 # ============================================================================
 # Defines information model entities: data entities, documents, and locations.
 #
-# VERSION: 1.0
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/fragments/entity.fragment.yaml"
+$id: "https://ubml.io/schemas/1.1/fragments/entity.fragment.yaml"
 title: "UBML Entity Fragment"
 description: |
   Information model entities representing the data landscape of a process.
@@ -40,7 +39,7 @@ $defs:
       Example:
         relationships:
           lines:
-            target: EN002
+            target: EN00002
             type: one-to-many
             description: "Order contains multiple line items"
     type: object
@@ -55,6 +54,27 @@ $defs:
         description: "Cardinality of the relationship."
         type: string
         enum: [one-to-one, one-to-many, many-to-one, many-to-many]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            "1:1":
+              value: "1:1"
+              hint: "Use 'one-to-one' not '1:1'."
+            "1:n":
+              value: "1:n"
+              hint: "Use 'one-to-many' not '1:n'."
+            "n:1":
+              value: "n:1"
+              hint: "Use 'many-to-one' not 'n:1'."
+            "n:m":
+              value: "n:m"
+              hint: "Use 'many-to-many' not 'n:m' or 'n:n'."
+            hasMany:
+              value: "hasMany"
+              hint: "Use 'one-to-many'. Rails-style associations aren't supported."
+            belongsTo:
+              value: "belongsTo"
+              hint: "Use 'many-to-one'. Rails-style associations aren't supported."
       
       description:
         description: "Description of the relationship semantics."
@@ -101,6 +121,39 @@ $defs:
         description: "Data type of the attribute."
         type: string
         enum: [string, number, boolean, date, datetime, duration, money, reference]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            int:
+              value: "int"
+              hint: "Use 'number' for all numeric types (integer and decimal)."
+            integer:
+              value: "integer"
+              hint: "Use 'number' for all numeric types."
+            float:
+              value: "float"
+              hint: "Use 'number' for all numeric types."
+            decimal:
+              value: "decimal"
+              hint: "Use 'number' for all numeric types."
+            text:
+              value: "text"
+              hint: "Use 'string' for text values."
+            varchar:
+              value: "varchar"
+              hint: "Use 'string' for text values."
+            bool:
+              value: "bool"
+              hint: "Use 'boolean' not 'bool'."
+            timestamp:
+              value: "timestamp"
+              hint: "Use 'datetime' for date and time values."
+            currency:
+              value: "currency"
+              hint: "Use 'money' for currency/monetary amounts."
+            ref:
+              value: "ref"
+              hint: "Use 'reference' for entity references."
       
       description:
         description: "Description of the attribute."
@@ -154,7 +207,7 @@ $defs:
       Documents are physical or digital files with content.
       
       Example:
-        EN001:
+        EN00001:
           name: Sales Order
           description: "Customer order with line items"
           attributes:
@@ -168,7 +221,7 @@ $defs:
               type: money
           relationships:
             customer:
-              target: EN002
+              target: EN00002
               type: many-to-one
     type: object
     additionalProperties: false

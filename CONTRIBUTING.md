@@ -115,7 +115,7 @@ properties:
 New element types must follow the established pattern:
 
 ```
-[2-3 letter prefix][3+ digits]
+[2-3 letter prefix][5+ digits, zero-padded]
 ```
 
 | Reserved | Element Type |

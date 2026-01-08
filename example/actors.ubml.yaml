@@ -1,45 +1,45 @@
-ubml: "1.0"
+ubml: "1.1"
 
 actors:
-  AC001:
+  AC00001:
     name: "Customer Service Representative"
     type: role
     kind: human
     description: "Front-line staff handling customer inquiries and initial onboarding"
     skills:
-      - SK001
-      - SK002
+      - SK00001
+      - SK00002
 
-  AC002:
+  AC00002:
     name: "Onboarding Specialist"
     type: role
     kind: human
     description: "Dedicated specialist for complex customer onboarding cases"
     skills:
-      - SK001
+      - SK00001
       - SK003
 
-  AC003:
+  AC00003:
     name: "CRM System"
     type: system
     kind: system
     description: "Customer Relationship Management system"
     
-  AC004:
+  AC00004:
     name: "Document Management System"
     type: system
     kind: system
     description: "System for storing and managing customer documents"
 
 skills:
-  SK001:
+  SK00001:
     name: "Customer Communication"
     description: "Ability to communicate effectively with customers"
     
-  SK002:
+  SK00002:
     name: "Data Entry"
     description: "Accurate and efficient data entry skills"
     
-  SK003:
+  SK00003:
     name: "Document Verification"
     description: "Ability to verify customer documents for compliance"

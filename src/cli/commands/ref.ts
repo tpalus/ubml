@@ -13,7 +13,12 @@ import {
   getElementTypeInfo,
   type ElementTypeInfo,
 } from '../schema-introspection';
-import { ID_PREFIXES } from '../../generated/metadata';
+import { 
+  ID_PREFIXES, 
+  ID_CONFIG, 
+  formatId,
+  type IdPrefix,
+} from '../../generated/metadata';
 
 // =============================================================================
 // Formatting Helpers
@@ -140,7 +145,7 @@ function showIdPatterns(): void {
   console.log(header('UBML ID Patterns'));
   console.log(dim('────────────────────────────────────────────────────────────'));
   console.log();
-  console.log('Format: PREFIX + 3+ digits (e.g., AC001, ST010, EN100)');
+  console.log(`Format: PREFIX + ${ID_CONFIG.digitLength}+ digits (e.g., AC00001, ST00010, EN01000)`);
   console.log();
   
   const prefixDescriptions: Record<string, string> = {
@@ -170,17 +175,24 @@ function showIdPatterns(): void {
   };
   
   // ID_PREFIXES is an object, get keys
-  const prefixes = Object.keys(ID_PREFIXES);
+  const prefixes = Object.keys(ID_PREFIXES) as IdPrefix[];
   
   for (const prefix of prefixes) {
     const description = prefixDescriptions[prefix] || prefix;
-    console.log(`  ${highlight(prefix + '###')}  - ${description}`);
+    const exampleId = formatId(prefix, 1);
+    console.log(`  ${highlight(prefix + '#'.repeat(ID_CONFIG.digitLength))}  - ${description}  ${dim(`(${exampleId})`)}`);
   }
   
   console.log();
+  console.log(dim(`ID Ranges:`));
+  console.log(dim(`  • 'ubml init' templates start at: ${formatId('XX' as IdPrefix, ID_CONFIG.initOffset).replace('XX', '<PREFIX>')}`));
+  console.log(dim(`  • 'ubml add' templates start at:  ${formatId('XX' as IdPrefix, ID_CONFIG.addOffset).replace('XX', '<PREFIX>')}`));
+  console.log();
   console.log(dim('Best Practice: Use gaps of 10 for easy insertion'));
-  console.log(dim('  ✓ AC010, AC020, AC030'));
-  console.log(dim('  ✗ AC001, AC002, AC003'));
+  console.log(dim('  ✓ AC00010, AC00020, AC00030'));
+  console.log(dim('  ✗ AC00001, AC00002, AC00003'));
+  console.log();
+  console.log(dim(`Use ${chalk.cyan('ubml nextid <prefix>')} to get the next available ID`));
   console.log();
 }
 
@@ -210,6 +222,52 @@ function showAllEnums(): void {
     }
     console.log();
   }
+}
+
+// =============================================================================
+// NextId Command
+// =============================================================================
+
+function showNextId(prefix: string, options: { start?: string }): void {
+  // Validate prefix
+  const upperPrefix = prefix.toUpperCase();
+  const validPrefixes = Object.keys(ID_PREFIXES);
+  
+  if (!validPrefixes.includes(upperPrefix)) {
+    console.error(chalk.red(`Invalid ID prefix: ${prefix}`));
+    console.log();
+    console.log('Valid prefixes: ' + validPrefixes.join(', '));
+    process.exit(1);
+  }
+  
+  const idPrefix = upperPrefix as IdPrefix;
+  const elementType = ID_PREFIXES[idPrefix];
+  
+  // Determine starting number
+  let startNum = ID_CONFIG.addOffset; // Default to add offset (for new content)
+  if (options.start === 'init') {
+    startNum = ID_CONFIG.initOffset;
+  } else if (options.start) {
+    const parsed = parseInt(options.start, 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      startNum = parsed;
+    }
+  }
+  
+  // Generate the ID
+  const nextId = formatId(idPrefix, startNum);
+  
+  console.log();
+  console.log(header('Next Available ID'));
+  console.log(dim('────────────────────────────────────────────────────────────'));
+  console.log();
+  console.log(`  Prefix:  ${highlight(idPrefix)} (${elementType})`);
+  console.log(`  Start:   ${startNum}`);
+  console.log(`  Next ID: ${code(nextId)}`);
+  console.log();
+  console.log(dim(`Tip: Subsequent IDs: ${formatId(idPrefix, startNum + 1)}, ${formatId(idPrefix, startNum + 2)}, ...`));
+  console.log(dim(`     With gaps of 10: ${formatId(idPrefix, startNum)}, ${formatId(idPrefix, startNum + 10)}, ${formatId(idPrefix, startNum + 20)}`));
+  console.log();
 }
 
 // =============================================================================
@@ -266,6 +324,21 @@ export function enumsCommand(): Command {
   command
     .description('Show all enum values')
     .action(showAllEnums);
+  
+  return command;
+}
+
+/**
+ * Create the nextid command.
+ */
+export function nextidCommand(): Command {
+  const command = new Command('nextid');
+  
+  command
+    .description('Get the next available ID for a given prefix')
+    .argument('<prefix>', `ID prefix (${Object.keys(ID_PREFIXES).join(', ')})`)
+    .option('-s, --start <number>', 'Starting number (default: addOffset=1000, use "init" for initOffset=1)')
+    .action(showNextId);
   
   return command;
 }

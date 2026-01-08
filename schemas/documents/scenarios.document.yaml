@@ -3,12 +3,11 @@
 # ============================================================================
 # Schema for .scenarios.ubml.yaml files - simulation scenario definitions.
 #
-# VERSION: 1.0
 # FILE PATTERN: *.scenarios.ubml.yaml
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.0/documents/scenarios.document.yaml"
+$id: "https://ubml.io/schemas/1.1/documents/scenarios.document.yaml"
 title: "Scenarios"
 description: |
   Scenario documents define simulation scenarios for "what-if" analysis.
@@ -55,9 +54,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.0" for this schema version.
+      Must be "1.1" for this schema version.
     type: string
-    const: "1.0"
+    const: "1.1"
   
   name:
     description: |
@@ -75,11 +74,11 @@ properties:
     description: |
       Scenario definitions, keyed by scenario ID.
       
-      Scenario IDs follow the SC### pattern (e.g., SC001, SC002).
+      Scenario IDs follow the SC### pattern (e.g., SC00001, SC00002).
       
       Example:
         scenarios:
-          SC001:
+          SC00001:
             name: "Current State Baseline"
             description: "2024 Q1 baseline scenario"
             arrivals:
@@ -94,7 +93,7 @@ properties:
     type: object
     additionalProperties: false
     patternProperties:
-      "^SC\\d{3,}$":
+      "^SC\\d{5,}$":
         $ref: "../fragments/scenario.fragment.yaml#/$defs/Scenario"
   
   metadata:

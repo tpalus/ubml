@@ -9,7 +9,7 @@ describe('Parser', () => {
   describe('parse', () => {
     it('should parse valid YAML', () => {
       const yaml = `
-ubml: "1.0"
+ubml: "1.1"
 name: "Test Workspace"
 `;
       const result = parse(yaml, 'test.workspace.ubml.yaml');
@@ -18,14 +18,14 @@ name: "Test Workspace"
       expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
       expect(result.document?.content).toEqual({
-        ubml: '1.0',
+        ubml: '1.1',
         name: 'Test Workspace',
       });
     });
 
     it('should report YAML syntax errors', () => {
       const invalidYaml = `
-ubml: "1.0"
+ubml: "1.1"
   invalid: indentation
 `;
       const result = parse(invalidYaml, 'test.workspace.ubml.yaml');
@@ -36,16 +36,16 @@ ubml: "1.0"
     });
 
     it('should extract document metadata', () => {
-      const yaml = `ubml: "1.0"`;
+      const yaml = `ubml: "1.1"`;
       const result = parse(yaml, 'test.process.ubml.yaml');
       
-      expect(result.document?.meta.version).toBe('1.0');
+      expect(result.document?.meta.version).toBe('1.1');
       expect(result.document?.meta.type).toBe('process');
       expect(result.document?.meta.filename).toBe('test.process.ubml.yaml');
     });
 
     it('should warn for unknown document types', () => {
-      const yaml = `ubml: "1.0"`;
+      const yaml = `ubml: "1.1"`;
       const result = parse(yaml, 'unknown.yaml');
       
       expect(result.warnings.length).toBeGreaterThan(0);
@@ -53,13 +53,12 @@ ubml: "1.0"
     });
 
     it('should provide source location for JSON paths', () => {
-      const yaml = `ubml: "1.0"
+      const yaml = `ubml: "1.1"
 processes:
-  PR001:
-    id: "PR001"
+  PR00001:
     name: "Test Process"
     steps:
-      ST001:
+      ST00001:
         name: "Step 1"
         kind: action
 `;
@@ -74,14 +73,14 @@ processes:
       expect(rootLoc!.line).toBe(1);
       
       // Test nested location
-      const processLoc = result.document!.getSourceLocation('/processes/PR001');
+      const processLoc = result.document!.getSourceLocation('/processes/PR00001');
       expect(processLoc).toBeDefined();
-      expect(processLoc!.line).toBe(4); // Line where PR001 value starts
+      expect(processLoc!.line).toBe(4); // Line where PR00001 value starts
       
       // Test deep nested location
-      const stepLoc = result.document!.getSourceLocation('/processes/PR001/steps/ST001');
+      const stepLoc = result.document!.getSourceLocation('/processes/PR00001/steps/ST00001');
       expect(stepLoc).toBeDefined();
-      expect(stepLoc!.line).toBe(8); // Line where ST001 value starts
+      expect(stepLoc!.line).toBe(7); // Line where ST00001 value starts (one line earlier without id)
       
       // Test invalid path returns undefined
       const invalidLoc = result.document!.getSourceLocation('/invalid/path');

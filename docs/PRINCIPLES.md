@@ -104,9 +104,11 @@ When expressing parent-child relationships, the schema must support **ONE** dire
 
 #### P1.2: No Redundant ID Declaration
 
-IDs must be specified in exactly one place. If an element is keyed by ID in YAML, it must not also have an ID property.
+Elements in keyed dictionaries must not duplicate the dictionary key as an `id` property. The key IS the identity.
 
-**Rationale:** Redundant IDs can mismatch. The parser should derive ID from structure.
+This applies at all nesting levels — flat collections, nested hierarchies, and recursive structures all use the same pattern: ID as key, never as property.
+
+**Rationale:** Redundant IDs create sync bugs when keys and properties diverge. Dictionary keys guarantee uniqueness. One representation eliminates ambiguity.
 
 #### P1.3: No Computed Aggregations
 
@@ -322,7 +324,7 @@ References to other elements use the element ID only, without file path qualific
 |---|-----------|------------|
 | **P1** | Single Source of Truth | No redundant information |
 | P1.1 | No Dual Hierarchy | Choose parent OR children, not both |
-| P1.2 | No Redundant ID | ID in key only, not as property |
+| P1.2 | No Redundant ID Declaration | ID in key only, not as property |
 | P1.3 | No Computed Aggregations | Don't store derivable values |
 | **P2** | Consistent Patterns | Same concept, same syntax |
 | P2.1 | Uniform ID Patterns | Enforced prefixes and formats |

@@ -10,11 +10,11 @@
  * import type { Process, Step, Actor, ProcessDocument } from 'ubml';
  * 
  * const process: Process = {
- *   id: 'PR001',
+ *   id: 'PR00001',
  *   name: 'Customer Onboarding',
  *   level: 3,
  *   steps: {
- *     ST001: {
+ *     ST00001: {
  *       name: 'Receive Application',
  *       kind: 'task',
  *     }
