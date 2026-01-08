@@ -2,7 +2,7 @@
  * Common utilities for CLI formatters.
  */
 
-import type { ErrorObject } from 'ajv';
+import type { RawAjvError, SchemaContext } from '../../validator.js';
 
 /**
  * Validation message structure (error or warning).
@@ -14,8 +14,10 @@ export interface ValidationMessage {
   line?: number;
   column?: number;
   path?: string;
-  ajvError?: ErrorObject;
-  schema?: any;
+  /** Raw Ajv error for enhanced formatting */
+  ajvError?: RawAjvError;
+  /** Schema context for suggestions and examples */
+  schemaContext?: SchemaContext;
 }
 
 /**

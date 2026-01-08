@@ -28,6 +28,37 @@ import { detectDocumentType, type DocumentType } from './generated/metadata.js';
 import { parse, type ParseResult, type UBMLDocument } from './parser.js';
 
 /**
+ * Raw Ajv error object for enhanced formatting.
+ * Re-exported from Ajv for convenience.
+ */
+export interface RawAjvError {
+  /** Error keyword (e.g., 'additionalProperties', 'enum', 'pattern') */
+  keyword?: string;
+  /** Instance path to the error location */
+  instancePath?: string;
+  /** Error message */
+  message?: string;
+  /** Error-specific parameters */
+  params?: Record<string, unknown>;
+  /** Schema path */
+  schemaPath?: string;
+  /** Actual data that failed validation */
+  data?: unknown;
+}
+
+/**
+ * Schema context for enhanced error messages.
+ */
+export interface SchemaContext {
+  /** Property schema with allowed values, patterns, examples */
+  propertySchema?: Record<string, unknown>;
+  /** Parent object's valid property names */
+  validProperties?: string[];
+  /** Schema examples if available */
+  examples?: unknown[];
+}
+
+/**
  * A validation error.
  */
 export interface ValidationError {
@@ -43,6 +74,10 @@ export interface ValidationError {
   line?: number;
   /** Column number (1-indexed) */
   column?: number;
+  /** Raw Ajv error for enhanced formatting */
+  ajvError?: RawAjvError;
+  /** Schema context for suggestions */
+  schemaContext?: SchemaContext;
 }
 
 /**
@@ -99,6 +134,8 @@ interface AjvError {
   instancePath?: string;
   keyword?: string;
   params?: Record<string, unknown>;
+  schemaPath?: string;
+  data?: unknown;
 }
 
 /** Internal validate function shape */
@@ -108,16 +145,102 @@ interface ValidateFn {
 }
 
 /**
- * Convert Ajv errors to ValidationErrors.
+ * Convert Ajv errors to ValidationErrors, preserving raw error data.
  */
-function convertAjvErrors(ajvErrors: AjvError[] | null | undefined): ValidationError[] {
+function convertAjvErrors(
+  ajvErrors: AjvError[] | null | undefined,
+  schema?: Record<string, unknown>
+): ValidationError[] {
   if (!ajvErrors) return [];
 
-  return ajvErrors.map((err) => ({
-    message: err.message ?? 'Unknown validation error',
-    path: err.instancePath || undefined,
-    code: err.keyword,
-  }));
+  return ajvErrors.map((err) => {
+    // Build schema context for enhanced error messages
+    const schemaContext = buildSchemaContext(err, schema);
+    
+    return {
+      message: err.message ?? 'Unknown validation error',
+      path: err.instancePath || undefined,
+      code: err.keyword,
+      ajvError: {
+        keyword: err.keyword,
+        instancePath: err.instancePath,
+        message: err.message,
+        params: err.params,
+        schemaPath: err.schemaPath,
+        data: err.data,
+      },
+      schemaContext,
+    };
+  });
+}
+
+/**
+ * Build schema context for enhanced error messages.
+ */
+function buildSchemaContext(
+  err: AjvError,
+  schema?: Record<string, unknown>
+): SchemaContext | undefined {
+  if (!schema) return undefined;
+  
+  const context: SchemaContext = {};
+  
+  // For additionalProperties errors, extract valid property names
+  if (err.keyword === 'additionalProperties' && err.schemaPath) {
+    const parentPath = getParentSchemaPath(err.instancePath || '');
+    const parentSchema = resolveSchemaPath(schema, parentPath);
+    if (parentSchema && typeof parentSchema === 'object' && 'properties' in parentSchema) {
+      const props = parentSchema.properties as Record<string, unknown>;
+      context.validProperties = Object.keys(props);
+    }
+  }
+  
+  // For enum errors, extract allowed values
+  if (err.keyword === 'enum' && err.params?.allowedValues) {
+    context.propertySchema = { enum: err.params.allowedValues };
+  }
+  
+  // For pattern errors, try to extract examples
+  if (err.keyword === 'pattern' && err.schemaPath) {
+    const propSchema = resolveSchemaPath(schema, err.schemaPath.replace('#/', '').replace('/pattern', ''));
+    if (propSchema && typeof propSchema === 'object') {
+      const ps = propSchema as Record<string, unknown>;
+      if (ps.examples) {
+        context.examples = ps.examples as unknown[];
+      }
+      context.propertySchema = ps;
+    }
+  }
+  
+  return Object.keys(context).length > 0 ? context : undefined;
+}
+
+/**
+ * Get parent path from instance path.
+ */
+function getParentSchemaPath(instancePath: string): string {
+  const parts = instancePath.split('/').filter(Boolean);
+  return parts.slice(0, -1).join('/');
+}
+
+/**
+ * Resolve a schema path to get the sub-schema.
+ */
+function resolveSchemaPath(schema: Record<string, unknown>, path: string): unknown {
+  if (!path) return schema;
+  
+  const parts = path.split('/').filter(Boolean);
+  let current: unknown = schema;
+  
+  for (const part of parts) {
+    if (current && typeof current === 'object' && part in (current as object)) {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return undefined;
+    }
+  }
+  
+  return current;
 }
 
 /**
@@ -146,6 +269,7 @@ export async function createValidator(): Promise<Validator> {
   const ajv = new Ajv2020({
     allErrors: true,
     strict: false,
+    verbose: true, // Include data in error objects for better error messages
   });
   
   addFormats(ajv);
@@ -179,15 +303,20 @@ export async function createValidator(): Promise<Validator> {
     }
     return validate;
   }
+  
+  function getSchemaForType(documentType: DocumentType): Record<string, unknown> | undefined {
+    return documentSchemas[documentType] as Record<string, unknown> | undefined;
+  }
 
   const validator: Validator = {
     validate(content: unknown, documentType: DocumentType): ValidationResult {
       const validate = getOrCompileValidator(documentType);
+      const schema = getSchemaForType(documentType);
       const valid = validate(content);
       
       return {
         valid,
-        errors: valid ? [] : convertAjvErrors(validate.errors),
+        errors: valid ? [] : convertAjvErrors(validate.errors, schema),
         warnings: [],
       };
     },
@@ -207,16 +336,18 @@ export async function createValidator(): Promise<Validator> {
       }
       
       const validate = getOrCompileValidator(documentType);
+      const schema = getSchemaForType(documentType);
       const valid = validate(doc.content);
       
       if (valid) {
         return { valid: true, errors: [], warnings: [] };
       }
       
-      // Convert errors with source location resolution
+      // Convert errors with source location resolution and Ajv error preservation
       const errors: ValidationError[] = (validate.errors ?? []).map((err) => {
         const path = err.instancePath || undefined;
         const loc = path ? doc.getSourceLocation(path) : undefined;
+        const schemaContext = buildSchemaContext(err, schema);
         
         return {
           message: err.message ?? 'Unknown validation error',
@@ -224,6 +355,15 @@ export async function createValidator(): Promise<Validator> {
           code: err.keyword,
           line: loc?.line,
           column: loc?.column,
+          ajvError: {
+            keyword: err.keyword,
+            instancePath: err.instancePath,
+            message: err.message,
+            params: err.params,
+            schemaPath: err.schemaPath,
+            data: err.data,
+          },
+          schemaContext,
         };
       });
       

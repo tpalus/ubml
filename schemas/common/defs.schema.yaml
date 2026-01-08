@@ -46,6 +46,10 @@ $defs:
       - "AC001"
       - "AC010"
       - "AC100"
+    x-ubml:
+      prefix: "AC"
+      humanName: "Actor ID"
+      errorHint: "AC + 3+ digits (e.g., AC001, AC010)"
 
   StepRef:
     description: |
@@ -509,6 +513,14 @@ $defs:
       - "1.5d"
       - "1wk"
       - "3mo"
+    x-ubml:
+      humanName: "Duration"
+      errorHint: "Number + unit (min, h, d, wk, mo)"
+      commonMistakes:
+        - pattern: "^\\d+$"
+          message: "Missing unit. Did you mean \"{value}h\" or \"{value}min\"?"
+        - pattern: "^\\d+\\s*(hours?|minutes?|days?)$"
+          message: "Use short units: min, h, d, wk, mo"
 
   Duration:
     description: |

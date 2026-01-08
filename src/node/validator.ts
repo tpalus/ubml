@@ -14,6 +14,8 @@ import {
   type ValidationResult, 
   type ValidationError, 
   type ValidationWarning,
+  type RawAjvError,
+  type SchemaContext,
 } from '../validator.js';
 import { 
   getUBMLFilePatterns,
@@ -133,9 +135,18 @@ function convertParseWarnings(
 
 /**
  * Convert browser validation errors to file validation errors.
+ * Preserves ajvError and schemaContext for enhanced formatting.
  */
 function convertBrowserErrors(
-  errors: Array<{ message: string; path?: string; code?: string; line?: number; column?: number }>,
+  errors: Array<{ 
+    message: string; 
+    path?: string; 
+    code?: string; 
+    line?: number; 
+    column?: number;
+    ajvError?: RawAjvError;
+    schemaContext?: SchemaContext;
+  }>,
   filepath: string
 ): FileValidationError[] {
   return errors.map((e) => ({
@@ -145,6 +156,8 @@ function convertBrowserErrors(
     code: e.code,
     line: e.line,
     column: e.column,
+    ajvError: e.ajvError,
+    schemaContext: e.schemaContext,
   }));
 }
 

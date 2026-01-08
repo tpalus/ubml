@@ -349,13 +349,6 @@ function addDocument(
     console.log();
   }
 
-  // Show VS Code tip
-  console.log(chalk.bold.cyan('In VS Code:'));
-  console.log(INDENT + '• Open ' + code(filename) + ' - you\'ll get autocomplete and validation');
-  console.log(INDENT + '• Press ' + code('Ctrl+Space') + ' to see available properties');
-  console.log(INDENT + '• Hover over properties for documentation');
-  console.log();
-
   // Show next steps
   console.log(chalk.bold('Next steps:'));
   console.log(INDENT + '1. Edit the template to match your business');

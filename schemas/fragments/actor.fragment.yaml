@@ -65,6 +65,27 @@ $defs:
           - customer: customer as a party
         type: string
         enum: [person, role, team, system, organization, external, customer]
+        x-ubml:
+          propertyNames: ["type"]
+          valueMistakes:
+            user:
+              value: "user"
+              hint: "Use 'person' for human individuals, or 'role' for job functions."
+            service:
+              value: "service"
+              hint: "Use 'system' for applications and APIs. Services in UBML refer to offerings, not actors."
+            application:
+              value: "application"
+              hint: "Use 'system' for applications, platforms, and external APIs."
+            department:
+              value: "department"
+              hint: "Use 'organization' for departments, divisions, and legal entities."
+            group:
+              value: "group"
+              hint: "Use 'team' for organizational units and groups."
+            human:
+              value: "human"
+              hint: "Use 'person' for individuals. 'human' is an actor 'kind', not a 'type'."
       
       kind:
         description: |

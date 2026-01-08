@@ -61,6 +61,8 @@ export {
   type ValidationWarning,
   type ValidateOptions,
   type ParseAndValidateResult,
+  type RawAjvError,
+  type SchemaContext,
 } from './validator.js';
 
 // ============================================================================

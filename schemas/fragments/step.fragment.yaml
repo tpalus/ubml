@@ -82,6 +82,17 @@ $defs:
       When step.review omits 'reviewers', it defaults to raci.consulted.
     type: object
     additionalProperties: false
+    x-ubml:
+      humanName: "RACI Matrix"
+      nestedProperties:
+        - responsible
+        - accountable
+        - consulted
+        - informed
+      misplacementHint: "These properties belong inside 'raci:', not at the step level"
+      misplacementExample: |
+        raci:
+          responsible: [AC001]
     properties:
       responsible:
         description: |
@@ -583,6 +594,27 @@ $defs:
           - action
           - decision
           - milestone
+        x-ubml:
+          propertyNames: ["kind"]
+          valueMistakes:
+            task:
+              value: "task"
+              hint: "Use 'action' for work steps. 'task' is not a valid step kind."
+            gateway:
+              value: "gateway"
+              hint: "Use 'decision' for branching points. BPMN 'gateway' maps to UBML 'decision'."
+            activity:
+              value: "activity"
+              hint: "Use 'action' for activities. BPMN 'activity' maps to UBML 'action'."
+            event:
+              value: "event"
+              hint: "Use 'start', 'end', 'wait', or 'milestone' instead. BPMN events map to specific UBML kinds."
+            approval:
+              value: "approval"
+              hint: "Use 'action' with an 'approval:' section. Approval is not a step kind, it's a step property."
+            review:
+              value: "review"
+              hint: "Use 'action' with a 'review:' section. Review is not a step kind, it's a step property."
       
       systems:
         description: |

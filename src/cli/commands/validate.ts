@@ -130,14 +130,6 @@ export function validateCommand(): Command {
         }
       }
 
-      // Show VS Code tip if there are errors (stylish format only)
-      if (!result.valid && options.format === 'stylish') {
-        console.log();
-        console.log(chalk.dim('──────────────────────────────────────────────────────────────'));
-        console.log(chalk.dim('Tip: Fix errors in VS Code with real-time schema validation.'));
-        console.log(chalk.dim(`     Run: ${chalk.cyan('ubml docs vscode')} for setup guide.`));
-      }
-
       // Exit with appropriate code
       process.exit(result.valid ? 0 : 1);
     });
