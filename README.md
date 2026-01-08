@@ -76,7 +76,6 @@ ubml: "1.1"
 
 processes:
   PR00001:
-    id: "PR00001"
     name: "Customer Onboarding"
     description: "End-to-end onboarding from application to activation"
     level: 3
@@ -92,9 +91,9 @@ processes:
         kind: action
         description: "Verify customer identity documents"
         inputs:
-          - ref: DC00001
+          - ref: EN00001
         outputs:
-          - ref: DC00002
+          - ref: EN00002
 
       ST00003:
         name: "Approved?"
@@ -110,13 +109,11 @@ See the [example/](./example) directory for a complete workspace.
 
 ### Install
 
-**CLI (for validation):**
 ```bash
-npm install -g ubml-cli
-```
+# Install globally for CLI usage
+npm install -g ubml
 
-**Library (for integration):**
-```bash
+# Or install locally for library integration
 npm install ubml
 ```
 
@@ -138,25 +135,9 @@ my-project/
 
 ### Configure VS Code
 
-Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml), then add to `.vscode/settings.json`:
+> **Tip:** Running `ubml init` automatically creates VS Code settings for you!
 
-```json
-{
-  "yaml.schemas": {
-    "node_modules/ubml/schemas/documents/workspace.document.yaml": "*.workspace.ubml.yaml",
-    "node_modules/ubml/schemas/documents/process.document.yaml": ["*.process.ubml.yaml", "process.ubml.yaml"],
-    "node_modules/ubml/schemas/documents/actors.document.yaml": ["*.actors.ubml.yaml", "actors.ubml.yaml"],
-    "node_modules/ubml/schemas/documents/entities.document.yaml": ["*.entities.ubml.yaml", "entities.ubml.yaml"],
-    "node_modules/ubml/schemas/documents/metrics.document.yaml": ["*.metrics.ubml.yaml", "metrics.ubml.yaml"],
-    "node_modules/ubml/schemas/documents/hypotheses.document.yaml": ["*.hypotheses.ubml.yaml", "hypotheses.ubml.yaml"],
-    "node_modules/ubml/schemas/documents/strategy.document.yaml": ["*.strategy.ubml.yaml", "strategy.ubml.yaml"],
-    "node_modules/ubml/schemas/documents/scenarios.document.yaml": ["*.scenarios.ubml.yaml", "scenarios.ubml.yaml"]
-  }
-}
-```
-
-> **Tip:** Running `ubml init` automatically creates these settings for you.
-```
+For manual setup, install the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) and `ubml init` will generate `.vscode/settings.json` with schema validation configured for both simple (`process.ubml.yaml`) and prefixed (`my-process.process.ubml.yaml`) file naming patterns.
 
 ### Validate
 
@@ -279,23 +260,13 @@ export default [
 
 ---
 
-## Packages
-
-This monorepo contains two packages:
-
-| Package | Description | npm |
-|---------|-------------|-----|
-| [ubml](./packages/core) | Core library for parsing, validation, and serialization | [![npm](https://img.shields.io/npm/v/ubml.svg)](https://www.npmjs.com/package/ubml) |
-| [ubml-cli](./packages/cli) | Command-line interface | [![npm](https://img.shields.io/npm/v/ubml-cli.svg)](https://www.npmjs.com/package/ubml-cli) |
-
----
-
 ## Documentation
 
 - **[Vision](./docs/VISION.md)** — Why UBML exists and where it's going
-- **[Best Practices](./docs/best-practices.md)** — Guidelines for effective modeling
-- **[Schema Reference](./docs/schema-reference.md)** — Complete element documentation
+- **[Best Practices](./docs/PRACTICES.md)** — Guidelines for effective modeling
+- **[Design Principles](./docs/PRINCIPLES.md)** — DSL design philosophy
 - **[Examples](./example)** — Sample workspace with all document types
+- **CLI Schema Reference** — Run `ubml schema` to explore interactively
 
 ---
 

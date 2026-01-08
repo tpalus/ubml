@@ -31,12 +31,12 @@ This project follows a standard code of conduct. Please be respectful and constr
 1. Fork the repository on GitHub
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/ubml-schema.git
-   cd ubml-schema
+   git clone https://github.com/YOUR_USERNAME/ubml.git
+   cd ubml
    ```
 3. Add the upstream remote:
    ```bash
-   git remote add upstream https://github.com/ubml/ubml-schema.git
+   git remote add upstream https://github.com/TALXIS/ubml.git
    ```
 
 ## Development Setup
@@ -45,14 +45,17 @@ This project follows a standard code of conduct. Please be respectful and constr
 # Install dependencies
 npm install
 
-# Validate all schemas
-npm run validate
+# Build
+npm run build
 
 # Run tests
 npm test
 
-# Build documentation
-npm run docs
+# Type check
+npm run typecheck
+
+# Validate example files
+npx tsx bin/ubml.ts validate ./example
 ```
 
 ## Schema Development Guidelines
@@ -217,8 +220,8 @@ Include:
 
 ## Questions?
 
-- Open a [Discussion](https://github.com/ubml/ubml-schema/discussions)
-- Check existing [Issues](https://github.com/ubml/ubml-schema/issues)
+- Open a [Discussion](https://github.com/TALXIS/ubml/discussions)
+- Check existing [Issues](https://github.com/TALXIS/ubml/issues)
 - Review the [documentation](./docs/)
 
 ---

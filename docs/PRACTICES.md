@@ -126,31 +126,34 @@ processes:
     # 50+ steps covering multiple journeys
 ```
 
-### Use Appropriate Step Types
+### Use Appropriate Step Kinds
 
 ```yaml
 steps:
-  # Start with an event
+  # Start of the process
   ST00001:
-    type: startEvent
+    kind: start
     name: "Order Received"
   
-  # Use tasks for actual work
+  # Use action for actual work
   ST00002:
-    type: task
+    kind: action
     name: "Validate Order"
   
-  # Use gateways for decisions
+  # Use decision for branching points
   ST00003:
-    type: gateway
-    gatewayType: exclusive
+    kind: decision
     name: "Order Valid?"
   
-  # Use blocks for structured control flow
+  # Use subprocess for nested steps
   ST00004:
-    type: block
-    operator: par
-    name: "Parallel Checks"
+    kind: subprocess
+    name: "Fulfillment Process"
+  
+  # Use milestone for significant checkpoints
+  ST00005:
+    kind: milestone
+    name: "Order Confirmed"
 ```
 
 ### Document Business Rules
@@ -159,6 +162,7 @@ steps:
 steps:
   ST00002:
     name: "Validate Order"
+    kind: action
     businessRules:
       - "Minimum order value is $100"
       - "Customer must have valid credit"
