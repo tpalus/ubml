@@ -20,6 +20,9 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
       
+      - name: Update npm to latest
+        run: npm install -g npm@latest
+      
       - run: npm ci
       
       - name: Publish to npm
