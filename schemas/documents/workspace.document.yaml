@@ -33,6 +33,10 @@ x-ubml-cli:
   categoryDisplayName: "Core Modeling"
   workflowOrder: 1
   shortDescription: "Root configuration file for a UBML project."
+  defaultFilename: "workspace"
+  detectBy:
+    - organization
+    - documents
   gettingStarted:
     - "Create a workspace file with name and description"
     - "Add process files for your business processes"

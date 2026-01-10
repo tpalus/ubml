@@ -40,6 +40,13 @@ x-ubml-cli:
   categoryDisplayName: "Strategy"
   workflowOrder: 8
   shortDescription: "Define value streams, capabilities, products, and services."
+  defaultFilename: "enterprise"
+  detectBy:
+    - valueStreams
+    - capabilities
+    - products
+    - services
+    - portfolios
   gettingStarted:
     - "Define value streams for customer journeys"
     - "Map capabilities required"

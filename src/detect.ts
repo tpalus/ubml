@@ -7,10 +7,17 @@
  * @module ubml
  */
 
-// Re-export from generated metadata
+// Re-export from schema module (primary implementation)
 export {
   detectDocumentType,
   detectDocumentTypeFromContent,
+  isUBMLFile,
+  getUBMLFilePatterns,
+  getSchemaPathForFileSuffix,
+} from './schema/detection.js';
+
+// Re-export types and constants from generated metadata
+export {
   type DocumentType,
   DOCUMENT_TYPES,
   isDocumentType,

@@ -38,6 +38,9 @@ x-ubml-cli:
   categoryDisplayName: "Core Modeling"
   workflowOrder: 4
   shortDescription: "Define the information model - data objects, documents, and locations."
+  defaultFilename: "entities"
+  detectBy:
+    - entities
   gettingStarted:
     - "Define entities for your core business objects"
     - "Add attributes with types and relationships"

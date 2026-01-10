@@ -38,6 +38,9 @@ x-ubml-cli:
   categoryDisplayName: "Advanced"
   workflowOrder: 12
   shortDescription: "Configure process mining data sources and mappings."
+  defaultFilename: "event-log"
+  detectBy:
+    - miningSources
   gettingStarted:
     - "Define the data source (CSV, database, API)"
     - "Map columns to event log fields"

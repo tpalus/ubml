@@ -38,6 +38,9 @@ x-ubml-cli:
   categoryDisplayName: "Core Modeling"
   workflowOrder: 2
   shortDescription: "Define people, roles, teams, and systems that participate in processes."
+  defaultFilename: "actors"
+  detectBy:
+    - actors
   gettingStarted:
     - "Define actors with their types (role, team, system, external)"
     - "Add skills they possess"

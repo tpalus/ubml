@@ -38,6 +38,9 @@ x-ubml-cli:
   categoryDisplayName: "Advanced"
   workflowOrder: 10
   shortDescription: "Define custom perspectives and diagram configurations."
+  defaultFilename: "views"
+  detectBy:
+    - views
   gettingStarted:
     - "Identify your target audience"
     - "Create a view with appropriate filters"

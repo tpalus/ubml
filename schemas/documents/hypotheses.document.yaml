@@ -39,6 +39,9 @@ x-ubml-cli:
   categoryDisplayName: "Analysis & Planning"
   workflowOrder: 6
   shortDescription: "Define hypothesis trees for structured problem framing."
+  defaultFilename: "solution"
+  detectBy:
+    - hypothesisTrees
   gettingStarted:
     - "Define the SCQH context"
     - "Create the root hypothesis"

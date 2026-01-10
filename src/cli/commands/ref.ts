@@ -12,7 +12,8 @@ import {
   getAllElementTypes,
   getElementTypeInfo,
   type ElementTypeInfo,
-} from '../schema-introspection';
+  getIdPrefixInfo,
+} from '../../schema/index.js';
 import { 
   ID_PREFIXES, 
   ID_CONFIG, 
@@ -125,37 +126,12 @@ function showIdPatterns(): void {
   console.log(`Format: PREFIX + ${ID_CONFIG.digitLength}+ digits (e.g., AC00001, ST00010, EN01000)`);
   console.log();
   
-  const prefixDescriptions: Record<string, string> = {
-    AC: 'Actors (people, teams, systems)',
-    ST: 'Steps in processes',
-    PR: 'Processes',
-    EN: 'Entities (data objects)',
-    HY: 'Hypotheses',
-    SC: 'Scenarios',
-    MT: 'Metrics',
-    KP: 'KPIs',
-    CP: 'Capabilities',
-    VS: 'Value Streams',
-    SV: 'Services',
-    PD: 'Products',
-    PF: 'Portfolios',
-    VW: 'Views',
-    EQ: 'Equipment',
-    LC: 'Locations',
-    SK: 'Skills',
-    RP: 'Resource Pools',
-    PS: 'Personas',
-    BK: 'Blocks',
-    PH: 'Phases',
-    DC: 'Documents',
-    EV: 'Evidence',
-  };
-  
   // ID_PREFIXES is an object, get keys
   const prefixes = Object.keys(ID_PREFIXES) as IdPrefix[];
   
   for (const prefix of prefixes) {
-    const description = prefixDescriptions[prefix] || prefix;
+    const info = getIdPrefixInfo(prefix);
+    const description = info?.shortDescription || prefix;
     const exampleId = formatId(prefix, 1);
     console.log(`  ${highlight(prefix + '#'.repeat(ID_CONFIG.digitLength))}  - ${description}  ${dim(`(${exampleId})`)}`);
   }

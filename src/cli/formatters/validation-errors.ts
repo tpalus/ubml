@@ -337,7 +337,7 @@ function formatOneOfError(
 ): EnhancedError {
   const passingSchemas = error.params?.passingSchemas;
   
-  if (passingSchemas && passingSchemas.length > 1) {
+  if (Array.isArray(passingSchemas) && passingSchemas.length > 1) {
     return {
       message: 'Value matches multiple possible schemas (ambiguous)',
       hint: 'Make the value more specific to match exactly one schema.',

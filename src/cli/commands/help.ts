@@ -2,6 +2,7 @@
  * Help command for UBML CLI.
  *
  * Unified help interface that consolidates documentation topics.
+ * Topics are now derived from schema metadata.
  *
  * @module ubml/cli/commands/help
  */
@@ -14,7 +15,13 @@ import {
   getAllElementTypes,
   getElementTypeInfo,
   getSuggestedWorkflow,
-} from '../schema-introspection';
+  getHelpTopics,
+  getHelpTopicsByCategory,
+  findHelpTopic,
+  getIdPrefixCategoryMap,
+  type HelpTopic,
+  type HelpTopicCategory,
+} from '../../schema/index.js';
 import { 
   SCHEMA_VERSION, 
   ID_PREFIXES, 
@@ -25,6 +32,17 @@ import {
   type DocumentType,
 } from '../../generated/metadata';
 import { INDENT, header, subheader, dim, code, highlight } from '../formatters/text';
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+function showTopicNotFound(topic: string): void {
+  console.error(chalk.red(`Unknown topic: ${topic}`));
+  console.error();
+  console.error('Run ' + code('ubml help') + ' to see all topics.');
+  process.exit(1);
+}
 
 // =============================================================================
 // Topic Content
@@ -235,14 +253,8 @@ function showIdPatterns(): void {
   console.log(`Format: ${highlight('PREFIX')} + ${ID_CONFIG.digitLength} digits (e.g., AC00001, PR01000)`);
   console.log();
   
-  const categories: Record<string, string[]> = {
-    'Process': ['PR', 'ST', 'PH', 'BK'],
-    'Actors': ['AC', 'SK', 'RP', 'EQ', 'PS'],
-    'Information': ['EN', 'DC', 'LC'],
-    'Strategy': ['VS', 'CP', 'PD', 'SV', 'PF'],
-    'Analysis': ['HY', 'SC', 'KP', 'EV'],
-    'Other': ['VW'],
-  };
+  // Get categories derived from schema (no hardcoding!)
+  const categories = getIdPrefixCategoryMap();
   
   for (const [category, prefixes] of Object.entries(categories)) {
     console.log(subheader(category));
@@ -392,31 +404,27 @@ function showTopicList(): void {
   console.log(dim('─'.repeat(60)));
   console.log();
   
-  console.log(subheader('Getting Started'));
-  console.log(INDENT + `${highlight('quickstart')}  - Quick start guide`);
-  console.log(INDENT + `${highlight('concepts')}    - Core UBML concepts`);
-  console.log(INDENT + `${highlight('workflow')}    - Recommended modeling order`);
-  console.log();
+  const topicsByCategory = getHelpTopicsByCategory();
   
-  console.log(subheader('Document Types'));
-  for (const type of DOCUMENT_TYPES) {
-    const info = getDocumentTypeInfo(type);
-    console.log(INDENT + `${highlight(type.padEnd(12))} - ${info?.title || type}`);
+  const categoryLabels: Record<HelpTopicCategory, string> = {
+    'getting-started': 'Getting Started',
+    'documents': 'Document Types',
+    'elements': 'Elements',
+    'reference': 'Reference',
+  };
+
+  const categoryOrder: HelpTopicCategory[] = ['getting-started', 'documents', 'elements', 'reference'];
+
+  for (const category of categoryOrder) {
+    const topics = topicsByCategory[category];
+    if (topics.length === 0) continue;
+
+    console.log(subheader(categoryLabels[category]));
+    for (const topic of topics) {
+      console.log(INDENT + `${highlight(topic.name.padEnd(12))} - ${topic.description}`);
+    }
+    console.log();
   }
-  console.log();
-  
-  console.log(subheader('Elements'));
-  console.log(INDENT + `${highlight('step')}        - Process step properties`);
-  console.log(INDENT + `${highlight('actor')}       - Actor properties`);
-  console.log(INDENT + `${highlight('entity')}      - Entity properties`);
-  console.log();
-  
-  console.log(subheader('Reference'));
-  console.log(INDENT + `${highlight('ids')}         - ID pattern reference`);
-  console.log(INDENT + `${highlight('duration')}    - Duration format guide`);
-  console.log(INDENT + `${highlight('raci')}        - RACI matrix explained`);
-  console.log(INDENT + `${highlight('vscode')}      - VS Code setup and tips`);
-  console.log();
   
   console.log(dim('─'.repeat(60)));
   console.log('Usage: ' + code('ubml help <topic>'));
@@ -468,15 +476,37 @@ Topics:
       }
       
       const normalizedTopic = topic.toLowerCase();
-      const handler = TOPICS[normalizedTopic];
       
+      // First try schema-driven topic lookup
+      const helpTopic = findHelpTopic(normalizedTopic);
+      
+      if (helpTopic) {
+        switch (helpTopic.type) {
+          case 'document':
+            showDocumentHelp(helpTopic.name);
+            break;
+          case 'element':
+            showElementHelp(helpTopic.name);
+            break;
+          case 'static':
+            // Static topics still use the TOPICS map for content
+            const handler = TOPICS[helpTopic.name] ?? TOPICS[normalizedTopic];
+            if (handler) {
+              handler();
+            } else {
+              showTopicNotFound(topic);
+            }
+            break;
+        }
+        return;
+      }
+      
+      // Check hardcoded TOPICS
+      const handler = TOPICS[normalizedTopic];
       if (handler) {
         handler();
       } else {
-        console.error(chalk.red(`Unknown topic: ${topic}`));
-        console.error();
-        console.error('Run ' + code('ubml help') + ' to see all topics.');
-        process.exit(1);
+        showTopicNotFound(topic);
       }
     });
 

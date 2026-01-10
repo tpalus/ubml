@@ -13,10 +13,10 @@ import { join, resolve, basename } from 'path';
 import { serialize } from '../../index';
 import {
   getDocumentTypeInfo,
-  getMinimalTemplate,
   getSuggestedNextStep,
   getSuggestedWorkflow,
-} from '../schema-introspection';
+  createDocument,
+} from '../../schema/index.js';
 import { 
   DOCUMENT_TYPES, 
   type DocumentType, 
@@ -368,7 +368,8 @@ function generateHypothesisTreeItems(
 ): SectionItem[] {
   const displayName = formatDisplayName(name);
   const offset = ID_CONFIG.addOffset;
-  const htId = formatId('HT', offset);
+  // HT pattern for hypothesis trees (not a standard IdPrefix in metadata)
+  const htId = `HT${String(offset).padStart(ID_CONFIG.digitLength, '0')}`;
   
   // H prefix is used for hypothesis nodes within a tree
   const h1 = `H${String(offset).padStart(ID_CONFIG.digitLength - 1, '0')}`;
@@ -436,8 +437,6 @@ function formatValue(value: unknown): string {
 }
 
 // =============================================================================
-// Templates (for fallback and programmatic use)
-// =============================================================================
 // Command Actions
 // =============================================================================
 
@@ -466,11 +465,13 @@ function showWhatCanBeAdded(dir: string): void {
   if (nextStep) {
     console.log(chalk.bold('Suggested next:'));
     const info = getDocumentTypeInfo(nextStep.type);
-    console.log(INDENT + highlight(nextStep.type) + ' - ' + info.title);
-    console.log(INDENT + dim(nextStep.reason));
-    console.log();
-    console.log(INDENT + 'Run: ' + code(`ubml add ${nextStep.type}`));
-    console.log();
+    if (info) {
+      console.log(INDENT + highlight(nextStep.type) + ' - ' + info.title);
+      console.log(INDENT + dim(nextStep.reason));
+      console.log();
+      console.log(INDENT + 'Run: ' + code(`ubml add ${nextStep.type}`));
+      console.log();
+    }
   }
 
   console.log(chalk.bold('Available document types:'));
@@ -478,6 +479,7 @@ function showWhatCanBeAdded(dir: string): void {
 
   for (const type of DOCUMENT_TYPES) {
     const info = getDocumentTypeInfo(type);
+    if (!info) continue;
     const exists = existingTypes.includes(type);
     const marker = exists ? dim(' (exists)') : '';
     console.log(INDENT + highlight(type.padEnd(12)) + info.title + marker);
@@ -504,6 +506,10 @@ function addDocument(
 ): void {
   const dir = resolve(options.dir);
   const info = getDocumentTypeInfo(type);
+  if (!info) {
+    console.error(chalk.red(`Error: Unknown document type: ${type}`));
+    process.exit(1);
+  }
 
   // Generate filename
   const baseName = name ? toKebabCase(name) : getDefaultName(type, dir);

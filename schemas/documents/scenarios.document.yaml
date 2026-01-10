@@ -39,6 +39,9 @@ x-ubml-cli:
   categoryDisplayName: "Analysis & Planning"
   workflowOrder: 7
   shortDescription: "Define simulation scenarios for what-if analysis."
+  defaultFilename: "baseline"
+  detectBy:
+    - scenarios
   gettingStarted:
     - "Define a baseline scenario with current volumes"
     - "Add work arrival patterns"

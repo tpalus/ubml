@@ -37,6 +37,11 @@ x-ubml-cli:
   categoryDisplayName: "Analysis & Planning"
   workflowOrder: 5
   shortDescription: "Define KPIs and ROI analyses for performance measurement."
+  defaultFilename: "metrics"
+  detectBy:
+    - kpis
+    - metrics
+    - roiAnalyses
   gettingStarted:
     - "Define KPIs for your key processes"
     - "Set baseline and target values"

@@ -35,6 +35,9 @@ x-ubml-cli:
   categoryDisplayName: "Core Modeling"
   workflowOrder: 3
   shortDescription: "Define business processes with steps, links, and control flow."
+  defaultFilename: "sample"
+  detectBy:
+    - processes
   gettingStarted:
     - "Define the process with id, name, and description"
     - "Add steps for each activity in the process"

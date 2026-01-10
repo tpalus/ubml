@@ -8,7 +8,7 @@
  * - add: Add new UBML documents to workspace
  * - validate: Validate UBML documents against schemas
  * - schema: Explore UBML schema and learn what you can model
- * - docs: Quick reference documentation
+ * - help: Interactive help system
  * - syntax: Quick syntax lookup for element types
  * - examples: Show examples for types or properties
  * - ids: Show ID pattern reference
@@ -24,7 +24,6 @@ import { validateCommand } from './commands/validate';
 import { initCommand } from './commands/init';
 import { schemaCommand } from './commands/schema';
 import { addCommand } from './commands/add';
-import { docsCommand } from './commands/docs';
 import { showCommand } from './commands/show';
 import { helpCommand } from './commands/help';
 import { syntaxCommand, examplesCommand, idsCommand, enumsCommand, nextidCommand, syncidsCommand } from './commands/ref';
@@ -62,7 +61,6 @@ ${chalk.dim('Documentation: https://ubml.io/docs')}
   program.addCommand(validateCommand());  // 4. Validate
   program.addCommand(showCommand());      // 5. Visualize workspace
   program.addCommand(helpCommand());      // Unified help
-  program.addCommand(docsCommand());      // Reference docs (kept for compatibility)
   
   // Quick reference commands
   program.addCommand(syntaxCommand());    // Quick syntax lookup

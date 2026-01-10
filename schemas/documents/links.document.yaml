@@ -36,6 +36,9 @@ x-ubml-cli:
   categoryDisplayName: "Advanced"
   workflowOrder: 11
   shortDescription: "Define relationships between steps across processes."
+  defaultFilename: "cross-process"
+  detectBy:
+    - links
   gettingStarted:
     - "Identify cross-process connections"
     - "Define links with source and target steps"

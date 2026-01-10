@@ -14,10 +14,11 @@ import {
   getDocumentTypeInfo,
   getAllElementTypes,
   getElementTypeInfo,
-  getAnnotatedTemplate,
   getSuggestedWorkflow,
+  createDocumentYaml,
+  getIdPrefixCategoryMap,
   type DocumentTypeInfo,
-} from '../schema-introspection';
+} from '../../schema/index.js';
 import { DOCUMENT_TYPES, type DocumentType } from '../../generated/metadata';
 import { INDENT, header, subheader, dim, success, highlight, code } from '../formatters/text';
 
@@ -108,6 +109,7 @@ function displayWorkflow(): void {
   const workflow = getSuggestedWorkflow();
   for (const step of workflow) {
     const info = getDocumentTypeInfo(step.type);
+    if (!info) continue;
     console.log(
       INDENT +
         chalk.bold.green(`${step.step}.`) +
@@ -131,6 +133,10 @@ function displayWorkflow(): void {
  */
 function displayDocumentType(type: DocumentType, options: { properties?: boolean; template?: boolean }): void {
   const info = getDocumentTypeInfo(type);
+  if (!info) {
+    console.error(`Unknown document type: ${type}`);
+    return;
+  }
 
   console.log();
   console.log(header(info.title));
@@ -233,7 +239,7 @@ function displayTemplate(type: DocumentType): void {
   console.log(subheader('Template:'));
   console.log();
 
-  const template = getAnnotatedTemplate(type);
+  const template = createDocumentYaml(type, { useComments: true });
   // Colorize YAML output
   const lines = template.split('\n');
   for (const line of lines) {
@@ -263,19 +269,13 @@ function displayElements(): void {
 
   const elements = getAllElementTypes();
 
-  // Group by category
-  const groups: Record<string, typeof elements> = {
-    'Process Elements': elements.filter((e) => ['PR', 'ST', 'PH', 'BK'].includes(e.prefix)),
-    'Actors & Resources': elements.filter((e) => ['AC', 'SK', 'RP', 'EQ', 'PS'].includes(e.prefix)),
-    'Information Model': elements.filter((e) => ['EN', 'DC', 'LC'].includes(e.prefix)),
-    'Strategy': elements.filter((e) => ['VS', 'CP', 'PD', 'SV', 'PF'].includes(e.prefix)),
-    'Analysis': elements.filter((e) => ['HY', 'EV', 'SC', 'KP'].includes(e.prefix)),
-    'Other': elements.filter((e) => ['VW'].includes(e.prefix)),
-  };
+  // Get categories derived from schema (no hardcoding!)
+  const categoryMap = getIdPrefixCategoryMap();
 
-  for (const [group, items] of Object.entries(groups)) {
+  for (const [categoryName, prefixes] of Object.entries(categoryMap)) {
+    const items = elements.filter((e) => prefixes.includes(e.prefix));
     if (items.length === 0) continue;
-    console.log(INDENT + chalk.bold(group));
+    console.log(INDENT + chalk.bold(categoryName));
     for (const item of items) {
       console.log(
         INDENT + INDENT +

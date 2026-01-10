@@ -38,6 +38,10 @@ x-ubml-cli:
   categoryDisplayName: "Advanced"
   workflowOrder: 9
   shortDescription: "Define business terminology and definitions."
+  defaultFilename: "glossary"
+  detectBy:
+    - terms
+    - glossary
   gettingStarted:
     - "Identify key terms in your domain"
     - "Write clear, concise definitions"

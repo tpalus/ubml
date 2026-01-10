@@ -1,10 +1,10 @@
 /**
  * Constants for UBML package.
  * 
+ * Version is derived from package.json
+ * 
  * AUTO-GENERATED FILE - DO NOT EDIT
  * Run: npm run generate
- * 
- * Version is derived from package.json
  */
 
 /**

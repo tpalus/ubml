@@ -38,6 +38,37 @@ x-ubml-id-config:
     - Add templates start at 01000 (e.g., AC0001000, PR0001000)
     - This allows ~1000 manually added items before collision
 
+# ==========================================================================
+# CATEGORY CONFIGURATION
+# ==========================================================================
+# Defines the display order and metadata for document/element categories.
+# ==========================================================================
+x-ubml-categories:
+  - key: process-elements
+    displayName: "Process Elements"
+    order: 1
+  - key: actors-resources
+    displayName: "Actors & Resources"
+    order: 2
+  - key: information-model
+    displayName: "Information Model"
+    order: 3
+  - key: strategy
+    displayName: "Strategy"
+    order: 4
+  - key: analysis
+    displayName: "Analysis"
+    order: 5
+  - key: core
+    displayName: "Core Modeling"
+    order: 6
+  - key: advanced
+    displayName: "Advanced"
+    order: 7
+  - key: other
+    displayName: "Other"
+    order: 99
+
 $defs:
 
   # ==========================================================================
@@ -65,7 +96,10 @@ $defs:
     x-ubml:
       prefix: "AC"
       humanName: "Actor ID"
+      shortDescription: "Actors (people, teams, systems)"
       errorHint: "AC + 5+ digits (e.g., AC00001, AC00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
 
   StepRef:
     description: |
@@ -80,6 +114,13 @@ $defs:
       - "ST00001"
       - "ST00010"
       - "ST0000100"
+    x-ubml:
+      prefix: "ST"
+      humanName: "Step ID"
+      shortDescription: "Steps in processes"
+      errorHint: "ST + 5+ digits (e.g., ST00001, ST00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
 
   ProcessRef:
     description: |
@@ -94,6 +135,13 @@ $defs:
       - "PR00001"
       - "PR00010"
       - "PR0000100"
+    x-ubml:
+      prefix: "PR"
+      humanName: "Process ID"
+      shortDescription: "Processes"
+      errorHint: "PR + 5+ digits (e.g., PR00001, PR00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
 
   EntityRef:
     description: |
@@ -108,6 +156,13 @@ $defs:
       - "EN00001"
       - "EN00010"
       - "EN0000100"
+    x-ubml:
+      prefix: "EN"
+      humanName: "Entity ID"
+      shortDescription: "Entities (data objects)"
+      errorHint: "EN + 5+ digits (e.g., EN00001, EN00010)"
+      category: information-model
+      categoryDisplayName: "Information Model"
 
   DocumentRef:
     description: |
@@ -120,6 +175,13 @@ $defs:
       Examples: DC001, DC010, DC100
     type: string
     pattern: "^DC\\d{5,}$"
+    x-ubml:
+      prefix: "DC"
+      humanName: "Document ID"
+      shortDescription: "Documents"
+      errorHint: "DC + 5+ digits (e.g., DC00001, DC00010)"
+      category: information-model
+      categoryDisplayName: "Information Model"
 
   SkillRef:
     description: |
@@ -132,6 +194,13 @@ $defs:
       Examples: SK00001, SK010, SK100
     type: string
     pattern: "^SK\\d{5,}$"
+    x-ubml:
+      prefix: "SK"
+      humanName: "Skill ID"
+      shortDescription: "Skills"
+      errorHint: "SK + 5+ digits (e.g., SK00001, SK00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
 
   ServiceRef:
     description: |
@@ -142,6 +211,13 @@ $defs:
       Examples: SV001, SV010, SV100
     type: string
     pattern: "^SV\\d{5,}$"
+    x-ubml:
+      prefix: "SV"
+      humanName: "Service ID"
+      shortDescription: "Services"
+      errorHint: "SV + 5+ digits (e.g., SV00001, SV00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
 
   ScenarioRef:
     description: |
@@ -152,6 +228,13 @@ $defs:
       Examples: SC00001, SC010, SC100
     type: string
     pattern: "^SC\\d{5,}$"
+    x-ubml:
+      prefix: "SC"
+      humanName: "Scenario ID"
+      shortDescription: "Scenarios"
+      errorHint: "SC + 5+ digits (e.g., SC00001, SC00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
 
   HypothesisRef:
     description: |
@@ -162,6 +245,13 @@ $defs:
       Examples: HY00001, HY010, HY100
     type: string
     pattern: "^HY\\d{5,}$"
+    x-ubml:
+      prefix: "HY"
+      humanName: "Hypothesis ID"
+      shortDescription: "Hypotheses"
+      errorHint: "HY + 5+ digits (e.g., HY00001, HY00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
 
   EvidenceRef:
     description: |
@@ -174,6 +264,13 @@ $defs:
       Examples: EV001, EV010, EV100
     type: string
     pattern: "^EV\\d{5,}$"
+    x-ubml:
+      prefix: "EV"
+      humanName: "Evidence ID"
+      shortDescription: "Evidence"
+      errorHint: "EV + 5+ digits (e.g., EV00001, EV00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
 
   KpiRef:
     description: |
@@ -184,6 +281,13 @@ $defs:
       Examples: KP00001, KP010, KP100
     type: string
     pattern: "^KP\\d{5,}$"
+    x-ubml:
+      prefix: "KP"
+      humanName: "KPI ID"
+      shortDescription: "KPIs"
+      errorHint: "KP + 5+ digits (e.g., KP00001, KP00010)"
+      category: analysis
+      categoryDisplayName: "Analysis"
 
   CapabilityRef:
     description: |
@@ -194,6 +298,13 @@ $defs:
       Examples: CP00001, CP010, CP100
     type: string
     pattern: "^CP\\d{5,}$"
+    x-ubml:
+      prefix: "CP"
+      humanName: "Capability ID"
+      shortDescription: "Capabilities"
+      errorHint: "CP + 5+ digits (e.g., CP00001, CP00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
 
   ValueStreamRef:
     description: |
@@ -204,6 +315,13 @@ $defs:
       Examples: VS00001, VS010, VS100
     type: string
     pattern: "^VS\\d{5,}$"
+    x-ubml:
+      prefix: "VS"
+      humanName: "Value Stream ID"
+      shortDescription: "Value Streams"
+      errorHint: "VS + 5+ digits (e.g., VS00001, VS00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
 
   ProductRef:
     description: |
@@ -214,6 +332,13 @@ $defs:
       Examples: PD001, PD010, PD100
     type: string
     pattern: "^PD\\d{5,}$"
+    x-ubml:
+      prefix: "PD"
+      humanName: "Product ID"
+      shortDescription: "Products"
+      errorHint: "PD + 5+ digits (e.g., PD00001, PD00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
 
   PortfolioRef:
     description: |
@@ -230,6 +355,13 @@ $defs:
       Examples: PF001, PF010, PF100
     type: string
     pattern: "^PF\\d{5,}$"
+    x-ubml:
+      prefix: "PF"
+      humanName: "Portfolio ID"
+      shortDescription: "Portfolios"
+      errorHint: "PF + 5+ digits (e.g., PF00001, PF00010)"
+      category: strategy
+      categoryDisplayName: "Strategy"
 
   EquipmentRef:
     description: |
@@ -250,6 +382,13 @@ $defs:
       Examples: EQ00001, EQ010, EQ100
     type: string
     pattern: "^EQ\\d{5,}$"
+    x-ubml:
+      prefix: "EQ"
+      humanName: "Equipment ID"
+      shortDescription: "Equipment"
+      errorHint: "EQ + 5+ digits (e.g., EQ00001, EQ00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
 
   LocationRef:
     description: |
@@ -270,6 +409,13 @@ $defs:
       Examples: LC001, LC010, LC100
     type: string
     pattern: "^LC\\d{5,}$"
+    x-ubml:
+      prefix: "LC"
+      humanName: "Location ID"
+      shortDescription: "Locations"
+      errorHint: "LC + 5+ digits (e.g., LC00001, LC00010)"
+      category: information-model
+      categoryDisplayName: "Information Model"
 
   BlockRef:
     description: |
@@ -284,6 +430,13 @@ $defs:
       Examples: BK001, BK010, BK100
     type: string
     pattern: "^BK\\d{5,}$"
+    x-ubml:
+      prefix: "BK"
+      humanName: "Block ID"
+      shortDescription: "Blocks"
+      errorHint: "BK + 5+ digits (e.g., BK00001, BK00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
 
   PhaseRef:
     description: |
@@ -299,6 +452,13 @@ $defs:
       Examples: PH001, PH010, PH100
     type: string
     pattern: "^PH\\d{5,}$"
+    x-ubml:
+      prefix: "PH"
+      humanName: "Phase ID"
+      shortDescription: "Phases"
+      errorHint: "PH + 5+ digits (e.g., PH00001, PH00010)"
+      category: process-elements
+      categoryDisplayName: "Process Elements"
 
   PersonaRef:
     description: |
@@ -309,6 +469,13 @@ $defs:
       Examples: PS001, PS010, PS100
     type: string
     pattern: "^PS\\d{5,}$"
+    x-ubml:
+      prefix: "PS"
+      humanName: "Persona ID"
+      shortDescription: "Personas"
+      errorHint: "PS + 5+ digits (e.g., PS00001, PS00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
 
   ResourcePoolRef:
     description: |
@@ -319,6 +486,13 @@ $defs:
       Examples: RP00001, RP010, RP100
     type: string
     pattern: "^RP\\d{5,}$"
+    x-ubml:
+      prefix: "RP"
+      humanName: "Resource Pool ID"
+      shortDescription: "Resource Pools"
+      errorHint: "RP + 5+ digits (e.g., RP00001, RP00010)"
+      category: actors-resources
+      categoryDisplayName: "Actors & Resources"
 
   ViewRef:
     description: |
@@ -329,6 +503,13 @@ $defs:
       Examples: VW00001, VW010, VW100
     type: string
     pattern: "^VW\\d{5,}$"
+    x-ubml:
+      prefix: "VW"
+      humanName: "View ID"
+      shortDescription: "Views"
+      errorHint: "VW + 5+ digits (e.g., VW00001, VW00010)"
+      category: other
+      categoryDisplayName: "Other"
 
   # ==========================================================================
   # DATA OBJECT REFERENCES
@@ -418,7 +599,6 @@ $defs:
         custom:
           region: "EMEA"
           priority: 1
-          isLegacy: true
           tags: ["urgent", "customer-facing"]
     type: object
     additionalProperties:
