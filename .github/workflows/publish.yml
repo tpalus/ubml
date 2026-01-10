@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     
     permissions:
-      id-token: write
-      contents: write
+      id-token: write  # Required for OIDC trusted publishing
+      contents: write  # Required for creating releases
     
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +24,6 @@ jobs:
       
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Extract version
         id: version
