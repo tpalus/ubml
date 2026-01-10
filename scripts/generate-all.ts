@@ -761,7 +761,7 @@ export const ID_CONFIG = {
   /** Number of digits in ID (zero-padded) */
   digitLength: ${idConfig.digitLength},
   /** Regex pattern for validation */
-  pattern: '${idConfig.pattern}',
+  pattern: '${idConfig.pattern.replace(/\\/g, '\\\\')}',
   /** Starting number for 'ubml init' templates */
   initOffset: ${idConfig.initOffset},
   /** Starting number for 'ubml add' templates */

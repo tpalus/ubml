@@ -499,7 +499,7 @@ export async function validate(
         const existing = definedIds.get(id)!;
         errors.push({
           code: 'ubml/duplicate-id',
-          message: `ID \"${id}\" is defined in multiple files: ${existing.filepath} and ${info.filepath}`,
+          message: `ID "${id}" is defined in multiple files: ${existing.filepath} and ${info.filepath}`,
           filepath: info.filepath,
           path: info.path,
         });
@@ -524,7 +524,7 @@ export async function validate(
       for (const filepath of uniqueFiles) {
         errors.push({
           code: 'ubml/undefined-reference',
-          message: `Reference to undefined ID \"${id}\"`,
+          message: `Reference to undefined ID "${id}"`,
           filepath,
         });
       }
@@ -542,7 +542,7 @@ export async function validate(
         
         warnings.push({
           code: 'ubml/unused-id',
-          message: `ID \"${id}\" is defined but never referenced`,
+          message: `ID "${id}" is defined but never referenced`,
           filepath: info.filepath,
           path: info.path,
           ...(location && {
