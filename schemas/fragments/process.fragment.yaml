@@ -155,45 +155,6 @@ $defs:
         $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
 
   # ==========================================================================
-  # PROCESS TRIGGER
-  # ==========================================================================
-
-  ProcessTrigger:
-    description: |
-      Events that start other processes or steps.
-      
-      Enables cross-process orchestration where completion of one step
-      triggers the start of another process.
-      
-      Example:
-        triggers:
-          - event: onComplete
-            source: ST015
-            target: PR010
-            condition: "order.value > 100000"
-    type: object
-    additionalProperties: false
-    required: [event, source, target]
-    properties:
-      event:
-        description: "Trigger event type."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessTriggerEvent"
-      source:
-        description: "Step ID that fires the trigger."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
-      target:
-        description: "Process ID to start."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
-      condition:
-        description: |
-          Guard expression for conditional triggering.
-          
-          Examples:
-            condition: "order.value > 50000"
-            condition: requiresEscalation
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
-
-  # ==========================================================================
   # PROCESS DEFINITION
   # ==========================================================================
 
@@ -203,7 +164,7 @@ $defs:
       
       Supports:
       - Multi-level hierarchy (L1 strategic to L4 detailed)
-      - Cross-process triggers
+      - Cross-process invocation via Step.calls
       - Unified links for routing and scheduling
       - Blocks for control flow grouping (par, alt, loop) - EXECUTION semantics
       - Phases for lifecycle stages and delivery phases - ORGANIZATIONAL overlay
@@ -258,12 +219,6 @@ $defs:
         type: array
         items:
           $ref: "../common/defs.schema.yaml#/$defs/StepRef"
-      
-      triggers:
-        description: "Events that start other processes or steps."
-        type: array
-        items:
-          $ref: "#/$defs/ProcessTrigger"
       
       steps:
         description: |

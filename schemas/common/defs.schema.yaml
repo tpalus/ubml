@@ -949,26 +949,6 @@ $defs:
       - onDeadlineBreach
 
   # ==========================================================================
-  # PROCESS TRIGGER EVENTS
-  # ==========================================================================
-
-  ProcessTriggerEvent:
-    description: |
-      Events that can trigger cross-process orchestration.
-      
-      Used by ProcessTrigger.event to start another process.
-      
-      EVENTS:
-      - onComplete: source step finishes successfully
-      - onStart: source step begins execution
-      - onError: source step fails or encounters an error
-    type: string
-    enum:
-      - onComplete
-      - onStart
-      - onError
-
-  # ==========================================================================
   # STANDARD APPROVAL OUTCOMES
   # ==========================================================================
 

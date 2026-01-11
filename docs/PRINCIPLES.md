@@ -1,13 +1,15 @@
-# UBML DSL Design Principles
+# UBML Language Design Principles
 
-> Language design principles for the Unified Business Modeling Language.
-> These principles govern how the DSL schema is designed, not how users write models.
+> Binding constraints for designing the UBML notation.
+> These principles govern the abstractions, vocabulary, and structure of the language — not tooling or implementation.
 
 ---
 
 ## Purpose
 
-This document defines **binding constraints** for UBML language design. When designing new schema elements or refactoring existing ones, these principles must be followed. Violations indicate a design flaw that must be resolved before release.
+This document defines **binding constraints** for UBML language design. When designing new abstractions, refining existing ones, or evaluating proposed changes, these principles must be followed. Violations indicate a design flaw that must be resolved before the change is accepted.
+
+The goal is a **focused, coherent notation** that serves its purpose: enabling business consultants to model how organizations create and deliver value.
 
 ---
 
@@ -57,12 +59,6 @@ These values resolve conflicts when principles compete:
 2. **Consultant vocabulary over standards vocabulary** — Use terms analysts actually say, not terms from specifications
 3. **Progressive complexity** — Simple things simple, complex things possible
 4. **Forgiveness over strictness** — Accept rough input, guide toward precision
-
----
-
-## Evolution Philosophy
-
-See **P11: Language Clarity Over Compatibility** for the formal principle governing UBML evolution.
 
 ---
 
@@ -148,6 +144,18 @@ The schema should provide a flattening mechanism (parent references) for hierarc
 
 **Rationale:** Human readability. Editor usability.
 
+#### P3.4: Domain-Based File Organization
+
+When splitting models across multiple files, organize by business domain (customer-service, order-management) rather than by element type (all processes together, all actors together).
+
+**Rationale:** Domain organization keeps related concepts together, making it easier to understand a business area holistically. Type-based organization scatters domain knowledge across the workspace.
+
+#### P3.5: Coherent Model Boundaries
+
+Each file should represent a coherent, understandable unit. A process file should cover one workflow that can be understood in a single reading. If a model grows too large to comprehend, split by subprocess boundaries.
+
+**Rationale:** Models exist to communicate understanding. A model too large to hold in working memory fails its purpose. Splitting should follow natural business boundaries, not arbitrary size limits.
+
 ---
 
 ## Semantic Design Principles
@@ -176,7 +184,7 @@ Documents should be able to declare their expected validation strictness. This a
 
 #### P4.4: No Hidden Defaults
 
-Schema properties with meaningful choices (enums, type discriminators) must not have defaults. Users must explicitly specify values.
+Schema properties with meaningful choices (enums, type discriminators) must not have defaults. Users must explicitly specify values. Property absence must not carry semantic meaning beyond "not specified."
 
 **Rationale:** Defaults hide options. Requiring explicit choice nudges users to consult help and understand alternatives. An analyst who types `kind: action` has learned that other kinds exist; one who relies on a default has not.
 
@@ -298,19 +306,7 @@ For any given concept, the schema must define exactly one structure. No shorthan
 
 **Rationale:** One way to express a thing means one pattern to learn, one pattern to parse, one pattern to validate. Alternatives create cognitive load and tooling complexity.
 
-**Example - Duration Format:**
-
-The duration format is exactly `{number}{unit}` where units are:
-- `min` - minutes (not `m`, not `minute`)
-- `h` - hours (not `hr`, not `hour`)
-- `d` - days (not `day`)
-- `wk` - weeks (not `w`, not `week`)
-- `mo` - months (not `month`)
-
-Valid: `30min`, `2h`, `1.5d`, `1wk`, `3mo`  
-Invalid: `30m`, `1h30m`, `PT30M`, `2 hours`
-
-Use decimals for compound durations: `1.5h` (not `1h30m`).
+Formatted values (durations, references, expressions) must have exactly one canonical syntax defined in the schema. See schema documentation for current format specifications.
 
 #### P9.2: No Shorthand Properties
 
@@ -323,12 +319,6 @@ Do not provide abbreviated property names or condensed formats alongside full fo
 References to other elements use the element ID only, without file path qualification or wrapper syntax.
 
 **Rationale:** Simple and readable. Global ID uniqueness makes this unambiguous.
-
-#### P9.4: One Command Per Action (CLI)
-
-The CLI must have exactly one command for each action. No aliases, no alternative spellings, no hidden synonyms.
-
-**Rationale:** One canonical form applies to tooling, not just schema. Users should learn one vocabulary. Documentation stays simple. Tab-completion is unambiguous.
 
 ---
 
@@ -403,64 +393,3 @@ Breaking changes require CLI migration support:
 - Clear diff output showing what changed and why
 
 **Rationale:** Breaking changes are acceptable only if migration is automated. Never force manual file editing across a workspace.
-
----
-
-## Principles Summary
-
-| # | Principle | Constraint |
-|---|-----------|------------|
-| **P1** | Single Source of Truth | No redundant information |
-| P1.1 | No Dual Hierarchy | Choose parent OR children, not both |
-| P1.2 | No Redundant ID Declaration | ID in key only, not as property |
-| P1.3 | No Computed Aggregations | Don't store derivable values |
-| P1.4 | No Built-In Version Control | Use git for history/diffing |
-| **P2** | Consistent Patterns | Same concept, same syntax |
-| P2.1 | Uniform ID Patterns | Enforced prefixes and formats |
-| P2.2 | Uniform Reference Syntax | Shared reference type definitions |
-| P2.3 | Uniform Optional Behavior | null/empty = absent |
-| **P3** | Hierarchy Through Structure | Nesting implies ownership |
-| P3.1 | Nesting for Ownership | Contained elements nested |
-| P3.2 | References for Cross-Cutting | Shared elements referenced |
-| P3.3 | Maximum Nesting Depth | Flatten deep hierarchies |
-| **P4** | Explicitness | Declare behavior, don't infer |
-| P4.1 | Semantic Properties Required | Meaning is explicit |
-| P4.2 | No Context-Dependent Defaults | Same default everywhere |
-| P4.3 | Validation Modes Explicit | Document declares strictness |
-| P4.4 | No Hidden Defaults | Choices require explicit values |
-| **P5** | Schema Design Rules | How to write schemas |
-| P5.1 | Fragment Modularity | One concept per file |
-| P5.2 | Required Properties Minimal | Only identification required |
-| P5.3 | Enums Complete | All values documented |
-| P5.4 | Descriptions as Documentation | Explain purpose, not structure |
-| **P6** | Terminology | Consultant vocabulary |
-| P6.1 | Business Vocabulary First | Terms analysts actually use |
-| P6.2 | Avoid Jargon | Plain language explanations |
-| P6.3 | Consistent Naming | Same concept, same term |
-| **P7** | Export Compatibility | Source format, not interchange |
-| P7.1 | Lossless Round-Trip Not Required | Export may lose context |
-| P7.2 | Import Should Enrich | Add context to imported models |
-| P7.3 | Mapping Documented | Explicit export trade-offs |
-| **P8** | Semantic Validation | What validator checks |
-| P8.1 | Reference Integrity | All refs resolve |
-| P8.2 | Type-Correct References | Ref matches target type |
-| P8.3 | Hierarchy Consistency | Parent/children agree |
-| P8.4 | Global ID Uniqueness | All IDs unique across workspace |
-| P8.5 | Cycle Detection | No circular hierarchies |
-| **P9** | One Canonical Form | One way to express each concept |
-| P9.1 | No Alternative Representations | No multiple syntaxes |
-| P9.2 | No Shorthand Properties | No abbreviated forms |
-| P9.3 | Bare ID References | Simple ID, no qualification |
-| P9.4 | One Command Per Action (CLI) | No aliases, no synonyms |
-| **P10** | Projection-First Design | Clean mapping to formal standards |
-| P10.1 | Element Types as Semantic Primitives | Kinds/types map 1:1 to BPMN/ArchiMate |
-| P10.2 | Behavioral Richness via Properties | Properties, not new primitive types |
-| P10.3 | Avoid Standard-Specific Semantics | No hardcoded APQC/TOGAF definitions |
-| P10.4 | Separation of Modeling and Operational | Roles for process, persons for staffing |
-| P10.5 | New Primitives Require Projection Mapping | Document all standard mappings first |
-| **P11** | Language Clarity Over Compatibility | Pristine DSL, not backward compatibility |
-| P11.1 | No Legacy Debt | Fix design mistakes, don't carry them forward |
-| P11.2 | Versioned Breaking Changes | Explicit versions, CLI detects mismatch |
-| P11.3 | Migration Tooling Required | Automated migration for breaking changes |
-
-

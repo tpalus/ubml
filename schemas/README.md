@@ -22,10 +22,10 @@ schemas/
 │   ├── link.fragment.yaml        # Link definitions
 │   ├── metrics.fragment.yaml     # KPI, ROI
 │   ├── mining.fragment.yaml      # Mining source, mappings
-│   ├── process.fragment.yaml     # Process, Phase, ProcessTrigger
+│   ├── process.fragment.yaml     # Process, Phase
 │   ├── resource.fragment.yaml    # Skill, ResourcePool, Equipment
 │   ├── scenario.fragment.yaml    # Scenario, WorkAttribute
-│   ├── step.fragment.yaml        # Step, Block, RACI
+│   ├── step.fragment.yaml        # Step, Block, RACI, ProcessCall
 │   ├── strategy.fragment.yaml    # ValueStream, Capability, Product
 │   └── view.fragment.yaml        # View definitions
 │
