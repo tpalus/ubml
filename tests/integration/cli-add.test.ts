@@ -52,7 +52,7 @@ describe('CLI Add Command', () => {
    * Helper to create a minimal workspace for testing
    */
   function createMinimalWorkspace(): void {
-    writeFileSync(join(tempDir, 'workspace.ubml.yaml'), 'ubml: "${SCHEMA_VERSION}"\nname: test\n');
+    writeFileSync(join(tempDir, 'workspace.ubml.yaml'), `ubml: "${SCHEMA_VERSION}"\nname: test\n`);
   }
 
   describe('add without arguments', () => {
