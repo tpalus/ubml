@@ -1,0 +1,40 @@
+#!/bin/sh
+# UBML Pre-commit Hook
+#
+# This hook ensures:
+# 1. Version consistency across all files
+# 2. No TypeScript lint errors
+# 3. Type checking passes
+#
+# To install: git config core.hooksPath .githooks
+
+echo "🔍 Running pre-commit checks..."
+
+# Check version consistency
+echo "\n📋 Verifying version consistency..."
+npm run verify-versions
+if [ $? -ne 0 ]; then
+  echo "\n❌ Version verification failed!"
+  echo "Run: npm run update-schema-versions && npm run generate"
+  exit 1
+fi
+
+# Run linter
+echo "\n🔧 Running linter..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "\n❌ Lint failed!"
+  echo "Run: npm run lint:fix"
+  exit 1
+fi
+
+# Run type checking
+echo "\n📘 Running type check..."
+npm run typecheck
+if [ $? -ne 0 ]; then
+  echo "\n❌ Type check failed!"
+  exit 1
+fi
+
+echo "\n✅ All pre-commit checks passed!\n"
+exit 0

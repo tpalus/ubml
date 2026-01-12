@@ -8,6 +8,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { execSync } from 'child_process';
 
 describe('CLI Init Command', () => {
@@ -72,7 +73,7 @@ describe('CLI Init Command', () => {
 
       if (workspaceFile) {
         const content = readFileSync(join(projectDir, workspaceFile), 'utf8');
-        expect(content).toContain('ubml: "1.1"');
+        expect(content).toContain(`ubml: "${SCHEMA_VERSION}"`);
       }
     });
 

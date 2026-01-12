@@ -8,6 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { SCHEMA_VERSION } from '../../src/constants.js';
 import { resolve } from 'path';
 import { parseFile, validateWorkspace } from '../../src/node/index.js';
 import { extractDefinedIds } from '../../src/semantic-validator.js';
@@ -23,7 +24,7 @@ describe('Example Workspace', () => {
       expect(result.errors).toHaveLength(0);
       expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
-      expect(result.document?.content).toHaveProperty('ubml', '1.1');
+      expect(result.document?.content).toHaveProperty('ubml', SCHEMA_VERSION);
     });
 
     it('should parse actors file', async () => {

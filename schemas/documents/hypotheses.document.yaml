@@ -7,7 +7,7 @@
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.io/schemas/1.1/documents/hypotheses.document.yaml"
+$id: "https://ubml.io/schemas/1.2/documents/hypotheses.document.yaml"
 title: "Hypotheses"
 description: |
   Hypothesis documents define hypothesis trees for structured problem framing.
@@ -57,9 +57,9 @@ properties:
   ubml:
     description: |
       UBML version identifier.
-      Must be "1.1" for this schema version.
+      Must be "1.2" for this schema version.
     type: string
-    const: "1.1"
+    const: "1.2"
   
   name:
     description: |

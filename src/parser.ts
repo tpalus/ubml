@@ -180,8 +180,15 @@ export function parse<T = unknown>(content: string, filename?: string): ParseRes
     documentType = detectDocumentTypeFromContent(parsedContent);
   }
 
-  // Extract UBML version
-  const ubmlVersion = (parsedContent as Record<string, unknown>)?.['ubml'] as string ?? '1.1';
+  // Extract UBML version (required)
+  const ubmlVersion = (parsedContent as Record<string, unknown>)?.['ubml'] as string;
+  
+  if (!ubmlVersion) {
+    throw new Error(
+      `Missing required 'ubml' property in ${filename}. ` +
+      `All UBML documents must declare their version (e.g., ubml: "1.1").`
+    );
+  }
 
   const meta: DocumentMeta = {
     version: ubmlVersion,

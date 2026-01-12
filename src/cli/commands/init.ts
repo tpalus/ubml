@@ -172,8 +172,24 @@ interface InitOptions {
  * Initialize a workspace in the current directory.
  */
 function initCurrentDirectory(name: string, options: InitOptions): void {
-  const workspaceDir = resolve('.');
-  const safeName = toKebabCase(name);
+  // Determine workspace directory
+  // If name is "." or an absolute/relative path, use it directly
+  // Otherwise, create a subdirectory with that name
+  const workspaceDir = name === '.' || name.startsWith('.') || name.startsWith('/') 
+    ? resolve(name)
+    : resolve('.', name);
+  const safeName = toKebabCase(name === '.' ? basename(process.cwd()) : name);
+
+  // Create directory if it doesn't exist (when creating new subdirectory)
+  if (workspaceDir !== resolve('.')) {
+    if (existsSync(workspaceDir) && !options.force) {
+      console.error(chalk.red(`Error: Directory already exists: ${workspaceDir}`));
+      console.error();
+      console.error('Use ' + code('--force') + ' to reinitialize.');
+      process.exit(1);
+    }
+    mkdirSync(workspaceDir, { recursive: true });
+  }
 
   // Check for existing UBML files
   if (hasUbmlFiles(workspaceDir) && !options.force) {
@@ -184,10 +200,10 @@ function initCurrentDirectory(name: string, options: InitOptions): void {
   }
 
   // Create files
-  createWorkspaceFiles(workspaceDir, safeName, name, options.minimal);
+  createWorkspaceFiles(workspaceDir, safeName, name === '.' ? basename(process.cwd()) : name, options.minimal);
 
   // Print success message
-  printSuccessMessage(workspaceDir, name, true);
+  printSuccessMessage(workspaceDir, name === '.' ? basename(process.cwd()) : name, workspaceDir === resolve('.'));
 }
 
 /**

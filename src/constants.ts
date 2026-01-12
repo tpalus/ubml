@@ -10,12 +10,12 @@
 /**
  * UBML package version (from package.json).
  */
-export const VERSION = "1.1.0";
+export const VERSION = "1.2.0";
 
 /**
  * UBML schema version (major.minor).
  */
-export const SCHEMA_VERSION = "1.1";
+export const SCHEMA_VERSION = "1.2";
 
 /**
  * Package name.

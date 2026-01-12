@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "ubml",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "UBML - Unified Business Modeling Language: parsing, validation, serialization, and CLI",
   "keywords": [
     "ubml",
@@ -64,14 +64,18 @@
   "scripts": {
     "build": "npm run generate && tsup",
     "generate": "tsx scripts/generate/index.ts",
+    "update-schema-versions": "tsx scripts/update-schema-versions.ts",
+    "verify-versions": "tsx scripts/verify-versions.ts",
     "validate:example": "tsx bin/ubml.ts validate ./example",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:workspace": "vitest run tests/workspace",
     "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
     "typecheck": "tsc --noEmit",
     "docs": "typedoc src/index.ts --out docs/api",
-    "prepublishOnly": "npm run build && npm run test"
+    "prebuild": "npm run update-schema-versions && npm run generate",
+    "prepublishOnly": "npm run verify-versions && npm run build && npm run test"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
