@@ -40,7 +40,7 @@ processes:
       
       expect(result.ok).toBe(true);
       expect(result.document).toBeDefined();
-      expect(result.document?.content).toHaveProperty('ubml', '1.1');
+      expect(result.document?.content).toHaveProperty('ubml', SCHEMA_VERSION);
       expect(result.document?.meta.type).toBe('process');
       expect(result.errors).toHaveLength(0);
     });
