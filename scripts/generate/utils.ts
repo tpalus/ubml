@@ -57,7 +57,7 @@ export function loadDirectory(dir: string): Record<string, unknown> {
   const files = readdirSync(dir).filter(f => f.endsWith('.yaml'));
 
   for (const file of files) {
-    const name = file.replace(/\.(document|fragment|schema)\.yaml$/, '');
+    const name = file.replace(/\.(document|types|defs|schema)\.yaml$/, '');
     result[name] = loadYamlFile(join(dir, file));
   }
 
@@ -96,12 +96,12 @@ export function discoverDocumentTypes(): string[] {
 }
 
 /**
- * Discover fragment types from schema files.
+ * Discover type definitions from schema files.
  */
-export function discoverFragments(): string[] {
-  const fragmentsDir = join(SCHEMAS_DIR, 'fragments');
-  const files = readdirSync(fragmentsDir).filter(f => f.endsWith('.fragment.yaml'));
-  return files.map(f => f.replace('.fragment.yaml', '')).sort();
+export function discoverTypes(): string[] {
+  const typesDir = join(SCHEMAS_DIR, 'types');
+  const files = readdirSync(typesDir).filter(f => f.endsWith('.types.yaml'));
+  return files.map(f => f.replace('.types.yaml', '')).sort();
 }
 
 // =============================================================================

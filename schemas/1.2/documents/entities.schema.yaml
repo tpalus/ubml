@@ -101,7 +101,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^EN\\d{5,}$":
-        $ref: "../fragments/entity.fragment.yaml#/$defs/Entity"
+        $ref: "../types/entity.types.yaml#/$defs/Entity"
   
   documents:
     description: |
@@ -119,7 +119,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^DC\\d{5,}$":
-        $ref: "../fragments/entity.fragment.yaml#/$defs/Document"
+        $ref: "../types/document.types.yaml#/$defs/Document"
   
   locations:
     description: |
@@ -137,7 +137,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^LO\\d{5,}$":
-        $ref: "../fragments/entity.fragment.yaml#/$defs/Location"
+        $ref: "../types/location.types.yaml#/$defs/Location"
   
   metadata:
     description: "Document metadata."
@@ -163,4 +163,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

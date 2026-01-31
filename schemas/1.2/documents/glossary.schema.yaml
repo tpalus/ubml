@@ -135,7 +135,7 @@ properties:
               Related glossary terms (references to other TM### IDs).
             type: array
             items:
-              $ref: "../common/defs.schema.yaml#/$defs/TermRef"
+              $ref: "../defs/refs.defs.yaml#/$defs/TermRef"
           
           source:
             description: "Source or authority for the definition."
@@ -192,4 +192,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

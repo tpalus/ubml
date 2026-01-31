@@ -215,13 +215,13 @@ properties:
   
   owner:
     description: "Workspace owner."
-    $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+    $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
   
   stakeholders:
     description: "Key stakeholders."
     type: array
     items:
-      $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+      $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
   
   tags:
     description: "Tags for filtering and organization."
@@ -231,7 +231,7 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
   
   idStats:
     description: |

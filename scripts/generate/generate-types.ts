@@ -19,8 +19,8 @@ import type { RefInfo } from './extract-metadata.js';
 // Configuration
 // =============================================================================
 
-const COMMON_DEFS_PATH = join(SCHEMAS_DIR, 'common', 'defs.schema.yaml');
-const FRAGMENTS_DIR = join(SCHEMAS_DIR, 'fragments');
+const DEFS_DIR = join(SCHEMAS_DIR, 'defs');
+const TYPES_DIR = join(SCHEMAS_DIR, 'types');
 const DOCUMENTS_DIR = join(SCHEMAS_DIR, 'documents');
 
 const COMPILE_OPTIONS: Partial<Options> = {
@@ -40,12 +40,12 @@ const COMPILE_OPTIONS: Partial<Options> = {
 /**
  * Convert a schema filename to a PascalCase type name.
  * Examples:
- *   actor.fragment.yaml → Actor
+ *   actor.types.yaml → Actor
  *   actors.schema.yaml → Actors
  */
 function schemaFileToTypeName(filename: string): string {
   const baseName = filename
-    .replace(/\.(fragment|document|schema)\.yaml$/, '')
+    .replace(/\.(types|document|schema|defs)\.yaml$/, '')
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase())
     .replace(/ /g, '');
@@ -92,15 +92,15 @@ function stripExtensions(schema: unknown): unknown {
  * Collect all $defs from all sources into a single map for unified reference resolution.
  */
 function collectAllDefs(
-  commonDefs: Record<string, unknown>,
-  fragmentDefs: Map<string, Record<string, unknown>>
+  defsDefs: Record<string, unknown>,
+  typesDefs: Map<string, Record<string, unknown>>
 ): Record<string, unknown> {
-  const allDefs: Record<string, unknown> = { ...commonDefs };
+  const allDefs: Record<string, unknown> = { ...defsDefs };
 
-  // Add all fragment defs
-  for (const [, defs] of fragmentDefs) {
+  // Add all type defs
+  for (const [, defs] of typesDefs) {
     for (const [defName, defValue] of Object.entries(defs)) {
-      // Don't overwrite common defs
+      // Don't overwrite defs from defs/
       if (!allDefs[defName]) {
         allDefs[defName] = defValue;
       }
@@ -137,8 +137,8 @@ function findDef(allDefs: Record<string, unknown>, defName: string): unknown | n
  * Inline all $refs recursively using a unified defs map.
  * Handles:
  * - Local refs: #/$defs/SomeType
- * - External defs refs: ../common/defs.schema.yaml#/$defs/SomeType
- * - Fragment refs: ../fragments/actor.fragment.yaml#/$defs/SomeType
+ * - External defs refs: ../defs/refs.defs.yaml#/$defs/SomeType, ../defs/primitives.defs.yaml#/$defs/SomeType, etc.
+ * - Type refs: ../types/actor.types.yaml#/$defs/SomeType
  */
 function inlineAllRefs(
   schema: unknown,
@@ -165,16 +165,16 @@ function inlineAllRefs(
         defName = localMatch[1];
       }
 
-      // Pattern 2: External defs ref - ../common/defs.schema.yaml#/$defs/SomeType
-      const defsMatch = ref.match(/defs\.schema\.yaml#\/\$defs\/(\w+)$/);
+      // Pattern 2: External defs ref - ../defs/refs.defs.yaml#/$defs/SomeType
+      const defsMatch = ref.match(/\.defs\.yaml#\/\$defs\/(\w+)$/);
       if (defsMatch) {
         defName = defsMatch[1];
       }
 
-      // Pattern 3: Fragment ref - ../fragments/actor.fragment.yaml#/$defs/SomeType
-      const fragmentMatch = ref.match(/\.fragment\.yaml#\/\$defs\/(\w+)$/);
-      if (fragmentMatch) {
-        defName = fragmentMatch[1];
+      // Pattern 3: Type ref - ../types/actor.types.yaml#/$defs/SomeType
+      const typesMatch = ref.match(/\.types\.yaml#\/\$defs\/(\w+)$/);
+      if (typesMatch) {
+        defName = typesMatch[1];
       }
 
       if (defName) {
@@ -397,26 +397,39 @@ function postProcessTypes(types: string): string {
 export async function generateTypesTs(refInfos: RefInfo[]): Promise<string> {
   const output: string[] = [];
 
-  // 1. Load common defs
-  const commonSchema = loadYamlFile(COMMON_DEFS_PATH) as SchemaWithDefs;
-  const commonDefs = commonSchema.$defs ?? {};
-
-  // 2. Load fragment defs (raw, without processing yet)
-  const fragmentDefsMap = new Map<string, Record<string, unknown>>();
-  const fragmentFiles = readdirSync(FRAGMENTS_DIR).filter((f) => f.endsWith('.fragment.yaml'));
-
-  for (const file of fragmentFiles) {
-    const filePath = join(FRAGMENTS_DIR, file);
+  // 1. Load all defs from defs/ directory
+  const defsDefsMap = new Map<string, Record<string, unknown>>();
+  const defsFiles = readdirSync(DEFS_DIR).filter((f) => f.endsWith('.defs.yaml'));
+  
+  for (const file of defsFiles) {
+    const filePath = join(DEFS_DIR, file);
     const schema = loadYamlFile(filePath) as SchemaWithDefs;
-    const fragmentName = file.replace('.fragment.yaml', '');
+    const defsName = file.replace('.defs.yaml', '');
 
     if (schema.$defs) {
-      fragmentDefsMap.set(fragmentName, schema.$defs as Record<string, unknown>);
+      for (const [defName, defValue] of Object.entries(schema.$defs)) {
+        defsDefsMap.set(defName, defValue as Record<string, unknown>);
+      }
+    }
+  }
+  const defsDefs = Object.fromEntries(defsDefsMap);
+
+  // 2. Load type defs (raw, without processing yet)
+  const typesDefsMap = new Map<string, Record<string, unknown>>();
+  const typesFiles = readdirSync(TYPES_DIR).filter((f) => f.endsWith('.types.yaml'));
+
+  for (const file of typesFiles) {
+    const filePath = join(TYPES_DIR, file);
+    const schema = loadYamlFile(filePath) as SchemaWithDefs;
+    const typesName = file.replace('.types.yaml', '');
+
+    if (schema.$defs) {
+      typesDefsMap.set(typesName, schema.$defs as Record<string, unknown>);
     }
   }
 
   // 3. Build unified defs map for ref resolution
-  const allDefs = collectAllDefs(commonDefs, fragmentDefsMap);
+  const allDefs = collectAllDefs(defsDefs, typesDefsMap);
 
   // 4. Generate branded reference types
   output.push('// =============================================================================');
@@ -431,25 +444,25 @@ export async function generateTypesTs(refInfos: RefInfo[]): Promise<string> {
   output.push('  return id as T;');
   output.push('}\n');
 
-  // 6. Generate types from common defs (primitives, etc.)
+  // 6. Generate types from defs (primitives, refs, shared, etc.)
   output.push('// =============================================================================');
-  output.push('// COMMON TYPES (from defs.schema.yaml)');
+  output.push('// COMMON TYPES (from defs/*.defs.yaml)');
   output.push('// =============================================================================\n');
 
-  const commonTypes = await generateTypesFromDefs(commonDefs, allDefs);
-  output.push(commonTypes.join('\n\n'));
+  const defsTypes = await generateTypesFromDefs(defsDefs, allDefs);
+  output.push(defsTypes.join('\n\n'));
   output.push('\n');
 
-  // 7. Generate types from fragments
+  // 7. Generate types from types/
   output.push('// =============================================================================');
-  output.push('// FRAGMENT TYPES (from fragment schemas)');
+  output.push('// ENTITY TYPES (from types/*.types.yaml)');
   output.push('// =============================================================================\n');
 
-  for (const [fragmentName, defs] of fragmentDefsMap) {
-    const fragmentTypes = await generateTypesFromDefs(defs, allDefs);
-    if (fragmentTypes.length > 0) {
-      output.push(`// --- ${fragmentName} ---`);
-      output.push(fragmentTypes.join('\n\n'));
+  for (const [typesName, defs] of typesDefsMap) {
+    const entityTypes = await generateTypesFromDefs(defs, allDefs);
+    if (entityTypes.length > 0) {
+      output.push(`// --- ${typesName} ---`);
+      output.push(entityTypes.join('\n\n'));
       output.push('');
     }
   }

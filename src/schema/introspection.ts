@@ -13,7 +13,7 @@ import {
   type DocumentType,
   type IdPrefix,
 } from '../metadata.js';
-import { documentSchemas, fragmentSchemas, defsSchema } from '../generated/bundled.js';
+import { documentSchemas, typeSchemas, refsDefsSchema, primitivesDefsSchema, sharedDefsSchema } from '../generated/bundled.js';
 import type {
   SchemaCliMetadata,
   DocumentTypeInfo,
@@ -211,11 +211,11 @@ export function getElementTypeInfo(elementType: string): ElementTypeInfo | undef
     ([, type]) => type.toLowerCase() === elementType.toLowerCase()
   );
   
-  // Also try to match by prefix name (e.g., 'step' matches 'Step' in fragments)
+  // Also try to match by prefix name (e.g., 'step' matches 'Step' in types)
   const capitalizedType = elementType.charAt(0).toUpperCase() + elementType.slice(1);
 
-  // Find the fragment containing this element
-  for (const [_fragName, schema] of Object.entries(fragmentSchemas)) {
+  // Find the type containing this element
+  for (const [_typeName, schema] of Object.entries(typeSchemas)) {
     const defs = (schema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
     if (!defs) continue;
 
@@ -271,8 +271,8 @@ export function getIdPrefixInfo(prefix: IdPrefix): IdPrefixInfo | undefined {
   const elementType = ID_PREFIXES[prefix];
   if (!elementType) return undefined;
 
-  // Find the Ref definition in defs schema
-  const defs = (defsSchema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
+  // Find the Ref definition in refs defs schema
+  const defs = (refsDefsSchema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
   if (!defs) {
     return {
       prefix,
@@ -316,7 +316,7 @@ export function getIdPrefixInfo(prefix: IdPrefix): IdPrefixInfo | undefined {
   // No fallback - throw error if not found in schema
   throw new Error(
     `Schema error: No Ref type found with prefix "${prefix}". ` +
-    `All ID prefixes must be defined in schemas/common/defs.schema.yaml with complete x-ubml metadata.`
+    `All ID prefixes must be defined in schemas/defs/refs.defs.yaml with complete x-ubml metadata.`
   );
 }
 
@@ -544,7 +544,7 @@ export function findHelpTopic(name: string): HelpTopic | undefined {
 // =============================================================================
 
 /**
- * Get information about a concept type from fragment schemas.
+ * Get information about a concept type from type schemas.
  * Used for help topics that explain control flow concepts like Block, Phase.
  * 
  * @param conceptName - Name of the concept (e.g., 'Block', 'Phase')
@@ -556,8 +556,8 @@ export function getConceptInfo(conceptName: string): {
 } | undefined {
   const capitalizedName = conceptName.charAt(0).toUpperCase() + conceptName.slice(1);
 
-  // Search all fragment schemas for the concept definition
-  for (const [_fragName, schema] of Object.entries(fragmentSchemas)) {
+  // Search all type schemas for the concept definition
+  for (const [_typeName, schema] of Object.entries(typeSchemas)) {
     const defs = (schema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
     if (!defs) continue;
 

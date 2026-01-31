@@ -1,13 +1,13 @@
 # ============================================================================
-# UBML Hypothesis Fragment Schema
+# UBML Hypothesis Types Schema
 # ============================================================================
 # Defines hypothesis trees and the SCQH problem framing framework.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/hypothesis.fragment.yaml"
-title: "UBML Hypothesis Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/hypothesis.types.yaml"
+title: "UBML Hypothesis Types"
 description: |
   Hypothesis trees provide structured problem framing using the SCQH 
   (Situation-Complication-Question-Hypothesis) framework from the 
@@ -288,11 +288,11 @@ $defs:
         description: |
           Priority for investigation/validation.
           Helps prioritize analysis efforts.
-        $ref: "../common/defs.schema.yaml#/$defs/Priority"
+        $ref: "../defs/shared.defs.yaml#/$defs/Priority"
       
       owner:
         description: "Person responsible for validating this node."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       dueDate:
         description: "Target date for validation."
@@ -333,7 +333,7 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
 
   # ==========================================================================
   # HYPOTHESIS TREE
@@ -413,13 +413,13 @@ $defs:
       
       owner:
         description: "Person responsible for this analysis."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       stakeholders:
         description: "Key stakeholders for the analysis."
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       createdAt:
         description: "When the analysis was created."
@@ -439,4 +439,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

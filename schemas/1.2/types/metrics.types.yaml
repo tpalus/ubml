@@ -1,18 +1,18 @@
 # ============================================================================
-# UBML Metrics Fragment Schema
+# UBML Metrics Types Schema
 # ============================================================================
 # Defines KPIs, metrics, and ROI analysis structures.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/metrics.fragment.yaml"
-title: "UBML Metrics Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/metrics.types.yaml"
+title: "UBML Metrics Types"
 description: |
   Metrics and measurement structures for process performance,
   business outcomes, and ROI analysis.
   
-  This fragment defines:
+  This schema defines:
   - KPI: Key Performance Indicators with targets and thresholds
   - ROI: Return on Investment analysis structure
 
@@ -227,15 +227,15 @@ $defs:
       
       process:
         description: "Process this KPI measures."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
       step:
         description: "Step this KPI measures."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       owner:
         description: "KPI owner responsible for tracking."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       tags:
         description: "Tags for filtering and views."
@@ -245,7 +245,7 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
 
   # ==========================================================================
   # ROI COMPONENT
@@ -272,7 +272,7 @@ $defs:
       
       amount:
         description: "Monetary value of this component."
-        $ref: "../common/defs.schema.yaml#/$defs/Money"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Money"
       
       timing:
         description: |
@@ -464,15 +464,15 @@ $defs:
         additionalProperties: false
         properties:
           totalCosts:
-            $ref: "../common/defs.schema.yaml#/$defs/Money"
+            $ref: "../defs/primitives.defs.yaml#/$defs/Money"
           totalBenefits:
-            $ref: "../common/defs.schema.yaml#/$defs/Money"
+            $ref: "../defs/primitives.defs.yaml#/$defs/Money"
           netBenefit:
-            $ref: "../common/defs.schema.yaml#/$defs/Money"
+            $ref: "../defs/primitives.defs.yaml#/$defs/Money"
           roiPercent:
             type: number
           npv:
-            $ref: "../common/defs.schema.yaml#/$defs/Money"
+            $ref: "../defs/primitives.defs.yaml#/$defs/Money"
           paybackMonths:
             type: integer
           irr:
@@ -480,11 +480,11 @@ $defs:
       
       owner:
         description: "Analysis owner."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       approvedBy:
         description: "Who approved the business case."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       approvedAt:
         description: "When the business case was approved."
@@ -499,4 +499,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

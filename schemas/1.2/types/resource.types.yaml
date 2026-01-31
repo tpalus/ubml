@@ -1,16 +1,16 @@
 # ============================================================================
-# UBML Resource Fragment Schema
+# UBML Resource Types Schema
 # ============================================================================
 # Defines skills, resource pools, and equipment for capacity planning.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/resource.fragment.yaml"
-title: "UBML Resource Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/resource.types.yaml"
+title: "UBML Resource Types"
 description: |
   Resources enable capacity-based simulation and resource matching.
-  This fragment defines Skills, Resource Pools, and Equipment.
+  This schema defines Skills, Resource Pools, and Equipment.
 
 $defs:
 
@@ -103,7 +103,7 @@ $defs:
         description: |
           Actor ID (usually a role or team) that members of this pool have.
           Used to connect the pool to organizational structure.
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       capacity:
         description: |
@@ -124,7 +124,7 @@ $defs:
         description: |
           Cost rate for this pool.
           Overrides individual actor rates for simulation costing.
-        $ref: "../common/defs.schema.yaml#/$defs/Rate"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Rate"
       
       skills:
         description: |
@@ -132,7 +132,7 @@ $defs:
           All members of the pool are assumed to have these skills.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/SkillRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/SkillRef"
       
       equipment:
         description: |
@@ -145,7 +145,7 @@ $defs:
           Only 5 deliveries can happen concurrently even if demand is higher.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/EquipmentRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/EquipmentRef"
       
       wipLimit:
         description: |
@@ -158,7 +158,7 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
 
   # ==========================================================================
   # EQUIPMENT DEFINITION
@@ -229,7 +229,7 @@ $defs:
           - Working at height certification for scaffolding
           
           When set, only actors with this skill can use this equipment.
-        $ref: "../common/defs.schema.yaml#/$defs/SkillRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/SkillRef"
       
       location:
         description: |
@@ -237,7 +237,7 @@ $defs:
           
           For mobile equipment (vehicles), this is the home base.
           For fixed equipment (machines), this is the installation site.
-        $ref: "../common/defs.schema.yaml#/$defs/LocationRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/LocationRef"
       
       capacity:
         description: |
@@ -253,11 +253,11 @@ $defs:
         description: |
           Cost per time unit when equipment is in use.
           Used for simulation costing.
-        $ref: "../common/defs.schema.yaml#/$defs/Rate"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Rate"
       
       owner:
         description: "Actor who owns or manages this equipment."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       tags:
         description: "Tags for filtering and grouping equipment."
@@ -267,4 +267,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

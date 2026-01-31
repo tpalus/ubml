@@ -108,11 +108,11 @@ export interface CategoryConfig {
 // =============================================================================
 
 /**
- * Extract ID patterns from defs.schema.yaml.
+ * Extract ID patterns from refs.defs.yaml.
  */
 export function extractIdPatterns(): RefInfo[] {
-  const defsPath = join(SCHEMAS_DIR, 'common', 'defs.schema.yaml');
-  const defs = loadYamlFile(defsPath) as {
+  const refsPath = join(SCHEMAS_DIR, 'defs', 'refs.defs.yaml');
+  const defs = loadYamlFile(refsPath) as {
     $defs?: Record<string, {
       pattern?: string;
       description?: string;
@@ -156,11 +156,11 @@ export function extractIdPatterns(): RefInfo[] {
 }
 
 /**
- * Extract ID generation config from defs.schema.yaml.
+ * Extract ID generation config from shared.defs.yaml.
  */
 export function extractIdConfig(): IdConfig {
-  const defsPath = join(SCHEMAS_DIR, 'common', 'defs.schema.yaml');
-  const defs = loadYamlFile(defsPath) as { 'x-ubml-id-config'?: IdConfig };
+  const sharedPath = join(SCHEMAS_DIR, 'defs', 'shared.defs.yaml');
+  const defs = loadYamlFile(sharedPath) as { 'x-ubml-id-config'?: IdConfig };
 
   const config = defs['x-ubml-id-config'];
   if (!config) {
@@ -218,12 +218,12 @@ export function extractContentDetectionConfig(documentTypes: string[]): ContentD
 // =============================================================================
 
 /**
- * Extract validation patterns from defs.schema.yaml.
+ * Extract validation patterns from primitives.defs.yaml.
  * Reads pattern from Duration and TimeString $defs.
  */
 export function extractValidationPatterns(): ValidationPatterns {
-  const defsPath = join(SCHEMAS_DIR, 'common', 'defs.schema.yaml');
-  const defs = loadYamlFile(defsPath) as {
+  const primitivesPath = join(SCHEMAS_DIR, 'defs', 'primitives.defs.yaml');
+  const defs = loadYamlFile(primitivesPath) as {
     $defs?: Record<string, { pattern?: string }>;
   };
 
@@ -276,12 +276,12 @@ export function extractCommonProperties(): CommonPropertiesConfig {
 // =============================================================================
 
 /**
- * Extract category configuration from defs.schema.yaml.
+ * Extract category configuration from shared.defs.yaml.
  * Reads x-ubml-categories for display order and naming.
  */
 export function extractCategoryConfig(): CategoryConfig[] {
-  const defsPath = join(SCHEMAS_DIR, 'common', 'defs.schema.yaml');
-  const defs = loadYamlFile(defsPath) as {
+  const sharedPath = join(SCHEMAS_DIR, 'defs', 'shared.defs.yaml');
+  const defs = loadYamlFile(sharedPath) as {
     'x-ubml-categories'?: CategoryConfig[];
   };
 
@@ -375,19 +375,22 @@ export function extractReferenceFields(): string[] {
     }
   }
 
-  // Walk all document and fragment schemas
+  // Walk all document and type schemas
   const documentsDir = join(SCHEMAS_DIR, 'documents');
-  const fragmentsDir = join(SCHEMAS_DIR, 'fragments');
-  const defsPath = join(SCHEMAS_DIR, 'common', 'defs.schema.yaml');
+  const typesDir = join(SCHEMAS_DIR, 'types');
+  const defsDir = join(SCHEMAS_DIR, 'defs');
 
-  walkSchema(loadYamlFile(defsPath));
+  // Walk all defs files
+  for (const file of readdirSync(defsDir).filter((f: string) => f.endsWith('.yaml'))) {
+    walkSchema(loadYamlFile(join(defsDir, file)));
+  }
 
   for (const file of readdirSync(documentsDir).filter((f: string) => f.endsWith('.yaml'))) {
     walkSchema(loadYamlFile(join(documentsDir, file)));
   }
 
-  for (const file of readdirSync(fragmentsDir).filter((f: string) => f.endsWith('.yaml'))) {
-    walkSchema(loadYamlFile(join(fragmentsDir, file)));
+  for (const file of readdirSync(typesDir).filter((f: string) => f.endsWith('.yaml'))) {
+    walkSchema(loadYamlFile(join(typesDir, file)));
   }
 
   return Array.from(refFieldsSet).sort();
@@ -600,13 +603,17 @@ export function extractToolingHints(): ToolingHints {
   }
 
   // Load all schemas and extract hints
-  const defsSchema = loadYamlFile(join(SCHEMAS_DIR, 'common', 'defs.schema.yaml'));
-  const fragmentsDir = join(SCHEMAS_DIR, 'fragments');
+  const defsDir = join(SCHEMAS_DIR, 'defs');
+  const typesDir = join(SCHEMAS_DIR, 'types');
   
-  walkDefs(defsSchema);
+  // Walk all defs files
+  for (const file of readdirSync(defsDir).filter((f: string) => f.endsWith('.yaml'))) {
+    walkDefs(loadYamlFile(join(defsDir, file)));
+  }
   
-  for (const file of readdirSync(fragmentsDir).filter((f: string) => f.endsWith('.yaml'))) {
-    walkDefs(loadYamlFile(join(fragmentsDir, file)));
+  // Walk all type files
+  for (const file of readdirSync(typesDir).filter((f: string) => f.endsWith('.yaml'))) {
+    walkDefs(loadYamlFile(join(typesDir, file)));
   }
 
   return { patterns, nestedProperties, enums };

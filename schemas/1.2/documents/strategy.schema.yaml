@@ -96,7 +96,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^VS\\d{5,}$":
-        $ref: "../fragments/strategy.fragment.yaml#/$defs/ValueStream"
+        $ref: "../types/strategy.types.yaml#/$defs/ValueStream"
   
   capabilities:
     description: |
@@ -116,7 +116,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^CP\\d{5,}$":
-        $ref: "../fragments/strategy.fragment.yaml#/$defs/Capability"
+        $ref: "../types/strategy.types.yaml#/$defs/Capability"
   
   products:
     description: |
@@ -135,7 +135,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^PD\\d{5,}$":
-        $ref: "../fragments/strategy.fragment.yaml#/$defs/Product"
+        $ref: "../types/strategy.types.yaml#/$defs/Product"
   
   services:
     description: |
@@ -154,7 +154,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^SV\\d{5,}$":
-        $ref: "../fragments/strategy.fragment.yaml#/$defs/Service"
+        $ref: "../types/strategy.types.yaml#/$defs/Service"
   
   portfolios:
     description: |
@@ -172,7 +172,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^PF\\d{5,}$":
-        $ref: "../fragments/strategy.fragment.yaml#/$defs/Portfolio"
+        $ref: "../types/strategy.types.yaml#/$defs/Portfolio"
   
   metadata:
     description: "Document metadata."
@@ -198,4 +198,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

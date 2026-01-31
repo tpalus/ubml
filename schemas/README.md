@@ -12,22 +12,27 @@ The schema follows a three-tier architecture for maintainability and modularity:
 schemas/
 ├── ubml.schema.yaml              # Root schema - validates complete UBML files
 │
-├── common/                       # Layer 1: Shared Definitions
-│   └── defs.schema.yaml          # References, primitives, expressions
+├── defs/                         # Layer 1: Shared Definitions
+│   ├── refs.defs.yaml            # ID reference types (ActorRef, StepRef, etc.)
+│   ├── primitives.defs.yaml      # Duration, Money, Rate, Expression, Calendar
+│   └── shared.defs.yaml          # CustomFields, Annotations, Priority, Outcomes
 │
-├── fragments/                    # Layer 2: Reusable Type Definitions
-│   ├── actor.fragment.yaml       # Actor, Persona
-│   ├── entity.fragment.yaml      # Entity, Document, Location
-│   ├── hypothesis.fragment.yaml  # SCQH, HypothesisNode, HypothesisTree
-│   ├── link.fragment.yaml        # Link definitions
-│   ├── metrics.fragment.yaml     # KPI, ROI
-│   ├── mining.fragment.yaml      # Mining source, mappings
-│   ├── process.fragment.yaml     # Process, Phase
-│   ├── resource.fragment.yaml    # Skill, ResourcePool, Equipment
-│   ├── scenario.fragment.yaml    # Scenario, WorkAttribute
-│   ├── step.fragment.yaml        # Step, Block, RACI, ProcessCall
-│   ├── strategy.fragment.yaml    # ValueStream, Capability, Product
-│   └── view.fragment.yaml        # View definitions
+├── types/                        # Layer 2: Reusable Type Definitions
+│   ├── actor.types.yaml          # Actor, Persona
+│   ├── block.types.yaml          # Block (control flow)
+│   ├── document.types.yaml       # Document (data object)
+│   ├── entity.types.yaml         # Entity, Attribute, Relationship
+│   ├── hypothesis.types.yaml     # HypothesisTree, HypothesisNode, SCQHContext
+│   ├── link.types.yaml           # Link, SchedulingProperties
+│   ├── location.types.yaml       # Location
+│   ├── metrics.types.yaml        # KPI, KPIThreshold, ROI
+│   ├── mining.types.yaml         # MiningSource, ActivityMapping, ResourceMapping
+│   ├── process.types.yaml        # Process, Phase
+│   ├── resource.types.yaml       # Skill, ResourcePool, Equipment
+│   ├── scenario.types.yaml       # Scenario, WorkAttribute, Arrivals
+│   ├── step.types.yaml           # Step, RACI, Loop, ProcessCall, Approval, Review
+│   ├── strategy.types.yaml       # ValueStream, Capability, Product, Service
+│   └── view.types.yaml           # View, ViewFilter, ViewStyling
 │
 └── documents/                    # Layer 3: File-Level Validation
     ├── actors.schema.yaml        # *.actors.ubml.yaml
@@ -58,7 +63,7 @@ schemas/
          ▼                        ▼                            ▼
 ┌─────────────────┐    ┌─────────────────┐          ┌─────────────────┐
 │   documents/    │    │   documents/    │          │   documents/    │
-│ process.document│    │ actors.document │   ...    │ hypotheses.doc  │
+│ process.schema  │    │ actors.schema   │   ...    │ hypotheses.*    │
 │                 │    │                 │          │                 │
 │ Validates:      │    │ Validates:      │          │ Validates:      │
 │ *.process.ubml  │    │ *.actors.ubml   │          │ *.hypotheses.*  │
@@ -66,15 +71,15 @@ schemas/
          │                      │                            │
          ▼                      ▼                            ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         fragments/                                  │
+│                            types/                                   │
 │              Reusable type definitions ($defs)                      │
 │                 Imported via $ref by documents                      │
 └─────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                     common/defs.schema.yaml                         │
-│          Foundation: primitives, refs, expressions                  │
+│                            defs/                                    │
+│        Foundation: refs, primitives, shared definitions             │
 │                    Always required by all schemas                   │
 └─────────────────────────────────────────────────────────────────────┘
 ```

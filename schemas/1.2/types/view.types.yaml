@@ -1,13 +1,13 @@
 # ============================================================================
-# UBML View Fragment Schema
+# UBML View Types Schema
 # ============================================================================
 # Defines custom views and diagram configurations.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/view.fragment.yaml"
-title: "UBML View Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/view.types.yaml"
+title: "UBML View Types"
 description: |
   Views are custom perspectives on the process model that highlight
   specific aspects for different audiences or purposes.
@@ -336,11 +336,11 @@ $defs:
       
       process:
         description: "Process to display (for process views)."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
       valueStream:
         description: "Value stream to display (for value-stream views)."
-        $ref: "../common/defs.schema.yaml#/$defs/ValueStreamRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ValueStreamRef"
       
       filters:
         description: "Filters to apply to the view."
@@ -391,11 +391,11 @@ $defs:
       # Comparison view properties
       baseScenario:
         description: "Base scenario for comparison views."
-        $ref: "../common/defs.schema.yaml#/$defs/ScenarioRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ScenarioRef"
       
       compareScenario:
         description: "Comparison scenario."
-        $ref: "../common/defs.schema.yaml#/$defs/ScenarioRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ScenarioRef"
       
       highlightDifferences:
         description: "Whether to highlight differences in comparison."
@@ -407,7 +407,7 @@ $defs:
         description: "KPIs to display (for metrics views)."
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/KPIRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/KPIRef"
       
       audience:
         description: |
@@ -430,7 +430,7 @@ $defs:
       
       owner:
         description: "View owner."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       tags:
         description: "Tags for filtering and views."
@@ -440,4 +440,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

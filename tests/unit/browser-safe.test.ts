@@ -170,11 +170,11 @@ processes:
       expect(processSchema.$id).toContain('process');
     });
 
-    it('should provide fragment schema by name', () => {
-      const actorFragment = schemas.fragment('actor');
+    it('should provide type schema by name', () => {
+      const actorType = schemas.type('actor');
       
-      expect(actorFragment).toBeDefined();
-      expect(actorFragment.$id).toContain('actor');
+      expect(actorType).toBeDefined();
+      expect(actorType.$id).toContain('actor');
     });
 
     it('should list all available document types', () => {

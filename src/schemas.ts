@@ -18,12 +18,14 @@
  * ```
  */
 
-import { type DocumentType, SCHEMA_VERSION, DOCUMENT_TYPES, FRAGMENT_NAMES } from './metadata.js';
+import { type DocumentType, SCHEMA_VERSION, DOCUMENT_TYPES } from './metadata.js';
 import {
   rootSchema,
-  defsSchema,
+  refsDefsSchema,
+  primitivesDefsSchema,
+  sharedDefsSchema,
   documentSchemas,
-  fragmentSchemas,
+  typeSchemas,
   getAllSchemasById,
 } from './generated/bundled.js';
 
@@ -71,17 +73,17 @@ export const schemas = {
   },
 
   /**
-   * Get a fragment schema by name.
+   * Get a type schema by name.
    * 
    * @example
    * ```typescript
-   * const stepSchema = schemas.fragment('step');
+   * const stepSchema = schemas.type('step');
    * ```
    */
-  fragment(name: string): JSONSchema {
-    const schema = fragmentSchemas[name];
+  type(name: string): JSONSchema {
+    const schema = typeSchemas[name];
     if (!schema) {
-      throw new Error(`Unknown fragment: ${name}`);
+      throw new Error(`Unknown type: ${name}`);
     }
     return schema as JSONSchema;
   },
@@ -94,10 +96,15 @@ export const schemas = {
   },
 
   /**
-   * Get the common definitions schema.
+   * Get the common definitions schemas.
+   * Returns an object with refs, primitives, and shared defs.
    */
-  defs(): JSONSchema {
-    return defsSchema as JSONSchema;
+  defs(): { refs: JSONSchema; primitives: JSONSchema; shared: JSONSchema } {
+    return {
+      refs: refsDefsSchema as JSONSchema,
+      primitives: primitivesDefsSchema as JSONSchema,
+      shared: sharedDefsSchema as JSONSchema,
+    };
   },
 
   /**
@@ -122,12 +129,5 @@ export const schemas = {
    */
   documentTypes(): readonly DocumentType[] {
     return DOCUMENT_TYPES;
-  },
-
-  /**
-   * List all available fragment names.
-   */
-  fragmentNames(): readonly string[] {
-    return FRAGMENT_NAMES;
   },
 } as const;

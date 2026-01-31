@@ -7,7 +7,7 @@
  * @module ubml/schema/derive
  */
 
-import { defsSchema } from '../generated/bundled.js';
+import { refsDefsSchema } from '../generated/bundled.js';
 import type { IdPrefix } from '../metadata.js';
 import { getCategorySortOrder } from '../metadata.js';
 
@@ -49,7 +49,7 @@ export interface IdPrefixMetadata {
  * Reads x-ubml extensions from $defs/*Ref definitions.
  */
 export function getAllIdPrefixMetadata(): IdPrefixMetadata[] {
-  const defs = (defsSchema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
+  const defs = (refsDefsSchema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>> | undefined;
   if (!defs) return [];
 
   const result: IdPrefixMetadata[] = [];

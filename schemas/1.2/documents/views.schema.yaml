@@ -97,7 +97,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^VW\\d{5,}$":
-        $ref: "../fragments/view.fragment.yaml#/$defs/View"
+        $ref: "../types/view.types.yaml#/$defs/View"
   
   metadata:
     description: "Document metadata."
@@ -123,4 +123,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

@@ -6,14 +6,14 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { defsSchema, documentSchemas } from '../../src/generated/bundled.js';
+import { refsDefsSchema, sharedDefsSchema, documentSchemas } from '../../src/generated/bundled.js';
 import { DOCUMENT_TYPES } from '../../src/metadata.js';
 
 describe('Schema Completeness - NO FALLBACKS ALLOWED', () => {
   
-  describe('Ref types in defs.schema.yaml', () => {
+  describe('Ref types in refs.defs.yaml', () => {
     it('should have complete x-ubml metadata for ALL Ref types', () => {
-      const defs = (defsSchema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>>;
+      const defs = (refsDefsSchema as Record<string, unknown>).$defs as Record<string, Record<string, unknown>>;
       const refTypes = Object.entries(defs).filter(([name]) => name.endsWith('Ref'));
       
       expect(refTypes.length).toBeGreaterThan(0);
@@ -61,10 +61,10 @@ describe('Schema Completeness - NO FALLBACKS ALLOWED', () => {
   });
   
   describe('Category configuration', () => {
-    it('should have complete category definitions in defs.schema.yaml', () => {
-      const categories = (defsSchema as Record<string, unknown>)['x-ubml-categories'] as unknown[];
+    it('should have complete category definitions in shared.defs.yaml', () => {
+      const categories = (sharedDefsSchema as Record<string, unknown>)['x-ubml-categories'] as unknown[];
       
-      expect(categories, 'defs.schema.yaml must define x-ubml-categories').toBeDefined();
+      expect(categories, 'shared.defs.yaml must define x-ubml-categories').toBeDefined();
       expect(Array.isArray(categories), 'x-ubml-categories must be an array').toBe(true);
       expect(categories.length, 'x-ubml-categories must not be empty').toBeGreaterThan(0);
       
@@ -78,10 +78,10 @@ describe('Schema Completeness - NO FALLBACKS ALLOWED', () => {
   });
   
   describe('ID configuration', () => {
-    it('should have complete ID config in defs.schema.yaml', () => {
-      const idConfig = (defsSchema as Record<string, unknown>)['x-ubml-id-config'] as Record<string, unknown> | undefined;
+    it('should have complete ID config in shared.defs.yaml', () => {
+      const idConfig = (sharedDefsSchema as Record<string, unknown>)['x-ubml-id-config'] as Record<string, unknown> | undefined;
       
-      expect(idConfig, 'defs.schema.yaml must define x-ubml-id-config').toBeDefined();
+      expect(idConfig, 'shared.defs.yaml must define x-ubml-id-config').toBeDefined();
       expect(idConfig!.digitLength, 'x-ubml-id-config must define digitLength').toBeDefined();
       expect(idConfig!.pattern, 'x-ubml-id-config must define pattern').toBeDefined();
       expect(idConfig!.initOffset, 'x-ubml-id-config must define initOffset').toBeDefined();

@@ -86,7 +86,7 @@ properties:
               orderId: approvedOrderId
     type: array
     items:
-      $ref: "../fragments/link.fragment.yaml#/$defs/Link"
+      $ref: "../types/link.types.yaml#/$defs/Link"
   
   metadata:
     description: "Document metadata."
@@ -112,4 +112,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

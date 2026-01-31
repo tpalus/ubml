@@ -137,7 +137,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^PR\\d{5,}$":
-        $ref: "fragments/process.fragment.yaml#/$defs/Process"
+        $ref: "types/process.types.yaml#/$defs/Process"
   
   # ══════════════════════════════════════════════════════════════════════════
   # ACTORS & RESOURCES
@@ -151,7 +151,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^AC\\d{5,}$":
-        $ref: "fragments/actor.fragment.yaml#/$defs/Actor"
+        $ref: "types/actor.types.yaml#/$defs/Actor"
   
   skills:
     description: |
@@ -161,7 +161,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^SK\\d{5,}$":
-        $ref: "fragments/resource.fragment.yaml#/$defs/Skill"
+        $ref: "types/resource.types.yaml#/$defs/Skill"
   
   resourcePools:
     description: |
@@ -171,7 +171,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^RP\\d{5,}$":
-        $ref: "fragments/resource.fragment.yaml#/$defs/ResourcePool"
+        $ref: "types/resource.types.yaml#/$defs/ResourcePool"
   
   equipment:
     description: |
@@ -181,7 +181,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^EQ\\d{5,}$":
-        $ref: "fragments/resource.fragment.yaml#/$defs/Equipment"
+        $ref: "types/resource.types.yaml#/$defs/Equipment"
   
   # ══════════════════════════════════════════════════════════════════════════
   # INFORMATION MODEL
@@ -195,7 +195,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^EN\\d{5,}$":
-        $ref: "fragments/entity.fragment.yaml#/$defs/Entity"
+        $ref: "types/entity.types.yaml#/$defs/Entity"
   
   documents:
     description: |
@@ -205,7 +205,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^DC\\d{5,}$":
-        $ref: "fragments/entity.fragment.yaml#/$defs/Document"
+        $ref: "types/entity.types.yaml#/$defs/Document"
   
   locations:
     description: |
@@ -215,7 +215,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^LO\\d{5,}$":
-        $ref: "fragments/entity.fragment.yaml#/$defs/Location"
+        $ref: "types/entity.types.yaml#/$defs/Location"
   
   # ══════════════════════════════════════════════════════════════════════════
   # SCENARIOS & SIMULATION
@@ -229,7 +229,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^SC\\d{5,}$":
-        $ref: "fragments/scenario.fragment.yaml#/$defs/Scenario"
+        $ref: "types/scenario.types.yaml#/$defs/Scenario"
   
   # ══════════════════════════════════════════════════════════════════════════
   # HYPOTHESIS TREES
@@ -243,7 +243,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^HT\\d{5,}$":
-        $ref: "fragments/hypothesis.fragment.yaml#/$defs/HypothesisTree"
+        $ref: "types/hypothesis.types.yaml#/$defs/HypothesisTree"
   
   # ══════════════════════════════════════════════════════════════════════════
   # STRATEGY
@@ -257,7 +257,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^VS\\d{5,}$":
-        $ref: "fragments/strategy.fragment.yaml#/$defs/ValueStream"
+        $ref: "types/strategy.types.yaml#/$defs/ValueStream"
   
   capabilities:
     description: |
@@ -267,7 +267,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^CP\\d{5,}$":
-        $ref: "fragments/strategy.fragment.yaml#/$defs/Capability"
+        $ref: "types/strategy.types.yaml#/$defs/Capability"
   
   products:
     description: |
@@ -277,7 +277,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^PD\\d{5,}$":
-        $ref: "fragments/strategy.fragment.yaml#/$defs/Product"
+        $ref: "types/strategy.types.yaml#/$defs/Product"
   
   services:
     description: |
@@ -287,7 +287,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^SV\\d{5,}$":
-        $ref: "fragments/strategy.fragment.yaml#/$defs/Service"
+        $ref: "types/strategy.types.yaml#/$defs/Service"
   
   portfolios:
     description: |
@@ -297,7 +297,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^PF\\d{5,}$":
-        $ref: "fragments/strategy.fragment.yaml#/$defs/Portfolio"
+        $ref: "types/strategy.types.yaml#/$defs/Portfolio"
   
   # ══════════════════════════════════════════════════════════════════════════
   # METRICS & ROI
@@ -311,7 +311,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^KP\\d{5,}$":
-        $ref: "fragments/metrics.fragment.yaml#/$defs/KPI"
+        $ref: "types/metrics.types.yaml#/$defs/KPI"
   
   roiAnalyses:
     description: |
@@ -321,7 +321,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^ROI\\d{5,}$":
-        $ref: "fragments/metrics.fragment.yaml#/$defs/ROI"
+        $ref: "types/metrics.types.yaml#/$defs/ROI"
   
   # ══════════════════════════════════════════════════════════════════════════
   # PROCESS MINING
@@ -335,7 +335,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^MS\\d{5,}$":
-        $ref: "fragments/mining.fragment.yaml#/$defs/MiningSource"
+        $ref: "types/mining.types.yaml#/$defs/MiningSource"
   
   # ══════════════════════════════════════════════════════════════════════════
   # VIEWS
@@ -349,7 +349,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^VW\\d{5,}$":
-        $ref: "fragments/view.fragment.yaml#/$defs/View"
+        $ref: "types/view.types.yaml#/$defs/View"
   
   # ══════════════════════════════════════════════════════════════════════════
   # CROSS-REFERENCES
@@ -360,7 +360,7 @@ properties:
       Cross-process links.
     type: array
     items:
-      $ref: "fragments/link.fragment.yaml#/$defs/Link"
+      $ref: "types/link.types.yaml#/$defs/Link"
   
   # ══════════════════════════════════════════════════════════════════════════
   # METADATA
@@ -389,13 +389,13 @@ properties:
   
   owner:
     description: "Document owner."
-    $ref: "common/defs.schema.yaml#/$defs/ActorRef"
+    $ref: "defs/refs.defs.yaml#/$defs/ActorRef"
   
   stakeholders:
     description: "Key stakeholders."
     type: array
     items:
-      $ref: "common/defs.schema.yaml#/$defs/ActorRef"
+      $ref: "defs/refs.defs.yaml#/$defs/ActorRef"
   
   tags:
     description: "Tags for filtering and organization."
@@ -405,4 +405,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "defs/shared.defs.yaml#/$defs/CustomFields"

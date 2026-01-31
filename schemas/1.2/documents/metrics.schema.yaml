@@ -99,7 +99,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^KP\\d{5,}$":
-        $ref: "../fragments/metrics.fragment.yaml#/$defs/KPI"
+        $ref: "../types/metrics.types.yaml#/$defs/KPI"
   
   roiAnalyses:
     description: |
@@ -126,7 +126,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^ROI\\d{5,}$":
-        $ref: "../fragments/metrics.fragment.yaml#/$defs/ROI"
+        $ref: "../types/metrics.types.yaml#/$defs/ROI"
   
   metadata:
     description: "Document metadata."
@@ -152,4 +152,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

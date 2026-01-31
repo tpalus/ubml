@@ -98,7 +98,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^AC\\d{5,}$":
-        $ref: "../fragments/actor.fragment.yaml#/$defs/Actor"
+        $ref: "../types/actor.types.yaml#/$defs/Actor"
   
   skills:
     description: |
@@ -116,7 +116,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^SK\\d{5,}$":
-        $ref: "../fragments/resource.fragment.yaml#/$defs/Skill"
+        $ref: "../types/resource.types.yaml#/$defs/Skill"
   
   resourcePools:
     description: |
@@ -135,7 +135,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^RP\\d{5,}$":
-        $ref: "../fragments/resource.fragment.yaml#/$defs/ResourcePool"
+        $ref: "../types/resource.types.yaml#/$defs/ResourcePool"
   
   equipment:
     description: |
@@ -154,7 +154,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^EQ\\d{5,}$":
-        $ref: "../fragments/resource.fragment.yaml#/$defs/Equipment"
+        $ref: "../types/resource.types.yaml#/$defs/Equipment"
   
   metadata:
     description: "Document metadata."
@@ -180,4 +180,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

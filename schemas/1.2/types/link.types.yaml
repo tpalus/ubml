@@ -1,13 +1,13 @@
 # ============================================================================
-# UBML Link Fragment Schema
+# UBML Link Types Schema
 # ============================================================================
 # Unified link type for routing, scheduling, and dependencies.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/link.fragment.yaml"
-title: "UBML Link Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/link.types.yaml"
+title: "UBML Link Types"
 description: |
   Links represent relationships between steps. In UBML, links unify three 
   concerns that are often separated in other process modeling notations:
@@ -63,13 +63,13 @@ $defs:
             "1d" - 1 day delay
             "-2h" - 2 hour overlap
             "30min" - 30 minute delay
-        $ref: "../common/defs.schema.yaml#/$defs/Duration"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
       
       priority:
         description: |
           Scheduling priority for resource-constrained scenarios.
           Higher priority links are scheduled first.
-        $ref: "../common/defs.schema.yaml#/$defs/Priority"
+        $ref: "../defs/shared.defs.yaml#/$defs/Priority"
 
   # ==========================================================================
   # LINK DEFINITION
@@ -134,11 +134,11 @@ $defs:
     properties:
       from:
         description: "Source step ID."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       to:
         description: "Target step ID."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       condition:
         description: |
@@ -148,7 +148,7 @@ $defs:
             condition: "amount > 10000"
             condition: "status == 'approved'"
             condition: requiresManagerApproval
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
       
       probability:
         description: |
@@ -200,4 +200,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

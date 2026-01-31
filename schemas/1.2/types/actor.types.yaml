@@ -1,16 +1,16 @@
 # ============================================================================
-# UBML Actor Fragment Schema
+# UBML Actor Types Schema
 # ============================================================================
 # Defines actors and personas - the participants in business processes.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/actor.fragment.yaml"
-title: "UBML Actor Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/actor.types.yaml"
+title: "UBML Actor Types"
 description: |
   Actors represent WHO does work in your business processes.
-  This fragment defines Actor and Persona types.
+  This schema defines Actor and Persona types.
 
 $defs:
 
@@ -131,7 +131,7 @@ $defs:
               amount: 75
               currency: "EUR"
               per: h
-        $ref: "../common/defs.schema.yaml#/$defs/Rate"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Rate"
       
       party:
         description: |
@@ -139,13 +139,13 @@ $defs:
           Used for containment/ownership hierarchy.
           
           Example: A role belongs to a team, which belongs to an organization.
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       reportsTo:
         description: |
           Reporting line (actor ID).
           Used for management hierarchy, separate from containment.
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       skills:
         description: |
@@ -160,7 +160,7 @@ $defs:
         type: array
         items:
           oneOf:
-            - $ref: "../common/defs.schema.yaml#/$defs/SkillRef"
+            - $ref: "../defs/refs.defs.yaml#/$defs/SkillRef"
             - $ref: "#/$defs/ActorSkill"
       
       description:
@@ -178,7 +178,7 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
 
   # ==========================================================================
   # ACTOR SKILL (with optional proficiency)
@@ -200,7 +200,7 @@ $defs:
     properties:
       skill:
         description: "Skill ID reference."
-        $ref: "../common/defs.schema.yaml#/$defs/SkillRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/SkillRef"
       level:
         description: |
           Proficiency level (1-5).
@@ -298,7 +298,7 @@ $defs:
           Links the archetype to actual organizational roles.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       goals:
         description: |

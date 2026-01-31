@@ -97,7 +97,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^SC\\d{5,}$":
-        $ref: "../fragments/scenario.fragment.yaml#/$defs/Scenario"
+        $ref: "../types/scenario.types.yaml#/$defs/Scenario"
   
   metadata:
     description: "Document metadata."
@@ -123,4 +123,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

@@ -1,13 +1,13 @@
 # ============================================================================
-# UBML Scenario Fragment Schema
+# UBML Scenario Types Schema
 # ============================================================================
 # Defines scenarios for simulation and work mix analysis.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/scenario.fragment.yaml"
-title: "UBML Scenario Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/scenario.types.yaml"
+title: "UBML Scenario Types"
 description: |
   Scenarios enable simulation and "what-if" analysis by defining:
   - Work arrivals (how work enters the process)
@@ -283,7 +283,7 @@ $defs:
       
       burstInterval:
         description: "For burst pattern: time between bursts."
-        $ref: "../common/defs.schema.yaml#/$defs/Duration"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
       
       seasonality:
         description: |
@@ -358,11 +358,11 @@ $defs:
       
       step:
         description: "Step this evidence relates to (if step-specific)."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       process:
         description: "Process this evidence relates to (if process-level)."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
       observedAt:
         description: "Date/time of observation (ISO 8601)."
@@ -449,7 +449,7 @@ $defs:
         description: |
           Parent scenario this inherits from.
           Used for scenario variations.
-        $ref: "../common/defs.schema.yaml#/$defs/ScenarioRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ScenarioRef"
       
       arrivals:
         description: "Work arrival patterns."
@@ -482,10 +482,10 @@ $defs:
         properties:
           warmupPeriod:
             description: "Simulation warmup period to discard."
-            $ref: "../common/defs.schema.yaml#/$defs/Duration"
+            $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
           runLength:
             description: "Total simulation run length."
-            $ref: "../common/defs.schema.yaml#/$defs/Duration"
+            $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
           replications:
             description: "Number of simulation replications."
             type: integer
@@ -503,4 +503,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

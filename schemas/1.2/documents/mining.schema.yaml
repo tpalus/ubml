@@ -99,7 +99,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^MS\\d{5,}$":
-        $ref: "../fragments/mining.fragment.yaml#/$defs/MiningSource"
+        $ref: "../types/mining.types.yaml#/$defs/MiningSource"
   
   metadata:
     description: "Document metadata."
@@ -125,4 +125,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

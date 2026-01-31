@@ -1,20 +1,20 @@
 # ============================================================================
-# UBML Entity Fragment Schema
+# UBML Entity Types Schema
 # ============================================================================
-# Defines information model entities: data entities, documents, and locations.
+# Defines data entities, attributes, and relationships in the information model.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/entity.fragment.yaml"
-title: "UBML Entity Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/entity.types.yaml"
+title: "UBML Entity Types"
 description: |
-  Information model entities representing the data landscape of a process.
+  Data entities representing the structured business objects in a process.
   
-  Entities fall into three categories:
-  - Data Entities: Business objects that hold structured data
-  - Documents: Physical or digital documents that carry information
-  - Locations: Physical or logical places where work happens
+  Entities are business objects that:
+  - Are created, read, updated, or deleted by process steps
+  - Have structured attributes with defined types
+  - Have relationships to other entities
 
 $defs:
 
@@ -48,7 +48,7 @@ $defs:
     properties:
       target:
         description: "Target entity ID."
-        $ref: "../common/defs.schema.yaml#/$defs/EntityRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
       
       type:
         description: "Cardinality of the relationship."
@@ -167,7 +167,7 @@ $defs:
       ref:
         description: |
           For type=reference, the target entity ID.
-        $ref: "../common/defs.schema.yaml#/$defs/EntityRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
       
       default:
         description: "Default value for the attribute."
@@ -274,233 +274,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
-
-  # ==========================================================================
-  # DOCUMENT
-  # ==========================================================================
-
-  Document:
-    description: |
-      A document in the information model.
-      
-      Documents represent physical or digital files that:
-      - Are inputs to or outputs from process steps
-      - Have a format (PDF, Word, Excel, etc.)
-      - May require signatures or approvals
-      - May be templates or generated documents
-      
-      DOCUMENT EXAMPLES:
-      - Contract, Invoice, Purchase Order, Report
-      - Application Form, Approval Form, Checklist
-      - Technical Drawing, Specification, Manual
-      
-      DOCUMENT vs ENTITY:
-      Documents have file content and format.
-      Entities are structured data in systems.
-      
-      Example:
-        DC001:
-          name: Contract Agreement
-          format: pdf
-          description: "Signed contract between parties"
-          isTemplate: false
-          requiresSignature: true
-    type: object
-    additionalProperties: false
-    required: [name]
-    properties:
-      name:
-        description: "Human-readable document name."
-        type: string
-      
-      description:
-        description: "Detailed description of the document."
-        type: string
-      
-      format:
-        description: |
-          Document format or file type.
-          
-          Examples: "pdf", "docx", "xlsx", "jpg", "dwg"
-        type: string
-      
-      isTemplate:
-        description: |
-          Whether this is a template document.
-          Templates are used to generate actual documents.
-        type: boolean
-        default: false
-      
-      templateSource:
-        description: |
-          For generated documents, the template document ID.
-        $ref: "../common/defs.schema.yaml#/$defs/DocumentRef"
-      
-      requiresSignature:
-        description: "Whether the document requires signature(s)."
-        type: boolean
-        default: false
-      
-      signatureCount:
-        description: "Number of signatures required."
-        type: integer
-        minimum: 0
-      
-      retentionPeriod:
-        description: |
-          How long the document must be retained.
-          
-          Example: "7y" (7 years)
-        $ref: "../common/defs.schema.yaml#/$defs/Duration"
-      
-      confidentiality:
-        description: |
-          Confidentiality classification.
-          
-          Common values:
-          - public: No restrictions
-          - internal: Internal use only
-          - confidential: Restricted access
-          - secret: Highly restricted
-        type: string
-        enum: [public, internal, confidential, secret]
-      
-      system:
-        description: |
-          System or repository where this document is stored.
-          
-          Example: "SharePoint", "DMS", "Archive System"
-        type: string
-      
-      relatedEntity:
-        description: |
-          Entity this document relates to or is attached to.
-          
-          Example: A contract document relates to a Contract entity.
-        $ref: "../common/defs.schema.yaml#/$defs/EntityRef"
-      
-      tags:
-        description: "Tags for filtering and views."
-        type: array
-        items:
-          type: string
-      
-      custom:
-        description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
-
-  # ==========================================================================
-  # LOCATION
-  # ==========================================================================
-
-  Location:
-    description: |
-      A physical or logical location where work happens.
-      
-      Locations are important for:
-      - Understanding where work is performed
-      - Modeling travel time between locations
-      - Capacity planning for physical spaces
-      - Compliance with location-specific regulations
-      
-      LOCATION EXAMPLES:
-      - Office, Warehouse, Factory, Store
-      - Field Site, Customer Premises
-      - Data Center, Cloud Region
-      
-      Example:
-        LO001:
-          name: Main Warehouse
-          type: warehouse
-          address: "123 Industrial Blvd, City"
-          capacity: 1000
-          capacityUnit: "pallets"
-    type: object
-    additionalProperties: false
-    required: [name]
-    properties:
-      name:
-        description: "Human-readable location name."
-        type: string
-      
-      description:
-        description: "Detailed description of the location."
-        type: string
-      
-      type:
-        description: |
-          Location type classification.
-        type: string
-        examples:
-          - office
-          - warehouse
-          - factory
-          - store
-          - field
-          - customer-site
-          - data-center
-          - remote
-      
-      address:
-        description: "Physical address, if applicable."
-        type: string
-      
-      coordinates:
-        description: |
-          Geographic coordinates (latitude, longitude).
-          Used for travel time calculations and mapping.
-        type: object
-        additionalProperties: false
-        properties:
-          latitude:
-            type: number
-            minimum: -90
-            maximum: 90
-          longitude:
-            type: number
-            minimum: -180
-            maximum: 180
-      
-      timezone:
-        description: |
-          Timezone for the location (IANA timezone name).
-          
-          Example: "Europe/Prague", "America/New_York"
-        type: string
-      
-      capacity:
-        description: "Location capacity (numeric value)."
-        type: number
-        minimum: 0
-      
-      capacityUnit:
-        description: |
-          Unit of capacity measurement.
-          
-          Examples: "people", "pallets", "vehicles", "desks"
-        type: string
-      
-      workingHours:
-        description: |
-          Working hours for this location.
-          
-          Example: "Mon-Fri 08:00-17:00"
-        type: string
-      
-      parent:
-        description: |
-          Parent location for hierarchical structure.
-          
-          Example: A warehouse inside a larger logistics hub.
-        $ref: "../common/defs.schema.yaml#/$defs/LocationRef"
-      
-      tags:
-        description: "Tags for filtering and views."
-        type: array
-        items:
-          type: string
-      
-      custom:
-        description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

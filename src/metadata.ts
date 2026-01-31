@@ -14,7 +14,7 @@
 
 import {
   DOCUMENT_TYPES,
-  FRAGMENT_NAMES,
+  TYPE_NAMES,
   SCHEMA_PATHS,
   ID_CONFIG,
   ID_PREFIXES,
@@ -27,7 +27,7 @@ import {
   NESTED_PROPERTY_HINTS,
   ENUM_HINTS,
   type DocumentType,
-  type FragmentName,
+  type TypeName,
   type IdPrefix,
   type ElementType,
   type CategoryConfigItem,
@@ -39,7 +39,7 @@ import {
 // Re-export data and types for convenience
 export {
   DOCUMENT_TYPES,
-  FRAGMENT_NAMES,
+  TYPE_NAMES,
   SCHEMA_PATHS,
   ID_CONFIG,
   ID_PREFIXES,
@@ -52,7 +52,7 @@ export {
   NESTED_PROPERTY_HINTS,
   ENUM_HINTS,
   type DocumentType,
-  type FragmentName,
+  type TypeName,
   type IdPrefix,
   type ElementType,
   type CategoryConfigItem,

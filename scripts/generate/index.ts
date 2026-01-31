@@ -31,7 +31,7 @@ import { join } from 'path';
 
 import {
   discoverDocumentTypes,
-  discoverFragments,
+  discoverTypes,
   ensureOutputDir,
   OUTPUT_DIR,
   ROOT_DIR,
@@ -64,12 +64,12 @@ async function main() {
 
   ensureOutputDir();
 
-  // Phase 1: Discover document types and fragments
-  console.log('📁 Discovering document types and fragments...');
+  // Phase 1: Discover document types and type definitions
+  console.log('📁 Discovering document types and type definitions...');
   const documentTypes = discoverDocumentTypes();
-  const fragments = discoverFragments();
+  const types = discoverTypes();
   console.log(`   Found ${documentTypes.length} document types: ${documentTypes.join(', ')}`);
-  console.log(`   Found ${fragments.length} fragments: ${fragments.join(', ')}`);
+  console.log(`   Found ${types.length} type definitions: ${types.join(', ')}`);
 
   // Phase 2: Extract ID patterns
   console.log('\n🔍 Extracting ID patterns from defs.schema.yaml...');
@@ -128,7 +128,7 @@ async function main() {
   console.log('\n📝 Generating TypeScript files (DATA ONLY - no functions)...');
 
   // Generate bundled.ts (schemas as data)
-  const bundledSchemas = bundleSchemas(documentTypes, fragments);
+  const bundledSchemas = bundleSchemas(documentTypes, types);
   const bundledContent = generateBundledTs(bundledSchemas);
   writeFileSync(join(OUTPUT_DIR, 'bundled.ts'), bundledContent, 'utf8');
   console.log('   ✓ src/generated/bundled.ts (schema data)');
@@ -136,7 +136,7 @@ async function main() {
   // Generate data.ts (pure data - replaces old metadata.ts)
   const dataContent = generateDataTs(
     documentTypes,
-    fragments,
+    types,
     refInfos,
     refFields,
     toolingHints,

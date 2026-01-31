@@ -1,16 +1,16 @@
 # ============================================================================
-# UBML Process Fragment Schema
+# UBML Process Types Schema
 # ============================================================================
 # Defines processes, phases, and cross-process triggers.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/process.fragment.yaml"
-title: "UBML Process Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/process.types.yaml"
+title: "UBML Process Types"
 description: |
   Processes are the core workflows containing steps, links, and control flow.
-  This fragment defines Process, Phase, and ProcessTrigger types.
+  This schema defines Process, Phase, and ProcessTrigger types.
 
 $defs:
 
@@ -120,19 +120,19 @@ $defs:
         description: |
           Actor responsible for this phase's completion.
           Typically a role or team, not an individual.
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       startMilestone:
         description: |
           Step ID marking the beginning of this phase.
           MUST reference a step with kind: milestone.
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       endMilestone:
         description: |
           Step ID marking the end of this phase.
           MUST reference a step with kind: milestone.
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       includeSteps:
         description: |
@@ -142,7 +142,7 @@ $defs:
           Note: Steps can only belong to ONE phase of each kind.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       tags:
         description: "Tags for filtering and views."
@@ -152,7 +152,7 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
 
   # ==========================================================================
   # PROCESS DEFINITION
@@ -206,19 +206,19 @@ $defs:
       
       parent:
         description: "Parent process ID for hierarchy."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
       startsWith:
         description: "Step IDs that are entry points to this process."
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       endsWith:
         description: "Step IDs that are exit points from this process."
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       steps:
         description: |
@@ -228,7 +228,7 @@ $defs:
         additionalProperties: false
         patternProperties:
           "^ST\\d{5,}$":
-            $ref: "step.fragment.yaml#/$defs/Step"
+            $ref: "step.types.yaml#/$defs/Step"
       
       links:
         description: |
@@ -236,7 +236,7 @@ $defs:
           Each link can carry both routing and scheduling properties.
         type: array
         items:
-          $ref: "link.fragment.yaml#/$defs/Link"
+          $ref: "link.types.yaml#/$defs/Link"
       
       blocks:
         description: |
@@ -247,7 +247,7 @@ $defs:
         additionalProperties: false
         patternProperties:
           "^BK\\d{5,}$":
-            $ref: "step.fragment.yaml#/$defs/Block"
+            $ref: "block.types.yaml#/$defs/Block"
       
       phases:
         description: |
@@ -277,4 +277,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

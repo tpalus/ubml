@@ -1,13 +1,13 @@
 # ============================================================================
-# UBML Mining Fragment Schema
+# UBML Mining Types Schema
 # ============================================================================
 # Defines process mining configuration and mappings.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/mining.fragment.yaml"
-title: "UBML Mining Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/mining.types.yaml"
+title: "UBML Mining Types"
 description: |
   Process mining configuration for connecting UBML models with event log data.
   
@@ -17,7 +17,7 @@ description: |
   - Identify bottlenecks and variations
   - Validate process improvements
   
-  This fragment enables mapping between:
+  This schema enables mapping between:
   - Event log activities → UBML steps
   - Event log resources → UBML actors
   - Event log attributes → UBML entities
@@ -72,7 +72,7 @@ $defs:
       
       step:
         description: "UBML step ID this activity maps to."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       
       type:
         description: |
@@ -122,7 +122,7 @@ $defs:
       
       actor:
         description: "UBML actor ID this resource maps to."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       type:
         description: |
@@ -164,7 +164,7 @@ $defs:
       
       entity:
         description: "UBML entity this attribute belongs to."
-        $ref: "../common/defs.schema.yaml#/$defs/EntityRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/EntityRef"
       
       field:
         description: "Field name within the entity."
@@ -330,7 +330,7 @@ $defs:
       
       process:
         description: "UBML process this source provides data for."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       
       activityMappings:
         description: "Activity to step mappings."
@@ -413,4 +413,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

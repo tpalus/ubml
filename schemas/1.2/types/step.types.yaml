@@ -1,16 +1,16 @@
 # ============================================================================
-# UBML Step Fragment Schema
+# UBML Step Types Schema
 # ============================================================================
-# Defines steps, blocks, and step-related constructs (RACI, approvals, etc.)
+# Defines step types and step-related constructs.
 #
 # ============================================================================
 
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://ubml.talxis.com/schemas/1.2/fragments/step.fragment.yaml"
-title: "UBML Step Fragment"
+$id: "https://ubml.talxis.com/schemas/1.2/types/step.types.yaml"
+title: "UBML Step Types"
 description: |
   Steps are the building blocks of processes.
-  This fragment defines Step, Block, RACI, Approval, Review, and related types.
+  This schema defines Step, RACI, Approval, Review, and related types.
 
 $defs:
 
@@ -41,7 +41,7 @@ $defs:
     properties:
       to:
         description: "Recipient actor ID."
-        $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       name:
         description: |
           Message name/content.
@@ -101,7 +101,7 @@ $defs:
           Example: [AC010] where AC010 is "Sales Manager" role
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       accountable:
         description: |
           Actor IDs who are ultimately answerable.
@@ -110,7 +110,7 @@ $defs:
           The accountable party has final authority and sign-off.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       consulted:
         description: |
           Actor IDs whose opinions are sought.
@@ -119,7 +119,7 @@ $defs:
           Two-way communication: you ask, they respond.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       informed:
         description: |
           Actor IDs who are kept up-to-date.
@@ -128,7 +128,7 @@ $defs:
           One-way communication: you tell, they receive.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
 
   # ==========================================================================
   # LOOP DEFINITION
@@ -215,7 +215,7 @@ $defs:
     properties:
       process:
         description: "Process ID to invoke."
-        $ref: "../common/defs.schema.yaml#/$defs/ProcessRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/ProcessRef"
       on:
         description: |
           Event that fires the call.
@@ -238,7 +238,7 @@ $defs:
           Examples:
             condition: "order.value > 50000"
             condition: requiresEscalation
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
 
   # ==========================================================================
   # SKILL REQUIREMENT
@@ -260,7 +260,7 @@ $defs:
     properties:
       skill:
         description: "Skill ID reference."
-        $ref: "../common/defs.schema.yaml#/$defs/SkillRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/SkillRef"
       level:
         description: |
           Required proficiency level (1-5).
@@ -298,10 +298,10 @@ $defs:
             delay: "30d"                        # fixed literal
             delay: { expr: "waitPeriod * 1.5" } # calculation
             delay: { expr: standardDelay }      # work attribute
-        $ref: "../common/defs.schema.yaml#/$defs/Duration"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
       relativeTo:
         description: "Step ID the delay is relative to."
-        $ref: "../common/defs.schema.yaml#/$defs/StepRef"
+        $ref: "../defs/refs.defs.yaml#/$defs/StepRef"
       condition:
         description: |
           Expression that must be true for trigger to fire.
@@ -309,7 +309,7 @@ $defs:
           Examples:
             condition: "order.value > 10000"    # calculation
             condition: requiresFollowup         # work attribute
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
 
   # ==========================================================================
   # BATCH DEFINITION
@@ -368,7 +368,7 @@ $defs:
       trigger:
         description: |
           Step lifecycle event that triggers this notification.
-        $ref: "../common/defs.schema.yaml#/$defs/StepLifecycleEvent"
+        $ref: "../defs/shared.defs.yaml#/$defs/StepLifecycleEvent"
       outcome:
         description: |
           For trigger: onOutcome, which outcome triggers this notification.
@@ -380,19 +380,19 @@ $defs:
           If omitted, defaults to raci.informed.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       threshold:
         description: |
           For trigger: onDeadlineWarning, time before deadline to notify.
           Example: "2d" = notify 2 days before deadline expires.
-        $ref: "../common/defs.schema.yaml#/$defs/DurationString"
+        $ref: "../defs/primitives.defs.yaml#/$defs/DurationString"
       priority:
         description: "Notification urgency level."
-        $ref: "../common/defs.schema.yaml#/$defs/Priority"
+        $ref: "../defs/shared.defs.yaml#/$defs/Priority"
       condition:
         description: |
           Guard expression - notification only sent if condition is true.
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
 
   # ==========================================================================
   # APPROVAL DEFINITION
@@ -434,7 +434,7 @@ $defs:
           At least one approver must be specified.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
         minItems: 1
       required:
         description: |
@@ -477,12 +477,12 @@ $defs:
           - never: comments optional (default)
           - onNegative: required when rejecting/returning
           - always: required for all outcomes
-        $ref: "../common/defs.schema.yaml#/$defs/CommentRequirement"
+        $ref: "../defs/shared.defs.yaml#/$defs/CommentRequirement"
       deadline:
         description: |
           Time limit for approvers to make a decision.
           If breached, can trigger notifications or auto-outcomes.
-        $ref: "../common/defs.schema.yaml#/$defs/DurationString"
+        $ref: "../defs/primitives.defs.yaml#/$defs/DurationString"
 
   # ==========================================================================
   # REVIEW DEFINITION
@@ -514,7 +514,7 @@ $defs:
           If omitted, defaults to raci.consulted.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       required:
         description: |
           How many reviewers must respond.
@@ -543,14 +543,14 @@ $defs:
         description: |
           Time limit for reviewers to respond.
           After deadline, step proceeds with whatever reviews are in.
-        $ref: "../common/defs.schema.yaml#/$defs/DurationString"
+        $ref: "../defs/primitives.defs.yaml#/$defs/DurationString"
       requireComment:
         description: |
           Whether reviewers must provide comments.
           - never: feedback optional (default)
           - onNegative: required when flagging issues/concerns
           - always: comments required from all reviewers
-        $ref: "../common/defs.schema.yaml#/$defs/CommentRequirement"
+        $ref: "../defs/shared.defs.yaml#/$defs/CommentRequirement"
 
   # ==========================================================================
   # DEADLINE DEFINITION
@@ -571,7 +571,7 @@ $defs:
     properties:
       limit:
         description: "Maximum allowed duration from step start."
-        $ref: "../common/defs.schema.yaml#/$defs/DurationString"
+        $ref: "../defs/primitives.defs.yaml#/$defs/DurationString"
       procedureRef:
         description: |
           Reference to external procedure, regulation, or SLA.
@@ -591,7 +591,7 @@ $defs:
             description: "Actor IDs to notify on breach."
             type: array
             items:
-              $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+              $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
           outcome:
             description: |
               Outcome to apply when deadline breaches.
@@ -690,7 +690,7 @@ $defs:
           For physical equipment, use 'equipment' instead.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/ActorRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/ActorRef"
       
       equipment:
         description: |
@@ -702,7 +702,7 @@ $defs:
           3. Simulation matches person with skill + available equipment
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/EquipmentRef"
+          $ref: "../defs/refs.defs.yaml#/$defs/EquipmentRef"
       
       guard:
         description: |
@@ -711,7 +711,7 @@ $defs:
           Examples:
             guard: "orderValue > 50000"
             guard: isHighValueEnterprise
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Expression"
       
       duration:
         description: |
@@ -721,7 +721,7 @@ $defs:
             duration: "2d"
             duration: { expr: "tri(d(1),d(2),d(4))" }
             duration: { expr: adjustedDuration }
-        $ref: "../common/defs.schema.yaml#/$defs/Duration"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
       
       effort:
         description: |
@@ -730,13 +730,13 @@ $defs:
           Examples:
             effort: "4h"
             effort: { expr: "baseEffort * 1.5" }
-        $ref: "../common/defs.schema.yaml#/$defs/Duration"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Duration"
       
       fixedCost:
         description: |
           Fixed cost for outsourced/third-party work.
           If not specified, cost is calculated from actor rates * effort.
-        $ref: "../common/defs.schema.yaml#/$defs/Money"
+        $ref: "../defs/primitives.defs.yaml#/$defs/Money"
       
       inputs:
         description: |
@@ -744,7 +744,7 @@ $defs:
           Input references are read-only and don't change document state.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/DataObjectInput"
+          $ref: "../defs/refs.defs.yaml#/$defs/DataObjectInput"
       
       outputs:
         description: |
@@ -752,7 +752,7 @@ $defs:
           Document lifecycle progresses based on output ordering.
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/DataObjectOutput"
+          $ref: "../defs/refs.defs.yaml#/$defs/DataObjectOutput"
       
       messages:
         description: "Messages sent during this step (for sequence diagrams)."
@@ -809,7 +809,7 @@ $defs:
         description: "Notes and markers attached to this step."
         type: array
         items:
-          $ref: "../common/defs.schema.yaml#/$defs/Annotation"
+          $ref: "../defs/shared.defs.yaml#/$defs/Annotation"
       
       trigger:
         description: "When this step is activated."
@@ -857,7 +857,7 @@ $defs:
       
       constraintDate:
         description: "Date for schedule constraint (ISO 8601)."
-        $ref: "../common/defs.schema.yaml#/$defs/DateString"
+        $ref: "../defs/primitives.defs.yaml#/$defs/DateString"
       
       description:
         description: "Longer description for reports and documentation."
@@ -871,133 +871,4 @@ $defs:
       
       custom:
         description: "User-defined custom fields."
-        $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
-
-  # ==========================================================================
-  # BLOCK DEFINITION
-  # ==========================================================================
-
-  Block:
-    description: |
-      Control flow block for grouping steps with execution semantics.
-      
-      OPERATORS:
-      - seq: sequential execution (default)
-      - par: parallel execution (all branches run concurrently)
-      - alt: alternative paths (exactly one branch based on guards)
-      - opt: optional execution (executes if guard is true)
-      - loop: repeated execution
-      - break: exit enclosing block
-      
-      BLOCKS vs PHASES:
-      ┌─────────────┬─────────────────────────┬─────────────────────────┐
-      │             │ BLOCKS (BK###)          │ PHASES (PH###)          │
-      ├─────────────┼─────────────────────────┼─────────────────────────┤
-      │ Purpose     │ Execution semantics     │ Organizational view     │
-      │ Operators   │ par, alt, loop, opt     │ lifecycle, delivery     │
-      │ Affects     │ Routing & scheduling    │ Nothing (metadata only) │
-      │ Question    │ "How does this run?"    │ "What stage is this?"   │
-      │ Simulation  │ Yes, changes behavior   │ No effect               │
-      └─────────────┴─────────────────────────┴─────────────────────────┘
-    type: object
-    additionalProperties: false
-    required: [name]
-    properties:
-      name:
-        description: "Human-readable block name."
-        type: string
-      
-      operator:
-        description: |
-          Block operator defining execution semantics.
-          
-          WHEN TO USE EACH:
-          - seq: Steps run one after another (default)
-          - par: Steps run at the same time (concurrent work)
-          - alt: Exactly one path chosen based on conditions
-          - opt: Path may or may not execute based on condition
-          - loop: Repeat steps until condition is false
-          - break: Exit the enclosing block early
-          
-          COMMON MISTAKE: Using 'alt' when you mean 'opt'.
-          Use 'alt' for mutually exclusive paths (only ONE executes).
-          Use 'opt' for optional work (might skip entirely).
-          
-          Examples:
-            seq: "First approve, then notify, then close"
-            par: "Inspect electrical AND inspect plumbing simultaneously"
-            alt: "Route by priority: urgent path OR normal path"
-            opt: "If high-value customer, perform extra validation"
-            loop: "Repeat rework cycle until quality threshold met"
-        type: string
-        enum: [seq, par, alt, opt, loop, break]
-        default: seq
-        examples:
-          - seq
-          - par
-          - alt
-        x-ubml:
-          propertyNames: ["operator"]
-          valueMistakes:
-            parallel:
-              value: "parallel"
-              hint: "Use 'par' for parallel execution."
-            alternative:
-              value: "alternative"
-              hint: "Use 'alt' for alternative/exclusive paths."
-            optional:
-              value: "optional"
-              hint: "Use 'opt' for optional execution."
-            sequence:
-              value: "sequence"
-              hint: "Use 'seq' for sequential execution."
-            xor:
-              value: "xor"
-              hint: "Use 'alt' for exclusive choice. BPMN XOR gateway maps to 'alt' blocks."
-            and:
-              value: "and"
-              hint: "Use 'par' for AND/parallel splits."
-            or:
-              value: "or"
-              hint: "For inclusive OR, use 'opt' blocks. For exclusive choice, use 'alt'."
-            exclusive:
-              value: "exclusive"
-              hint: "Use 'alt' for exclusive gateway semantics."
-            gateway:
-              value: "gateway"
-              hint: "Use 'alt' for exclusive, 'par' for parallel. Gateway is a BPMN term."
-      
-      guard:
-        description: |
-          Condition for opt/alt/loop blocks.
-          For loop operator: loop continues while guard is true.
-        $ref: "../common/defs.schema.yaml#/$defs/Expression"
-      
-      maxIterations:
-        description: |
-          Maximum iterations for loop operator.
-          Prevents infinite loops in simulation.
-        type: integer
-        minimum: 1
-      
-      steps:
-        description: "Step IDs in this block."
-        type: array
-        items:
-          $ref: "../common/defs.schema.yaml#/$defs/StepRef"
-      
-      operands:
-        description: |
-          Nested blocks (for alt branches or parallel regions).
-          Keyed by block ID (BK### pattern).
-        type: object
-        additionalProperties: false
-        patternProperties:
-          "^BK\\d{5,}$":
-            $ref: "#/$defs/Block"
-      
-      annotations:
-        description: "Notes and markers attached to this block."
-        type: array
-        items:
-          $ref: "../common/defs.schema.yaml#/$defs/Annotation"
+        $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

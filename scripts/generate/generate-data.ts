@@ -28,7 +28,7 @@ import type {
  */
 export function generateDataTs(
   documentTypes: string[],
-  fragments: string[],
+  types: string[],
   refInfos: RefInfo[],
   refFields: string[],
   toolingHints: ToolingHints,
@@ -44,9 +44,13 @@ export function generateDataTs(
   // Build SCHEMA_PATHS object
   const schemaPaths = {
     root: 'ubml.schema.yaml',
-    defs: 'common/defs.schema.yaml',
+    defs: {
+      refs: 'defs/refs.defs.yaml',
+      primitives: 'defs/primitives.defs.yaml',
+      shared: 'defs/shared.defs.yaml',
+    },
     documents: Object.fromEntries(documentTypes.map((t) => [t, `documents/${t}.schema.yaml`])),
-    fragments: Object.fromEntries(fragments.map((f) => [f, `fragments/${f}.fragment.yaml`])),
+    types: Object.fromEntries(types.map((t) => [t, `types/${t}.types.yaml`])),
   };
 
   // Build CONTENT_DETECTION_CONFIG object
@@ -77,16 +81,16 @@ export const DOCUMENT_TYPES = ${JSON.stringify(documentTypes, null, 2).replace(/
 export type DocumentType = typeof DOCUMENT_TYPES[number];
 
 // ============================================================================
-// FRAGMENT NAMES
+// TYPE NAMES
 // ============================================================================
 
 /**
- * Available fragment schema names.
- * Derived from: schemas/fragments/*.fragment.yaml
+ * Available type schema names.
+ * Derived from: schemas/types/*.types.yaml
  */
-export const FRAGMENT_NAMES = ${JSON.stringify(fragments, null, 2).replace(/\n/g, '\n')} as const;
+export const TYPE_NAMES = ${JSON.stringify(types, null, 2).replace(/\n/g, '\n')} as const;
 
-export type FragmentName = typeof FRAGMENT_NAMES[number];
+export type TypeName = typeof TYPE_NAMES[number];
 
 // ============================================================================
 // SCHEMA PATHS
@@ -103,7 +107,7 @@ export const SCHEMA_PATHS = ${JSON.stringify(schemaPaths, null, 2)} as const;
 
 /**
  * Configuration for ID generation.
- * Extracted from: schemas/common/defs.schema.yaml x-ubml-id-config
+ * Extracted from: schemas/defs/shared.defs.yaml x-ubml-id-config
  */
 export const ID_CONFIG = {
   /** Number of digits in ID (zero-padded) */
@@ -122,7 +126,7 @@ export const ID_CONFIG = {
 
 /**
  * ID prefix to element type mapping.
- * Extracted from: schemas/common/defs.schema.yaml $defs/*Ref patterns
+ * Extracted from: schemas/defs/refs.defs.yaml $defs/*Ref patterns
  */
 export const ID_PREFIXES = ${JSON.stringify(idPrefixesObj, null, 2)} as const;
 

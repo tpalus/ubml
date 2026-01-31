@@ -98,7 +98,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^HT\\d{5,}$":
-        $ref: "../fragments/hypothesis.fragment.yaml#/$defs/HypothesisTree"
+        $ref: "../types/hypothesis.types.yaml#/$defs/HypothesisTree"
   
   metadata:
     description: "Document metadata."
@@ -124,4 +124,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"

@@ -125,8 +125,8 @@ export * from './types.js';
 // ============================================================================
 
 export {
-  FRAGMENT_NAMES,
-  type FragmentName,
+  TYPE_NAMES,
+  type TypeName,
   // ID patterns and validation
   ID_PREFIXES,
   type IdPrefix,

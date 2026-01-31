@@ -102,7 +102,7 @@ properties:
     additionalProperties: false
     patternProperties:
       "^PR\\d{5,}$":
-        $ref: "../fragments/process.fragment.yaml#/$defs/Process"
+        $ref: "../types/process.types.yaml#/$defs/Process"
   
   metadata:
     description: "Document metadata."
@@ -128,4 +128,4 @@ properties:
   
   custom:
     description: "User-defined custom fields."
-    $ref: "../common/defs.schema.yaml#/$defs/CustomFields"
+    $ref: "../defs/shared.defs.yaml#/$defs/CustomFields"
