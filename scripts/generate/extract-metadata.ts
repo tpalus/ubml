@@ -192,7 +192,7 @@ export function extractContentDetectionConfig(documentTypes: string[]): ContentD
   const configs: ContentDetectionConfig[] = [];
 
   for (const type of documentTypes) {
-    const schemaPath = join(SCHEMAS_DIR, 'documents', `${type}.document.yaml`);
+    const schemaPath = join(SCHEMAS_DIR, 'documents', `${type}.schema.yaml`);
     const schema = loadYamlFile(schemaPath) as {
       'x-ubml-cli'?: {
         detectBy?: string[];
@@ -251,9 +251,9 @@ export function extractValidationPatterns(): ValidationPatterns {
  * These are properties that appear in all/most document types.
  */
 export function extractCommonProperties(): CommonPropertiesConfig {
-  // Common properties are derived from ubml.schema.yaml or workspace.document.yaml
+  // Common properties are derived from ubml.schema.yaml or workspace.schema.yaml
   // For now, we use a well-known set that could later be moved to schema metadata
-  const workspacePath = join(SCHEMAS_DIR, 'documents', 'workspace.document.yaml');
+  const workspacePath = join(SCHEMAS_DIR, 'documents', 'workspace.schema.yaml');
   const schema = loadYamlFile(workspacePath) as {
     properties?: Record<string, unknown>;
     'x-ubml-common-properties'?: string[];
@@ -408,7 +408,7 @@ export function extractTemplateData(documentTypes: string[]): TemplateData[] {
   const skipProps = new Set(commonProps.properties);
 
   for (const type of documentTypes) {
-    const schemaPath = join(SCHEMAS_DIR, 'documents', `${type}.document.yaml`);
+    const schemaPath = join(SCHEMAS_DIR, 'documents', `${type}.schema.yaml`);
     const schema = loadYamlFile(schemaPath) as {
       title?: string;
       description?: string;

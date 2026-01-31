@@ -23,7 +23,7 @@ npm test
 |------|---------|----------|
 | Common definitions | `*.schema.yaml` | `schemas/common/` |
 | Fragments | `*.fragment.yaml` | `schemas/fragments/` |
-| Documents | `*.document.yaml` | `schemas/documents/` |
+| Documents | `*.schema.yaml` | `schemas/documents/` |
 
 Every property must have a description explaining purpose, not just type.
 

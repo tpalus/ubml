@@ -80,8 +80,8 @@ description: |
   For VS Code support, add to settings.json:
   
     "yaml.schemas": {
-      "https://ubml.talxis.com/schemas/1.2/documents/process.document.yaml": "*.process.ubml.yaml",
-      "https://ubml.talxis.com/schemas/1.2/documents/actors.document.yaml": "*.actors.ubml.yaml",
+      "https://ubml.talxis.com/schemas/1.2/documents/process.schema.yaml": "*.process.ubml.yaml",
+      "https://ubml.talxis.com/schemas/1.2/documents/actors.schema.yaml": "*.actors.ubml.yaml",
       ...
     }
   

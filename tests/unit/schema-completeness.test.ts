@@ -45,7 +45,7 @@ describe('Schema Completeness - NO FALLBACKS ALLOWED', () => {
         const metadata = schema['x-ubml-cli'] as Record<string, unknown> | undefined;
         
         // Must have x-ubml-cli metadata
-        expect(metadata, `${type}.document.yaml must have x-ubml-cli metadata`).toBeDefined();
+        expect(metadata, `${type}.schema.yaml must have x-ubml-cli metadata`).toBeDefined();
         
         // Must have ALL required fields - NO FALLBACKS
         expect(metadata!.category, `${type} must define x-ubml-cli.category`).toBeDefined();

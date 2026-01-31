@@ -45,7 +45,7 @@ export function generateDataTs(
   const schemaPaths = {
     root: 'ubml.schema.yaml',
     defs: 'common/defs.schema.yaml',
-    documents: Object.fromEntries(documentTypes.map((t) => [t, `documents/${t}.document.yaml`])),
+    documents: Object.fromEntries(documentTypes.map((t) => [t, `documents/${t}.schema.yaml`])),
     fragments: Object.fromEntries(fragments.map((f) => [f, `fragments/${f}.fragment.yaml`])),
   };
 
@@ -70,7 +70,7 @@ This separation ensures:
 
 /**
  * Supported UBML document types.
- * Derived from: schemas/documents/*.document.yaml
+ * Derived from: schemas/documents/*.schema.yaml
  */
 export const DOCUMENT_TYPES = ${JSON.stringify(documentTypes, null, 2).replace(/\n/g, '\n')} as const;
 

@@ -30,18 +30,18 @@ schemas/
 │   └── view.fragment.yaml        # View definitions
 │
 └── documents/                    # Layer 3: File-Level Validation
-    ├── actors.document.yaml      # *.actors.ubml.yaml
-    ├── entities.document.yaml    # *.entities.ubml.yaml
-    ├── glossary.document.yaml    # *.glossary.ubml.yaml
-    ├── hypotheses.document.yaml  # *.hypotheses.ubml.yaml
-    ├── links.document.yaml       # *.links.ubml.yaml
-    ├── metrics.document.yaml     # *.metrics.ubml.yaml
-    ├── mining.document.yaml      # *.mining.ubml.yaml
-    ├── process.document.yaml     # *.process.ubml.yaml
-    ├── scenarios.document.yaml   # *.scenarios.ubml.yaml
-    ├── strategy.document.yaml    # *.strategy.ubml.yaml
-    ├── views.document.yaml       # *.views.ubml.yaml
-    └── workspace.document.yaml   # *.workspace.ubml.yaml
+    ├── actors.schema.yaml        # *.actors.ubml.yaml
+    ├── entities.schema.yaml      # *.entities.ubml.yaml
+    ├── glossary.schema.yaml      # *.glossary.ubml.yaml
+    ├── hypotheses.schema.yaml    # *.hypotheses.ubml.yaml
+    ├── links.schema.yaml         # *.links.ubml.yaml
+    ├── metrics.schema.yaml       # *.metrics.ubml.yaml
+    ├── mining.schema.yaml        # *.mining.ubml.yaml
+    ├── process.schema.yaml       # *.process.ubml.yaml
+    ├── scenarios.schema.yaml     # *.scenarios.ubml.yaml
+    ├── strategy.schema.yaml      # *.strategy.ubml.yaml
+    ├── views.schema.yaml         # *.views.ubml.yaml
+    └── workspace.schema.yaml     # *.workspace.ubml.yaml
 ```
 
 ## Schema Composition

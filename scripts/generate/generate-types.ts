@@ -41,7 +41,7 @@ const COMPILE_OPTIONS: Partial<Options> = {
  * Convert a schema filename to a PascalCase type name.
  * Examples:
  *   actor.fragment.yaml → Actor
- *   actors.document.yaml → Actors
+ *   actors.schema.yaml → Actors
  */
 function schemaFileToTypeName(filename: string): string {
   const baseName = filename
@@ -280,7 +280,7 @@ async function generateDocumentTypes(
   allDefs: Record<string, unknown>
 ): Promise<string[]> {
   const results: string[] = [];
-  const documentFiles = readdirSync(DOCUMENTS_DIR).filter((f) => f.endsWith('.document.yaml'));
+  const documentFiles = readdirSync(DOCUMENTS_DIR).filter((f) => f.endsWith('.schema.yaml'));
 
   for (const file of documentFiles) {
     const filePath = join(DOCUMENTS_DIR, file);
@@ -475,7 +475,7 @@ export async function generateTypesTs(refInfos: RefInfo[]): Promise<string> {
   output.push('// DOCUMENT UNION TYPE');
   output.push('// =============================================================================\n');
 
-  const docFiles = readdirSync(DOCUMENTS_DIR).filter((f) => f.endsWith('.document.yaml'));
+  const docFiles = readdirSync(DOCUMENTS_DIR).filter((f) => f.endsWith('.schema.yaml'));
   const docTypeNames = docFiles.map((f) => schemaFileToTypeName(f) + 'Document');
   output.push('export type UBMLDocumentContent =');
   output.push('  | ' + docTypeNames.join('\n  | ') + ';\n');

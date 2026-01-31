@@ -91,8 +91,8 @@ export function writeGeneratedFile(filename: string, content: string): void {
  */
 export function discoverDocumentTypes(): string[] {
   const documentsDir = join(SCHEMAS_DIR, 'documents');
-  const files = readdirSync(documentsDir).filter(f => f.endsWith('.document.yaml'));
-  return files.map(f => f.replace('.document.yaml', '')).sort();
+  const files = readdirSync(documentsDir).filter(f => f.endsWith('.schema.yaml'));
+  return files.map(f => f.replace('.schema.yaml', '')).sort();
 }
 
 /**

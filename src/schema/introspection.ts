@@ -100,7 +100,7 @@ export function getDocumentTypeInfo(type: DocumentType): DocumentTypeInfo | unde
   // Require metadata to exist - no fallbacks
   if (!metadata) {
     throw new Error(
-      `Schema error: ${type}.document.yaml is missing x-ubml-cli metadata. ` +
+      `Schema error: ${type}.schema.yaml is missing x-ubml-cli metadata. ` +
       `All document schemas must define: category, categoryDisplayName, workflowOrder, shortDescription, defaultFilename`
     );
   }
@@ -108,7 +108,7 @@ export function getDocumentTypeInfo(type: DocumentType): DocumentTypeInfo | unde
   // Require all critical fields
   if (!metadata.category || !metadata.categoryDisplayName || !metadata.shortDescription || !metadata.defaultFilename) {
     throw new Error(
-      `Schema error: ${type}.document.yaml x-ubml-cli is incomplete. ` +
+      `Schema error: ${type}.schema.yaml x-ubml-cli is incomplete. ` +
       `Required fields: category, categoryDisplayName, shortDescription, defaultFilename`
     );
   }
