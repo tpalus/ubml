@@ -88,9 +88,9 @@ $defs:
         - accountable
         - consulted
         - informed
-      misplacementHint: "These properties belong inside 'raci:', not at the step level"
+      misplacementHint: "These properties belong inside 'RACI:', not at the step level"
       misplacementExample: |
-        raci:
+        RACI:
           responsible: [AC00001]
     properties:
       responsible:
@@ -760,7 +760,7 @@ $defs:
         items:
           $ref: "#/$defs/Message"
       
-      raci:
+      RACI:
         description: "RACI matrix for this step."
         $ref: "#/$defs/RACI"
       

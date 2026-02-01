@@ -4,6 +4,15 @@ This directory contains the UBML (Unified Business Modeling Language) JSON Schem
 
 > For file naming conventions, ID patterns, and VS Code setup, see the main [README](../README.md).
 
+## Naming Conventions
+
+Type names use **PascalCase**. For acronyms, only capitalize the first letter:
+- `KpiRef` (not `KPIRef`)
+- `ApiKey` (not `APIKey`)
+- `ScqhBlock` (not `SCQHBlock`)
+
+This ensures consistent naming across the schema and prevents case-sensitivity issues in tooling.
+
 ## Architecture
 
 The schema follows a three-tier architecture for maintainability and modularity:
@@ -22,7 +31,7 @@ schemas/
 │   ├── block.types.yaml          # Block (control flow)
 │   ├── document.types.yaml       # Document (data object)
 │   ├── entity.types.yaml         # Entity, Attribute, Relationship
-│   ├── hypothesis.types.yaml     # HypothesisTree, HypothesisNode, SCQHContext
+│   ├── hypothesis.types.yaml     # HypothesisTree, HypothesisNode, SCQH
 │   ├── link.types.yaml           # Link, SchedulingProperties
 │   ├── location.types.yaml       # Location
 │   ├── metrics.types.yaml        # KPI, KPIThreshold, ROI

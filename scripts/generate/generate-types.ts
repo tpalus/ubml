@@ -16,6 +16,65 @@ import { createBanner, loadYamlFile, SCHEMAS_DIR, SCHEMA_VERSION } from './utils
 import type { RefInfo } from './extract-metadata.js';
 
 // =============================================================================
+// Error Collection
+// =============================================================================
+
+interface CompilationError {
+  source: string;
+  typeName: string;
+  error: Error;
+}
+
+const compilationErrors: CompilationError[] = [];
+
+// =============================================================================
+// Type Registry (Prevent Duplicates at Source)
+// =============================================================================
+
+/**
+ * Registry to track emitted types and prevent duplicates.
+ * Fails on conflicting definitions instead of silently deduplicating.
+ */
+class TypeRegistry {
+  private emitted = new Map<string, { source: string; content: string }>();
+
+  /**
+   * Register a type. Returns true if the type is new, false if already emitted.
+   * Throws if the same type name has conflicting content.
+   */
+  register(typeName: string, source: string, content: string): boolean {
+    if (this.emitted.has(typeName)) {
+      const existing = this.emitted.get(typeName)!;
+      // Normalize whitespace for comparison
+      const normalizedExisting = existing.content.replace(/\s+/g, ' ').trim();
+      const normalizedNew = content.replace(/\s+/g, ' ').trim();
+      
+      if (normalizedExisting !== normalizedNew) {
+        // Conflicting definitions - fail hard
+        throw new Error(
+          `Type ${typeName} has conflicting definitions:\n` +
+          `  - ${existing.source}\n` +
+          `  - ${source}\n` +
+          `Fix the schema to have consistent type definitions.`
+        );
+      }
+      return false; // Already emitted, skip
+    }
+    this.emitted.set(typeName, { source, content });
+    return true; // New type
+  }
+
+  /**
+   * Check if a type has been registered.
+   */
+  has(typeName: string): boolean {
+    return this.emitted.has(typeName);
+  }
+}
+
+const typeRegistry = new TypeRegistry();
+
+// =============================================================================
 // Configuration
 // =============================================================================
 
@@ -111,25 +170,17 @@ function collectAllDefs(
 }
 
 /**
- * Find a definition by name, with case-insensitive fallback for Ref types.
- * This handles inconsistencies like KPIRef vs KpiRef in schemas.
+ * Find a definition by name.
+ * Returns null if not found - caller must handle missing definitions.
+ * 
+ * Note: Case-insensitive fallback was removed because the schema is consistent
+ * (uses PascalCase with only first letter capitalized for acronyms: KpiRef not KPIRef).
+ * If a definition is missing, it indicates a schema typo that should be fixed.
  */
 function findDef(allDefs: Record<string, unknown>, defName: string): unknown | null {
-  // Exact match first
   if (allDefs[defName]) {
     return allDefs[defName];
   }
-
-  // For Ref types, try case-insensitive match
-  if (defName.endsWith('Ref')) {
-    const lowerName = defName.toLowerCase();
-    for (const key of Object.keys(allDefs)) {
-      if (key.toLowerCase() === lowerName) {
-        return allDefs[key];
-      }
-    }
-  }
-
   return null;
 }
 
@@ -179,26 +230,36 @@ function inlineAllRefs(
 
       if (defName) {
         const foundDef = findDef(allDefs, defName);
-        if (foundDef) {
-          // Prevent infinite recursion
-          if (visited.has(defName)) {
-            // For recursive types, just return a simple object type
-            return { type: 'object' };
-          }
-
-          const newVisited = new Set(visited);
-          newVisited.add(defName);
-
-          // Recursively inline the definition
-          const inlined = inlineAllRefs(foundDef, allDefs, newVisited);
-
-          // If there were other properties besides $ref, merge them
-          const { $ref, ...rest } = obj;
-          if (Object.keys(rest).length > 0) {
-            return { ...(inlined as object), ...rest };
-          }
-          return inlined;
+        if (!foundDef) {
+          throw new Error(
+            `Schema error: Referenced definition '${defName}' not found in $ref: ${ref}\n` +
+            `Available definitions: ${Object.keys(allDefs).join(', ')}`
+          );
         }
+
+        // Prevent infinite recursion
+        if (visited.has(defName)) {
+          // For recursive types, just return a simple object type
+          return { type: 'object' };
+        }
+
+        const newVisited = new Set(visited);
+        newVisited.add(defName);
+
+        // Recursively inline the definition
+        const inlined = inlineAllRefs(foundDef, allDefs, newVisited);
+
+        // If there were other properties besides $ref, merge them
+        const { $ref, ...rest } = obj;
+        if (Object.keys(rest).length > 0) {
+          return { ...(inlined as object), ...rest };
+        }
+        return inlined;
+      } else {
+        throw new Error(
+          `Schema error: Could not extract definition name from $ref: ${ref}\n` +
+          `Expected format: #/$defs/TypeName or ../path/file.yaml#/$defs/TypeName`
+        );
       }
     }
 
@@ -235,7 +296,8 @@ export type ${typeName} = string & { readonly __brand: '${typeName}' };`;
  */
 async function generateTypesFromDefs(
   defs: Record<string, unknown>,
-  allDefs: Record<string, unknown>
+  allDefs: Record<string, unknown>,
+  sourceFile: string = 'defs'
 ): Promise<string[]> {
   const results: string[] = [];
 
@@ -263,10 +325,17 @@ async function generateTypesFromDefs(
         compiled.includes(`export type ${defName} =`) ||
         compiled.includes(`export interface ${defName}`)
       ) {
-        results.push(compiled);
+        // Register with TypeRegistry to prevent duplicates
+        if (typeRegistry.register(defName, sourceFile, compiled)) {
+          results.push(compiled);
+        }
       }
     } catch (error) {
-      console.warn(`   ⚠ Could not compile ${defName}: ${(error as Error).message}`);
+      compilationErrors.push({
+        source: sourceFile,
+        typeName: defName,
+        error: error as Error,
+      });
     }
   }
 
@@ -303,9 +372,17 @@ async function generateDocumentTypes(
       };
 
       const compiled = await compile(schemaWithMeta, docName, COMPILE_OPTIONS);
-      results.push(compiled);
+      
+      // Register with TypeRegistry to prevent duplicates
+      if (typeRegistry.register(docName, file, compiled)) {
+        results.push(compiled);
+      }
     } catch (error) {
-      console.warn(`   ⚠ Could not compile document ${file}: ${(error as Error).message}`);
+      compilationErrors.push({
+        source: file,
+        typeName: docName,
+        error: error as Error,
+      });
     }
   }
 
@@ -317,74 +394,14 @@ async function generateDocumentTypes(
 // =============================================================================
 
 /**
- * Post-process generated types to fix common issues and add enhancements.
+ * Post-process generated types for basic cleanup.
+ * 
+ * Note: Duplicate prevention is handled at source by TypeRegistry.
+ * This function only does final whitespace cleanup.
  */
 function postProcessTypes(types: string): string {
-  let result = types;
-
-  // Remove duplicate interface declarations by tracking what we've seen
-  const seenDeclarations = new Set<string>();
-  const lines = result.split('\n');
-  const outputLines: string[] = [];
-  let currentBlock: string[] = [];
-  let currentDeclName = '';
-  let braceDepth = 0;
-  let inDeclaration = false;
-
-  for (const line of lines) {
-    // Check for start of a declaration
-    const declMatch = line.match(/^export\s+(interface|type)\s+(\w+)/);
-
-    if (declMatch && !inDeclaration) {
-      currentDeclName = declMatch[2];
-      currentBlock = [line];
-      inDeclaration = true;
-      braceDepth = (line.match(/{/g) || []).length - (line.match(/}/g) || []).length;
-
-      // For type aliases that end on same line
-      if (line.includes('=') && line.endsWith(';') && braceDepth === 0) {
-        if (!seenDeclarations.has(currentDeclName)) {
-          seenDeclarations.add(currentDeclName);
-          outputLines.push(...currentBlock);
-        }
-        inDeclaration = false;
-        currentBlock = [];
-        currentDeclName = '';
-      }
-    } else if (inDeclaration) {
-      currentBlock.push(line);
-      braceDepth += (line.match(/{/g) || []).length - (line.match(/}/g) || []).length;
-
-      // End of declaration
-      if (braceDepth <= 0 && (line.trim() === '}' || line.endsWith(';'))) {
-        if (!seenDeclarations.has(currentDeclName)) {
-          seenDeclarations.add(currentDeclName);
-          outputLines.push(...currentBlock);
-        }
-        inDeclaration = false;
-        currentBlock = [];
-        currentDeclName = '';
-        braceDepth = 0;
-      }
-    } else {
-      outputLines.push(line);
-    }
-  }
-
-  // Add any remaining block
-  if (currentBlock.length > 0 && currentDeclName && !seenDeclarations.has(currentDeclName)) {
-    outputLines.push(...currentBlock);
-  }
-
-  result = outputLines.join('\n');
-
   // Clean up multiple blank lines
-  result = result.replace(/\n{3,}/g, '\n\n');
-
-  // Fix any [k: string]: unknown patterns that should be more specific
-  // (json-schema-to-typescript sometimes generates these)
-
-  return result;
+  return types.replace(/\n{3,}/g, '\n\n');
 }
 
 // =============================================================================
@@ -449,7 +466,7 @@ export async function generateTypesTs(refInfos: RefInfo[]): Promise<string> {
   output.push('// COMMON TYPES (from defs/*.defs.yaml)');
   output.push('// =============================================================================\n');
 
-  const defsTypes = await generateTypesFromDefs(defsDefs, allDefs);
+  const defsTypes = await generateTypesFromDefs(defsDefs, allDefs, 'defs/*.defs.yaml');
   output.push(defsTypes.join('\n\n'));
   output.push('\n');
 
@@ -459,7 +476,7 @@ export async function generateTypesTs(refInfos: RefInfo[]): Promise<string> {
   output.push('// =============================================================================\n');
 
   for (const [typesName, defs] of typesDefsMap) {
-    const entityTypes = await generateTypesFromDefs(defs, allDefs);
+    const entityTypes = await generateTypesFromDefs(defs, allDefs, `types/${typesName}.types.yaml`);
     if (entityTypes.length > 0) {
       output.push(`// --- ${typesName} ---`);
       output.push(entityTypes.join('\n\n'));
@@ -510,6 +527,16 @@ To modify types, edit the corresponding YAML schema and regenerate.`
 
   // Post-process to remove duplicates and clean up
   finalOutput = postProcessTypes(finalOutput);
+
+  // Check for compilation errors and fail with details
+  if (compilationErrors.length > 0) {
+    console.error(`\n❌ ${compilationErrors.length} type compilation failures:\n`);
+    for (const err of compilationErrors) {
+      console.error(`  ${err.source} → ${err.typeName}`);
+      console.error(`    ${err.error.message}\n`);
+    }
+    throw new Error(`Type generation failed with ${compilationErrors.length} errors`);
+  }
 
   return finalOutput;
 }

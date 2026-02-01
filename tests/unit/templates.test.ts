@@ -224,7 +224,7 @@ ubml: "${SCHEMA_VERSION}"
 hypothesisTrees:
   HT00001:
     name: "Process Improvement Analysis"
-    scqh:
+    SCQH:
       situation: "Current state description"
       complication: "Problem description"
       question: "How can we improve?"

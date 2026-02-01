@@ -44,6 +44,18 @@ x-ubml-cli:
     - "Add entity files for your information model"
   exampleFilename: "acme-project.workspace.ubml.yaml"
 
+# Common properties that appear in all/most document types
+# Used by generators to filter out non-section properties
+x-ubml-common-properties:
+  - ubml
+  - name
+  - description
+  - metadata
+  - tags
+  - custom
+  - version
+  - status
+
 type: object
 additionalProperties: false
 required: [ubml, name]

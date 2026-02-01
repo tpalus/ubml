@@ -157,27 +157,27 @@ export function extractIdPatterns(): RefInfo[] {
 
 /**
  * Extract ID generation config from shared.defs.yaml.
+ * Throws if x-ubml-id-config is missing or incomplete.
  */
 export function extractIdConfig(): IdConfig {
   const sharedPath = join(SCHEMAS_DIR, 'defs', 'shared.defs.yaml');
-  const defs = loadYamlFile(sharedPath) as { 'x-ubml-id-config'?: IdConfig };
+  const defs = loadYamlFile(sharedPath) as { 'x-ubml-id-config'?: Partial<IdConfig> };
 
   const config = defs['x-ubml-id-config'];
   if (!config) {
-    return {
-      digitLength: 5,
-      pattern: '^[A-Z]+\\d{5}$',
-      initOffset: 1,
-      addOffset: 1000,
-    };
+    throw new Error(
+      'Schema error: shared.defs.yaml must define x-ubml-id-config'
+    );
   }
 
-  return {
-    digitLength: config.digitLength ?? 5,
-    pattern: config.pattern ?? '^[A-Z]+\\d{5}$',
-    initOffset: config.initOffset ?? 1,
-    addOffset: config.addOffset ?? 1000,
-  };
+  const required = ['digitLength', 'pattern', 'initOffset', 'addOffset'] as const;
+  for (const field of required) {
+    if (config[field] === undefined) {
+      throw new Error(`Schema error: x-ubml-id-config.${field} is missing`);
+    }
+  }
+
+  return config as IdConfig;
 }
 
 // =============================================================================
@@ -219,7 +219,8 @@ export function extractContentDetectionConfig(documentTypes: string[]): ContentD
 
 /**
  * Extract validation patterns from primitives.defs.yaml.
- * Reads pattern from Duration and TimeString $defs.
+ * Reads pattern from DurationString and TimeString $defs.
+ * Throws if patterns are missing.
  */
 export function extractValidationPatterns(): ValidationPatterns {
   const primitivesPath = join(SCHEMAS_DIR, 'defs', 'primitives.defs.yaml');
@@ -227,19 +228,18 @@ export function extractValidationPatterns(): ValidationPatterns {
     $defs?: Record<string, { pattern?: string }>;
   };
 
-  let duration = '^[0-9]+(\\.[0-9]+)?(min|h|d|wk|mo)$';
-  let time = '^[0-2][0-9]:[0-5][0-9]$';
-
-  if (defs.$defs) {
-    if (defs.$defs.Duration?.pattern) {
-      duration = defs.$defs.Duration.pattern;
-    }
-    if (defs.$defs.TimeString?.pattern) {
-      time = defs.$defs.TimeString.pattern;
-    }
+  // DurationString has the actual pattern (Duration is a oneOf wrapper)
+  if (!defs.$defs?.DurationString?.pattern) {
+    throw new Error('Schema error: primitives.defs.yaml must define DurationString with pattern');
+  }
+  if (!defs.$defs?.TimeString?.pattern) {
+    throw new Error('Schema error: primitives.defs.yaml must define TimeString with pattern');
   }
 
-  return { duration, time };
+  return {
+    duration: defs.$defs.DurationString.pattern,
+    time: defs.$defs.TimeString.pattern,
+  };
 }
 
 // =============================================================================
@@ -249,26 +249,23 @@ export function extractValidationPatterns(): ValidationPatterns {
 /**
  * Extract common properties from the workspace document schema.
  * These are properties that appear in all/most document types.
+ * Throws if x-ubml-common-properties is missing.
  */
 export function extractCommonProperties(): CommonPropertiesConfig {
-  // Common properties are derived from ubml.schema.yaml or workspace.schema.yaml
-  // For now, we use a well-known set that could later be moved to schema metadata
   const workspacePath = join(SCHEMAS_DIR, 'documents', 'workspace.schema.yaml');
   const schema = loadYamlFile(workspacePath) as {
     properties?: Record<string, unknown>;
     'x-ubml-common-properties'?: string[];
   };
 
-  // Check if schema defines common properties explicitly
   const explicitCommon = schema['x-ubml-common-properties'];
-  if (explicitCommon && Array.isArray(explicitCommon)) {
-    return { properties: explicitCommon };
+  if (!explicitCommon || !Array.isArray(explicitCommon)) {
+    throw new Error(
+      'Schema error: workspace.schema.yaml must define x-ubml-common-properties array'
+    );
   }
 
-  // Fall back to well-known common properties
-  return {
-    properties: ['ubml', 'name', 'description', 'metadata', 'tags', 'custom', 'version', 'status'],
-  };
+  return { properties: explicitCommon };
 }
 
 // =============================================================================
@@ -278,6 +275,7 @@ export function extractCommonProperties(): CommonPropertiesConfig {
 /**
  * Extract category configuration from shared.defs.yaml.
  * Reads x-ubml-categories for display order and naming.
+ * Throws if x-ubml-categories is missing or empty.
  */
 export function extractCategoryConfig(): CategoryConfig[] {
   const sharedPath = join(SCHEMAS_DIR, 'defs', 'shared.defs.yaml');
@@ -286,19 +284,13 @@ export function extractCategoryConfig(): CategoryConfig[] {
   };
 
   const categories = defs['x-ubml-categories'];
-  if (categories && Array.isArray(categories)) {
-    return categories.sort((a, b) => a.order - b.order);
+  if (!categories || !Array.isArray(categories) || categories.length === 0) {
+    throw new Error(
+      'Schema error: shared.defs.yaml must define x-ubml-categories array'
+    );
   }
 
-  // Fall back to default categories
-  return [
-    { key: 'process-elements', displayName: 'Process Elements', order: 1 },
-    { key: 'actors-resources', displayName: 'Actors & Resources', order: 2 },
-    { key: 'information-model', displayName: 'Information Model', order: 3 },
-    { key: 'strategy', displayName: 'Strategy', order: 4 },
-    { key: 'analysis', displayName: 'Analysis', order: 5 },
-    { key: 'other', displayName: 'Other', order: 99 },
-  ];
+  return categories.sort((a, b) => a.order - b.order);
 }
 
 // =============================================================================
@@ -452,21 +444,39 @@ export function extractTemplateData(documentTypes: string[]): TemplateData[] {
         }
       }
 
+      const description = propSchema.description as string | undefined;
       sections.push({
         name: propName,
         idPrefix,
-        description: ((propSchema.description as string) ?? '').split('\n')[0],
+        description: description ? description.split('\n')[0] : '',
         required: required.includes(propName),
       });
+    }
+
+    // Validate required metadata - no silent fallbacks
+    if (!metadata.shortDescription) {
+      throw new Error(
+        `Schema error: ${type}.schema.yaml missing required x-ubml-cli.shortDescription`
+      );
+    }
+    if (!metadata.category) {
+      throw new Error(
+        `Schema error: ${type}.schema.yaml missing required x-ubml-cli.category`
+      );
+    }
+    if (metadata.workflowOrder === undefined) {
+      throw new Error(
+        `Schema error: ${type}.schema.yaml missing required x-ubml-cli.workflowOrder`
+      );
     }
 
     templates.push({
       type,
       title: schema.title ?? type,
-      shortDescription: metadata.shortDescription ?? '',
-      category: metadata.category ?? 'advanced',
-      categoryDisplayName: metadata.categoryDisplayName ?? 'Advanced',
-      workflowOrder: metadata.workflowOrder ?? 99,
+      shortDescription: metadata.shortDescription,
+      category: metadata.category,
+      categoryDisplayName: metadata.categoryDisplayName ?? metadata.category,
+      workflowOrder: metadata.workflowOrder,
       defaultFilename: metadata.defaultFilename ?? type,
       gettingStarted: metadata.gettingStarted ?? [],
       exampleFilename: metadata.exampleFilename ?? `${type}.ubml.yaml`,
@@ -531,15 +541,14 @@ export function extractToolingHints(): ToolingHints {
     // Extract nested property hints from x-ubml.nestedProperties
     const xubml = def['x-ubml'] as Record<string, unknown> | undefined;
     if (xubml?.nestedProperties && Array.isArray(xubml.nestedProperties)) {
-      const parentProp = findPropertyNameForType(name);
-      if (parentProp) {
-        nestedProperties.push({
-          parentProperty: parentProp,
-          childProperties: xubml.nestedProperties as string[],
-          misplacementHint: (xubml.misplacementHint as string) || `These properties belong inside '${parentProp}'`,
-          misplacementExample: (xubml.misplacementExample as string) || '',
-        });
-      }
+      // Property name matches type name exactly (e.g., SCQH type → SCQH property, RACI type → RACI property)
+      const parentProp = name;
+      nestedProperties.push({
+        parentProperty: parentProp,
+        childProperties: xubml.nestedProperties as string[],
+        misplacementHint: (xubml.misplacementHint as string) || `These properties belong inside '${parentProp}:'`,
+        misplacementExample: (xubml.misplacementExample as string) || '',
+      });
     }
 
     // Extract enum hints from types with enum and x-ubml
@@ -575,17 +584,6 @@ export function extractToolingHints(): ToolingHints {
         }
       }
     }
-  }
-
-  function findPropertyNameForType(typeName: string): string | undefined {
-    const typeToProperty: Record<string, string> = {
-      'RACI': 'raci',
-      'Loop': 'loop',
-      'Block': 'block',
-      'Approval': 'approval',
-      'Review': 'review',
-    };
-    return typeToProperty[typeName] || typeName.toLowerCase();
   }
 
   function walkDefs(obj: unknown): void {

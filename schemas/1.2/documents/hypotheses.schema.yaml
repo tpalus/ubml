@@ -83,7 +83,7 @@ properties:
         hypothesisTrees:
           HT00001:
             name: "Process Optimization Analysis"
-            scqh:
+            SCQH:
               situation: "Current process takes 5 days"
               complication: "Customers expect 2 days"
               question: "How can we reduce to 2 days?"

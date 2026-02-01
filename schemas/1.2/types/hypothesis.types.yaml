@@ -34,7 +34,7 @@ $defs:
   # SCQH CONTEXT
   # ==========================================================================
 
-  SCQHContext:
+  SCQH:
     description: |
       Situation-Complication-Question-Hypothesis framing context.
       
@@ -43,7 +43,7 @@ $defs:
       
       EXAMPLE - Process Improvement Project:
       
-        scqh:
+        SCQH:
           situation: |
             Order processing currently takes 5 days on average,
             involving 3 departments and 12 handoffs.
@@ -62,7 +62,7 @@ $defs:
       
       EXAMPLE - Strategic Analysis:
       
-        scqh:
+        SCQH:
           situation: |
             We are a mid-sized logistics company with 15% market share
             in the regional B2B delivery market.
@@ -87,9 +87,9 @@ $defs:
         - complication
         - question
         - hypothesis
-      misplacementHint: "These properties belong inside 'scqh:', not at the tree level"
+      misplacementHint: "These properties belong inside 'SCQH:', not at the tree level"
       misplacementExample: |
-        scqh:
+        SCQH:
           situation: "Current state description"
           complication: "What changed"
           question: "Key question"
@@ -357,7 +357,7 @@ $defs:
         hypothesisTrees:
           HT00001:
             name: "Process Optimization Analysis"
-            scqh:
+            SCQH:
               situation: "Current order processing takes 5 days"
               complication: "Customers expect 2-day delivery"
               question: "How to reduce to 2 days?"
@@ -385,9 +385,9 @@ $defs:
         description: "Detailed description of the analysis."
         type: string
       
-      scqh:
+      SCQH:
         description: "SCQH problem framing context."
-        $ref: "#/$defs/SCQHContext"
+        $ref: "#/$defs/SCQH"
       
       root:
         description: |

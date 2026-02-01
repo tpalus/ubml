@@ -69,8 +69,8 @@ describe('formatValidationError', () => {
 
       const result = formatValidationError(error);
       expect(result.message).toBe('Unknown property: "responsible"');
-      expect(result.suggestion).toBe("Did you mean to put this inside 'raci'?");
-      expect(result.example).toContain('raci:');
+      expect(result.suggestion).toBe("Did you mean to put this inside 'RACI'?");
+      expect(result.example).toContain('RACI:');
       expect(result.example).toContain('responsible: [AC00001]');
     });
 

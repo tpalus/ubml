@@ -18,17 +18,15 @@
  * @module scripts/verify-versions
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
-import { join, extname } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const ROOT_DIR = join(__dirname, '..');
-const SCHEMAS_ROOT = join(ROOT_DIR, 'schemas');
-const SRC_DIR = join(ROOT_DIR, 'src');
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import {
+  getPackageVersion,
+  getAllYamlFiles,
+  ROOT_DIR,
+  SCHEMAS_ROOT,
+  SRC_DIR,
+} from './shared/version-utils.js';
 
 // =============================================================================
 // Types
@@ -39,65 +37,6 @@ interface VersionIssue {
   expected: string;
   found: string;
   context: string;
-}
-
-// =============================================================================
-// Version Reading
-// =============================================================================
-
-/**
- * Read package version from package.json.
- */
-function getPackageVersion(): { full: string; schema: string } {
-  const packageJsonPath = join(ROOT_DIR, 'package.json');
-  
-  let packageJson: { version?: string };
-  try {
-    const content = readFileSync(packageJsonPath, 'utf8');
-    packageJson = JSON.parse(content);
-  } catch (error) {
-    console.error(`❌ Failed to read package.json: ${error}`);
-    process.exit(1);
-  }
-
-  if (!packageJson.version) {
-    console.error('❌ Version missing in package.json');
-    process.exit(1);
-  }
-
-  const fullVersion = packageJson.version;
-  const schemaVersion = fullVersion.split('.').slice(0, 2).join('.');
-
-  return { full: fullVersion, schema: schemaVersion };
-}
-
-// =============================================================================
-// File Scanning
-// =============================================================================
-
-/**
- * Get all YAML files in a directory recursively.
- */
-function getAllYamlFiles(dir: string): string[] {
-  const files: string[] = [];
-  
-  function scan(currentDir: string): void {
-    const entries = readdirSync(currentDir);
-    
-    for (const entry of entries) {
-      const fullPath = join(currentDir, entry);
-      const stat = statSync(fullPath);
-      
-      if (stat.isDirectory()) {
-        scan(fullPath);
-      } else if (extname(entry) === '.yaml') {
-        files.push(fullPath);
-      }
-    }
-  }
-  
-  scan(dir);
-  return files;
 }
 
 // =============================================================================

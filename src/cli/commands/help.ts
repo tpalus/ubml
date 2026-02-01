@@ -383,7 +383,7 @@ function showRaciHelp(): void {
     ST00001:
       name: "Review Contract"
       kind: action
-      raci:
+      RACI:
         responsible: [AC00001]  # Legal Counsel
         accountable: AC00002    # Department Head
         consulted: [AC00003]    # Finance

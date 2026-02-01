@@ -30,7 +30,7 @@ processes:
       ST00001:
         kind: action
         name: "Do Work"
-        raci:
+        RACI:
           accountable:
             - AC00001
 `;
@@ -58,7 +58,7 @@ processes:
       ST00001:
         kind: action
         name: "Step"
-        raci:
+        RACI:
           accountable:
             - AC99999
 `;
@@ -170,7 +170,7 @@ processes:
       ST00001:
         kind: action
         name: "Step"
-        raci:
+        RACI:
           accountable:
             - AC00001
 `, 'process.process.ubml.yaml');

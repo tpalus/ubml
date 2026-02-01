@@ -289,7 +289,7 @@ function generateProcessItems(
         kind: action
         description: "TODO: What happens in this step?"
         # duration: "1h"
-        # raci:
+        # RACI:
         #   responsible: [${acRef}]
       ${stEnd}:
         name: "End"
@@ -377,7 +377,7 @@ function generateHypothesisTreeItems(
   
   const treeContent = `
     name: "${displayName} Analysis"
-    scqh:
+    SCQH:
       situation: "TODO: Current state description"
       complication: "TODO: What problem exists?"
       question: "How can we improve?"
